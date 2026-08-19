@@ -32,9 +32,9 @@ with st.sidebar:
     fonte_escolhida = st.selectbox(
         "Base Jurisprudencial Prioritária:",
         [
+            "STF e STJ (Tribunais Superiores)",
             "STF - Supremo Tribunal Federal",
             "STJ - Superior Tribunal de Justiça",
-            "STF e STJ (Tribunais Superiores)",
             "DataJud / CNJ (TJs e TRFs)"
         ]
     )
@@ -59,7 +59,7 @@ def consultar_processos_datajud(termo_busca: str, sigla_tribunal: str = "tjsp") 
     Consulta processos e movimentações no DataJud/CNJ (TJs e TRFs).
     """
     if not cnj_key:
-        return "Chave do DataJud/CNJ não informada."
+        return "Chave do DataJud/CNJ não informada na barra lateral."
 
     tribunal_limpo = sigla_tribunal.lower().strip()
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal_limpo}/_search"
@@ -98,7 +98,7 @@ def consultar_processos_datajud(termo_busca: str, sigla_tribunal: str = "tjsp") 
 # 4. Interface Principal de Chat
 # ----------------------------------------------------
 st.header("⚖️ Consulta Jurisprudencial com IA")
-st.info(f"📍 Foco Selecionado: **{fonte_escolhida}**")
+st.info(f"📍 Foco Selecionado: **{fonte_escolhida}**" + (f" ({tribunal_datajud.upper()})" if fonte_escolhida == "DataJud / CNJ (TJs e TRFs)" else ""))
 
 if not gemini_key:
     st.warning("👈 Insira sua **Gemini API Key** na barra lateral para começar.")
@@ -111,29 +111,32 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-if prompt := st.chat_input("Ex.: Qual o entendimento do STJ sobre apropriação indébita tributária?"):
+if prompt := st.chat_input("Ex.: Qual o entendimento do STJ sobre dano moral presumido em inscrição indevida?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        with st.spinner("Buscando jurisprudência atualizada e acórdãos..."):
+        with st.spinner("Pesquisando teses, súmulas e julgados oficiais..."):
             try:
                 client = genai.Client(api_key=gemini_key)
 
-                instrucoes = (
-                    "Você é um especialista em pesquisa jurisprudencial brasileira. "
-                    f"O usuário definiu foco na base: '{fonte_escolhida}'. "
-                    "Utilize a ferramenta de busca do Google para encontrar teses consolidadas, súmulas, "
-                    "temas de repercussão geral (STF), recursos repetitivos (STJ) e acórdãos oficiais. "
-                    "Sempre cite os números dos temas, súmulas ou julgados e apresente a fundamentação com clareza."
-                )
-
-                # Ativa o Google Search nativo da API do Gemini + DataJud
-                ferramentas = [
-                    types.Tool(google_search=types.GoogleSearch()),
-                    consultar_processos_datajud
-                ]
+                # Roteamento de ferramentas para não conflitar tipos
+                if fonte_escolhida == "DataJud / CNJ (TJs e TRFs)":
+                    ferramentas = [consultar_processos_datajud]
+                    instrucoes = (
+                        f"Você é um consultor jurídico. Utilize a ferramenta do DataJud para consultar processos no tribunal '{tribunal_datajud}'. "
+                        "Apresente os números de processos, classes e órgãos julgadores encontrados."
+                    )
+                    prompt_envio = f"[Tribunal: {tribunal_datajud}] {prompt}"
+                else:
+                    ferramentas = [types.Tool(google_search=types.GoogleSearch())]
+                    instrucoes = (
+                        f"Você é um especialista em jurisprudência brasileira com foco em: '{fonte_escolhida}'. "
+                        "Utilize a busca do Google para localizar súmulas, teses repetitivas do STJ, repercussão geral do STF e acórdãos oficiais. "
+                        "Estruture a resposta com clareza, citando o número dos precedentes (ex: Súmula, Tema Repetitivo ou REsp/RE) e a fundamentação jurídica."
+                    )
+                    prompt_envio = f"[Foco: {fonte_escolhida}] {prompt}"
 
                 chat = client.chats.create(
                     model="gemini-2.5-flash",
@@ -144,8 +147,7 @@ if prompt := st.chat_input("Ex.: Qual o entendimento do STJ sobre apropriação 
                     )
                 )
 
-                prompt_completo = f"[Base Prioritária: {fonte_escolhida}] {prompt}"
-                response = chat.send_message(prompt_completo)
+                response = chat.send_message(prompt_envio)
                 texto_resposta = response.text
 
                 st.markdown(texto_resposta)

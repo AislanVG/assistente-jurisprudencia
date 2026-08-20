@@ -46,7 +46,7 @@ chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 chat_vazio = len(chat_atual["messages"]) == 0
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico
+# 4. Injeção de CSS Aprimorado
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -106,8 +106,8 @@ css_customizado = """
         font-weight: 700;
         color: #1e293b;
         text-align: center;
-        margin-top: 3vh;
-        margin-bottom: 12px;
+        margin-top: 4vh;
+        margin-bottom: 24px;
     }
 
     .feed-header {
@@ -116,40 +116,22 @@ css_customizado = """
         color: #475569;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        margin-top: 20px;
-        margin-bottom: 10px;
+        margin-top: 24px;
+        margin-bottom: 12px;
         text-align: center;
     }
+
+    /* Margem inferior para a última mensagem não colidir com o chat_input */
+    .main-chat-container {
+        padding-bottom: 100px;
+    }
+
+    .action-bar {
+        margin-top: 8px;
+        margin-bottom: 20px;
+    }
+</style>
 """
-
-if chat_vazio:
-    css_customizado += """
-    div[data-testid="stChatInput"] {
-        position: fixed !important;
-        top: 34% !important;
-        bottom: auto !important;
-        left: calc(50% + 80px) !important;
-        transform: translate(-50%, -50%) !important;
-        width: 55% !important;
-        max-width: 780px !important;
-        z-index: 999 !important;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
-        border-radius: 14px !important;
-    }
-    .hero-spacer {
-        height: 80px;
-    }
-    """
-else:
-    css_customizado += """
-    div[data-testid="stChatInput"] {
-        position: fixed !important;
-        bottom: 20px !important;
-        z-index: 999 !important;
-    }
-    """
-
-css_customizado += "</style>"
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
@@ -436,7 +418,6 @@ else:
 # ----------------------------------------------------
 if chat_vazio:
     st.markdown(f"<div class='hero-title'>{saudacao}</div>", unsafe_allow_html=True)
-    st.markdown("<div class='hero-spacer'></div>", unsafe_allow_html=True)
     
     col_c1, col_c2, col_c3 = st.columns([0.5, 3.5, 0.5])
     with col_c2:
@@ -467,13 +448,15 @@ else:
     st.subheader(chat_atual["mode"])
     if chat_atual["title"]:
         st.caption(f"Processo: **{chat_atual['title']}**")
-        
+    
+    st.markdown("<div class='main-chat-container'>", unsafe_allow_html=True)
     for i, msg in enumerate(chat_atual["messages"]):
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
             
             if msg["role"] == "assistant":
-                col_act1, col_act2, col_act3, _ = st.columns([0.15, 0.15, 0.15, 0.55])
+                st.markdown("<div class='action-bar'>", unsafe_allow_html=True)
+                col_act1, col_act2, col_act3, _ = st.columns([0.15, 0.12, 0.12, 0.61])
                 with col_act1:
                     st.download_button(
                         label="📥 Baixar",
@@ -481,7 +464,7 @@ else:
                         file_name=f"Parecer_MPMS_{i}.txt",
                         mime="text/plain",
                         key=f"dl_{i}",
-                        help="Baixar o texto desta resposta"
+                        help="Baixar esta manifestação"
                     )
                 with col_act2:
                     if st.button("👍", key=f"like_{i}", help="Aprovar resposta"):
@@ -489,11 +472,13 @@ else:
                 with col_act3:
                     if st.button("👎", key=f"dislike_{i}", help="Sinalizar ajuste"):
                         st.toast("Feedback registrado para melhoria.", icon="📝")
+                st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 12. Processamento de Mensagens com Ingestão Otimizada
+# 12. Processamento de Mensagens
 # ----------------------------------------------------
-prompt_placeholder = "Digite sua matéria jurídica ou use para pesquisar acórdãos..." if chat_vazio else "Digite sua resposta ou orientação..."
+prompt_placeholder = "Digite sua matéria jurídica ou use para pesquisar acórdãos..." if chat_vazio else "Digite sua resposta ou orientação para a próxima fase..."
 prompt_digitado = st.chat_input(prompt_placeholder)
 prompt_final = st.session_state.pop("trigger_prompt", None) or prompt_digitado
 
@@ -536,7 +521,6 @@ if prompt_final:
                     types.Content(role="user", parts=user_parts)
                 )
 
-                # Busca externa ativada apenas no modo pesquisa para evitar sobrecarga no modo parecer
                 usar_web = not is_parecer_mode
 
                 texto_resposta = executar_geracao_com_retry(

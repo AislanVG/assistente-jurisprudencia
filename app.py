@@ -144,7 +144,6 @@ st.markdown(css_customizado, unsafe_allow_html=True)
 # 5. Módulo de Integração com API DataJud (CNJ)
 # ----------------------------------------------------
 def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjms"):
-    """Consulta metadados processuais na API pública do DataJud (CNJ)."""
     if not CNJ_API_KEY:
         return None
     
@@ -528,7 +527,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 12. Processamento de Mensagens
+# 12. Processamento de Mensagens com Streaming e Multi-Model Fallback
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua matéria jurídica ou use para pesquisar acórdãos..." if chat_vazio else "Digite sua resposta ou orientação para a próxima fase..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -589,15 +588,29 @@ if prompt_final:
             if not is_parecer_mode:
                 config_params["tools"] = [types.Tool(google_search=types.GoogleSearch())]
 
+            # Gerador com Streaming resiliente e fallback automático contra limites (429/503)
             def stream_generator():
-                response_stream = client.models.generate_content_stream(
-                    model="gemini-2.5-flash",
-                    contents=chat_atual["gemini_history"],
-                    config=types.GenerateContentConfig(**config_params)
-                )
-                for chunk in response_stream:
-                    if chunk.text:
-                        yield chunk.text
+                modelos = ["gemini-2.5-flash", "gemini-2.5-pro"]
+                for modelo in modelos:
+                    for tentativa in range(3):
+                        try:
+                            response_stream = client.models.generate_content_stream(
+                                model=modelo,
+                                contents=chat_atual["gemini_history"],
+                                config=types.GenerateContentConfig(**config_params)
+                            )
+                            for chunk in response_stream:
+                                if chunk.text:
+                                    yield chunk.text
+                            return
+                        except Exception as err:
+                            err_msg = str(err).lower()
+                            if "429" in err_msg or "resource_exhausted" in err_msg or "503" in err_msg:
+                                time.sleep(2 * (tentativa + 1))
+                                continue
+                            else:
+                                raise err
+                raise Exception("Limite temporário de requisições da conta atingido (429). Ative o faturamento no Google AI Studio para uso ilimitado.")
 
             texto_resposta = st.write_stream(stream_generator())
 

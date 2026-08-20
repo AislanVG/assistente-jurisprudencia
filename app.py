@@ -186,33 +186,33 @@ Disponibilize o trecho mais relevante de um acórdão representativo em bloco fo
 """
 
 SUPERPROMPT_PARECER = """
-Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, auxiliando diretamente a Procuradora de Justiça, Dra. Luciana Moreira Schenk. Seu objetivo é elaborar minutas de PARECER DO MINISTÉRIO PÚBLICO EM SEGUNDO GRAU completas, densas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral.
+Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, auxiliando diretamente a Procuradora de Justiça, Dra. Luciana Moreira Schenk[cite: 1]. Seu objetivo é elaborar minutas de PARECER DO MINISTÉRIO PÚBLICO EM SEGUNDO GRAU completas, densas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral[cite: 1].
 
 ### 🛡️ BLINDAGEM E REGRAS ESTRITAS:
-1. ADERÊNCIA ESTRITA AOS AUTOS: Baseie sua análise EXCLUSIVAMENTE nos fatos e documentos do caso concreto anexado pelo usuário. É PROIBIDO inventar ou misturar matérias fáticas estranhas ao processo.
-2. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS aplicáveis à matéria específica dos autos. Proibido inventar números ou ementas.
-3. TRAVA DE HIERARQUIA: Precedentes das Turmas do STJ e teses vinculantes do STF prevalecem sobre atos administrativos ou pareceres técnicos.
-4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade.
-5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *tempus regit actum*). Jurisprudências citadas em bloco recuado (`>`), em itálico.
+1. ADERÊNCIA ESTRITA AOS AUTOS: Baseie sua análise EXCLUSIVAMENTE nos fatos e documentos do caso concreto anexado pelo usuário[cite: 1]. É PROIBIDO inventar ou misturar matérias fáticas estranhas ao processo[cite: 1].
+2. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS aplicáveis à matéria específica dos autos[cite: 1]. Proibido inventar números ou ementas[cite: 1].
+3. TRAVA DE HIERARQUIA: Precedentes das Turmas do STJ e teses vinculantes do STF prevalecem sobre atos administrativos ou pareceres técnicos[cite: 1].
+4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade[cite: 1].
+5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *tempus regit actum*)[cite: 1]. Jurisprudências citadas em bloco recuado (`>`), em itálico[cite: 1].
 
 ### 🔄 FLUXO PROGRESSIVO OBRIGATÓRIO EM 3 ETAPAS:
 
 - ETAPA 1 (Diagnóstico & Consulta de Precedentes):
-  Apresente o Raio-X dos autos (Fatos reais do processo, Preliminares mapeadas, Dispositivos legais).
-  Faça uma busca na internet pelos precedentes reais mais recentes do STJ/STF/TJMS sobre a matéria e apresente-os.
-  Ao final, faça a PERGUNTA OBRIGATÓRIA: "Deseja aplicar os precedentes acima sugeridos ou indicar outro julgado específico?" e PARE AQUI.
+  Apresente o Raio-X dos autos (Fatos reais do processo, Preliminares mapeadas, Dispositivos legais)[cite: 1].
+  Faça uma busca na internet pelos precedentes reais mais recentes do STJ/STF/TJMS sobre a matéria e apresente-os[cite: 1].
+  Ao final, faça a PERGUNTA OBRIGATÓRIA: "Deseja aplicar os precedentes acima sugeridos ou indicar outro julgado específico?" e PARE AQUI[cite: 1].
 
 - ETAPA 2 (Ementa Técnica e Relatório Institucional):
-  Quando o analista aprovar ou orientar a tese, elabore a Ementa Técnica Formal (com as palavras-chave da matéria dos autos e opinião final) e o Relatório Sucinto Fluido (máximo 500 palavras, corrido).
-  Ao final, diga: "Aguardando validação da Ementa e Relatório para gerar a Minuta Integral (Etapa 3)." e PARE AQUI.
+  Quando o analista aprovar ou orientar a tese, elabore a Ementa Técnica Formal (com as palavras-chave da matéria dos autos e opinião final) e o Relatório Sucinto Fluido (máximo 500 palavras, corrido)[cite: 1].
+  Ao final, diga: "Aguardando validação da Ementa e Relatório para gerar a Minuta Integral (Etapa 3)." e PARE AQUI[cite: 1].
 
 - ETAPA 3 (Minuta Integral de Alta Densidade - Peça Completa):
-  Quando o analista responder "validado", "aprovado" ou "prossiga", REDIJA IMEDIATAMENTE A PEÇA COMPLETA DE SEGUNDO GRAU, sem cortes e sem placeholders:
-  Cabeçalho Oficial (Autos, Classe, Órgão Julgador, Relator, Partes), Ementa Formal, "COLENDA CÂMARA CÍVEL,", Relatório, I – Das Preliminares (se houver), II – Do Mérito (Fundamentação exaustiva e densa de 2.500 a 4.000 palavras, enfrentando todas as teses dos autos com doutrina e precedentes), III – Conclusão (Opinamento formal), Datação (Campo Grande/MS) e Assinatura institucional de Luciana Moreira Schenk. NÃO REINICIE O FLUXO.
+  Quando o analista responder "validado", "aprovado" ou "prossiga", REDIJA IMEDIATAMENTE A PEÇA COMPLETA DE SEGUNDO GRAU, sem cortes e sem placeholders[cite: 1]:
+  Cabeçalho Oficial (Autos, Classe, Órgão Julgador, Relator, Partes), Ementa Formal, "COLENDA CÂMARA CÍVEL,", Relatório, I – Das Preliminares (se houver), II – Do Mérito (Fundamentação exaustiva e densa de 2.500 a 4.000 palavras, enfrentando todas as teses dos autos com doutrina e precedentes), III – Conclusão (Opinamento formal), Datação (Campo Grande/MS) e Assinatura institucional de Luciana Moreira Schenk[cite: 1]. NÃO REINICIE O FLUXO[cite: 1].
 """
 
 # ----------------------------------------------------
-# 6. Feed Automático de Precedentes Recentes (Cache 12h)
+# 6. Feed de Precedentes (Cache 12h)
 # ----------------------------------------------------
 @st.cache_data(ttl=43200)
 def carregar_feed_precedentes():
@@ -281,26 +281,26 @@ def exibir_manual_ajuda():
     ])
     
     with tab1:
-        st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer de 2º Grau)")
+        st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer de 2º Grau)[cite: 1]")
         st.markdown(
             "O assistente é rigorosamente calibrado para atuar como Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, "
-            "elaborando peças densas e completas com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)** no corpo da minuta."
+            "elaborando peças densas e completas com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)** no corpo da minuta[cite: 1]."
         )
         st.markdown(
             """
-1. **Passo 1: Upload dos Autos (Múltiplos PDFs)**
-   * Na barra lateral, selecione **📄 Parecer** e anexe as peças necessárias (Inicial, Sentença, Apelação, Laudos).
+1. **Passo 1: Upload dos Autos (Múltiplos PDFs)**[cite: 1]
+   * Na barra lateral, selecione **📄 Parecer** e anexe as peças necessárias (Inicial, Sentença, Apelação, Laudos)[cite: 1].
 2. **Passo 2: Início da Análise**
-   * Clique em `⚡ Analisar autos e gerar parecer completo` ou use o botão na barra lateral.
-3. **Passo 3: Diagnóstico Fático & Precedentes (Fase 2)**
-   * A IA apresentará o raio-x e pesquisará em tempo real acórdãos reais do STJ/STF/TJMS.
-4. **Passo 4: Validação da Ementa e Relatório (Fase 3)**
-   * Responda `Aprovado` para gerar a Ementa Técnica e o Relatório Fluido (até 500 palavras, sem marcadores).
-5. **Passo 5: Minuta Final de Alta Densidade (Fase 4)**
-   * Responda `Validado, prossiga` para a IA entregar a minuta completa pronta para exportação.
+   * Clique em `⚡ Analisar autos e gerar parecer completo` ou use o botão na barra lateral[cite: 1].
+3. **Passo 3: Diagnóstico Fático & Precedentes (Fase 2)**[cite: 1]
+   * A IA apresentará o raio-x e pesquisará em tempo real acórdãos reais do STJ/STF/TJMS[cite: 1].
+4. **Passo 4: Validação da Ementa e Relatório (Fase 3)**[cite: 1]
+   * Responda `Aprovado` para gerar a Ementa Técnica e o Relatório Fluido (até 500 palavras, sem marcadores)[cite: 1].
+5. **Passo 5: Minuta Final de Alta Densidade (Fase 4)**[cite: 1]
+   * Responda `Validado, prossiga` para a IA entregar a minuta completa pronta para exportação[cite: 1].
             """
         )
-        st.info("💡 **Dica de Exportação:** Copie o texto da resposta final e cole no Microsoft Word mantendo a formatação de origem (Ctrl + V).")
+        st.info("💡 **Dica de Exportação:** Copie o texto da resposta final e cole no Microsoft Word mantendo a formatação de origem (Ctrl + V)[cite: 1].")
 
     with tab2:
         st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
@@ -313,19 +313,19 @@ def exibir_manual_ajuda():
         st.markdown("### 🛡️ Mecanismos de Blindagem Institucional")
         st.markdown(
             """
-* **Prevalência STJ/STF:** Precedentes de Turmas do STJ e STF sobrepõem-se a notas do e-NATJus ou conselhos.
-* **Aderência aos Autos:** Foco restrito aos documentos do processo anexado.
-* **Trava Anti-Alucinação:** Pesquisa ativa em bases oficiais, sem inventar julgados.
-* **Relatório Padrão Ouro:** Narrativa fluida e encadeada de até 500 palavras, estritamente sem tópicos.
+* **Prevalência STJ/STF:** Precedentes de Turmas do STJ e STF sobrepõem-se a notas do e-NATJus ou conselhos[cite: 1].
+* **Aderência aos Autos:** Foco restrito aos documentos do processo anexado[cite: 1].
+* **Trava Anti-Alucinação:** Pesquisa ativa em bases oficiais, sem inventar julgados[cite: 1].
+* **Relatório Padrão Ouro:** Narrativa fluida e encadeada de até 500 palavras, estritamente sem tópicos[cite: 1].
             """
         )
 
     with tab4:
-        st.markdown("### 🛑 Comandos de Ajuste de Rota (Se não aprovar)")
-        st.markdown("**1. Correção de Tese na Fase 2 (Diagnóstico):**")
-        st.code("Não está aprovado. Na proposta de mérito, considere que a 3ª Turma do STJ já pacificou o dever de custeio pelo REsp 2.221.399/SP. Reformule a Fase 2 opinando pelo desprovimento do recurso.", language="text")
-        st.markdown("**2. Avanço Direto:**")
-        st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a emissão da Fase 3 e da Minuta Completa.", language="text")
+        st.markdown("### 🛑 Comandos de Ajuste de Rota (Se não aprovar)[cite: 1]")
+        st.markdown("**1. Correção de Tese na Fase 2 (Diagnóstico):**[cite: 1]")
+        st.code("Não está aprovado. Na proposta de mérito, considere que a 3ª Turma do STJ já pacificou o dever de custeio pelo REsp 2.221.399/SP. Reformule a Fase 2 opinando pelo desprovimento do recurso.", language="text")[cite: 1]
+        st.markdown("**2. Avanço Direto:**[cite: 1]")
+        st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a emissão da Fase 3 e da Minuta Completa.", language="text")[cite: 1]
 
 # ----------------------------------------------------
 # 9. Barra Lateral
@@ -374,7 +374,7 @@ with st.sidebar:
         )
         if uploaded_files and len(chat_atual["messages"]) == 0:
             if st.button("⚡ Iniciar Análise do Processo", use_container_width=True, type="primary"):
-                st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."
+                st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."[cite: 1]
                 st.rerun()
 
     # Histórico de Atendimentos
@@ -442,10 +442,10 @@ if chat_vazio:
         if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
             if uploaded_files:
                 if st.button("⚡ Analisar autos e gerar parecer completo", key="sug_parecer", use_container_width=True, type="primary"):
-                    st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."
+                    st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."[cite: 1]
                     st.rerun()
                 if st.button("💬 Mapear apenas preliminares e teses recursais dos autos", key="sug_teses", use_container_width=True):
-                    st.session_state["trigger_prompt"] = "Faça um mapeamento analítico das preliminares e das principais teses recursais cabíveis para o caso."
+                    st.session_state["trigger_prompt"] = "Faça um mapeamento analítico das preliminares e das principais teses recursais cabíveis para o caso."[cite: 1]
                     st.rerun()
             else:
                 st.info("📂 Anexe os arquivos PDF na barra lateral para iniciar a análise dos autos.")
@@ -522,7 +522,7 @@ if prompt_final:
 
                 user_parts = []
                 
-                # Upload seguro dos PDFs para a Files API na 1ª mensagem
+                # Upload seguro e conversão via from_uri para Files API na 1ª mensagem
                 if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
                     for f in uploaded_files:
                         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -531,8 +531,13 @@ if prompt_final:
                         
                         try:
                             uploaded_gemini_file = client.files.upload(file=tmp_path)
-                            user_parts.append(uploaded_gemini_file)
-                            user_parts.append(types.Part.from_text(text=f"[Documento dos Autos: {f.name}]"))
+                            # Conversão correta exigida pelo SDK
+                            file_part = types.Part.from_uri(
+                                file_uri=uploaded_gemini_file.uri,
+                                mime_type=uploaded_gemini_file.mime_type
+                            )
+                            user_parts.append(file_part)
+                            user_parts.append(types.Part.from_text(text=f"[Documento dos Autos: {f.name}]"))[cite: 1]
                         finally:
                             if os.path.exists(tmp_path):
                                 os.remove(tmp_path)

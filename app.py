@@ -111,25 +111,25 @@ Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do
 
 ### 🛡️ BLINDAGEM E REGRAS ESTRITAS:
 1. ADERÊNCIA ESTRITA AOS AUTOS: Baseie sua análise EXCLUSIVAMENTE nos fatos e documentos do caso concreto anexado pelo usuário. É PROIBIDO inventar ou misturar matérias fáticas estranhas ao processo (ex: não cite saúde se o caso for imobiliário/tributário).
-2. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS aplicáveis à matéria específica dos autos[cite: 1]. Proibido inventar números ou ementas[cite: 1].
-3. TRAVA DE HIERARQUIA: Precedentes das Turmas do STJ e teses vinculantes do STF prevalecem sobre atos administrativos ou pareceres técnicos[cite: 1].
-4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade[cite: 1].
-5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *tempus regit actum*)[cite: 1]. Jurisprudências citadas em bloco recuado (`>`), em itálico[cite: 1].
+2. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS aplicáveis à matéria específica dos autos. Proibido inventar números ou ementas.
+3. TRAVA DE HIERARQUIA: Precedentes das Turmas do STJ e teses vinculantes do STF prevalecem sobre atos administrativos ou pareceres técnicos.
+4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade.
+5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *tempus regit actum*). Jurisprudências citadas em bloco recuado (`>`), em itálico.
 
 ### 🔄 FLUXO PROGRESSIVO OBRIGATÓRIO EM 3 ETAPAS:
 
 - ETAPA 1 (Diagnóstico & Consulta de Precedentes):
-  Apresente o Raio-X dos autos (Fatos reais do processo, Preliminares mapeadas, Dispositivos legais)[cite: 1].
-  Faça uma busca na internet pelos precedentes reais mais recentes do STJ/STF/TJMS sobre a matéria e apresente-os[cite: 1].
-  Ao final, faça a PERGUNTA OBRIGATÓRIA: "Deseja aplicar os precedentes acima sugeridos ou indicar outro julgado específico?" e PARE AQUI[cite: 1].
+  Apresente o Raio-X dos autos (Fatos reais do processo, Preliminares mapeadas, Dispositivos legais).
+  Faça uma busca na internet pelos precedentes reais mais recentes do STJ/STF/TJMS sobre a matéria e apresente-os.
+  Ao final, faça a PERGUNTA OBRIGATÓRIA: "Deseja aplicar os precedentes acima sugeridos ou indicar outro julgado específico?" e PARE AQUI.
 
 - ETAPA 2 (Ementa Técnica e Relatório Institucional):
-  Quando o analista aprovar ou orientar a tese, elabore a Ementa Técnica Formal (com as palavras-chave da matéria dos autos e opinião final) e o Relatório Sucinto Fluido (máximo 500 palavras, corrido)[cite: 1].
-  Ao final, diga: "Aguardando validação da Ementa e Relatório para gerar a Minuta Integral (Etapa 3)." e PARE AQUI[cite: 1].
+  Quando o analista aprovar ou orientar a tese, elabore a Ementa Técnica Formal (com as palavras-chave da matéria dos autos e opinião final) e o Relatório Sucinto Fluido (máximo 500 palavras, corrido).
+  Ao final, diga: "Aguardando validação da Ementa e Relatório para gerar a Minuta Integral (Etapa 3)." e PARE AQUI.
 
 - ETAPA 3 (Minuta Integral de Alta Densidade - Peça Completa):
-  Quando o analista responder "validado", "aprovado" ou "prossiga", REDIJA IMEDIATAMENTE A PEÇA COMPLETA DE SEGUNDO GRAU, sem cortes e sem placeholders[cite: 1]:
-  Cabeçalho Oficial (Autos, Classe, Órgão Julgador, Relator, Partes), Ementa Formal, "COLENDA CÂMARA CÍVEL,", Relatório, I – Das Preliminares (se houver), II – Do Mérito (Fundamentação exaustiva e densa de 2.500 a 4.000 palavras, enfrentando todas as teses dos autos com doutrina e precedentes), III – Conclusão (Opinamento formal), Datação (Campo Grande/MS) e Assinatura institucional de Luciana Moreira Schenk[cite: 1]. NÃO REINICIE O FLUXO[cite: 1].
+  Quando o analista responder "validado", "aprovado" ou "prossiga", REDIJA IMEDIATAMENTE A PEÇA COMPLETA DE SEGUNDO GRAU, sem cortes e sem placeholders:
+  Cabeçalho Oficial (Autos, Classe, Órgão Julgador, Relator, Partes), Ementa Formal, "COLENDA CÂMARA CÍVEL,", Relatório, I – Das Preliminares (se houver), II – Do Mérito (Fundamentação exaustiva e densa de 2.500 a 4.000 palavras, enfrentando todas as teses dos autos com doutrina e precedentes), III – Conclusão (Opinamento formal), Datação (Campo Grande/MS) e Assinatura institucional de Luciana Moreira Schenk. NÃO REINICIE O FLUXO.
 """
 
 # ----------------------------------------------------
@@ -142,7 +142,7 @@ if "chats" not in st.session_state:
             "title": "",
             "mode": "📄 Minuta de Parecer (MPMS)",
             "messages": [],
-            "gemini_history": [] # Histórico estruturado para a API
+            "gemini_history": []
         }
     }
     st.session_state.current_chat_id = primeiro_id
@@ -165,10 +165,10 @@ def exibir_manual_ajuda():
     with tab1:
         st.markdown(
             """
-### 🏛️ Fluxo em 3 Etapas Integradas:[cite: 1]
-1. **Etapa 1 (Upload & Raio-X):** Anexe os PDFs dos autos e clique em `⚡ Iniciar Análise do Processo`[cite: 1]. A IA lerá as peças e apresentará o diagnóstico com os precedentes reais sugeridos[cite: 1].
-2. **Etapa 2 (Ementa & Relatório):** Digite `Aprovado` (ou indique uma diretriz específica)[cite: 1]. A IA gerará a Ementa Técnica e o Relatório Fluido de até 500 palavras[cite: 1].
-3. **Etapa 3 (Minuta Completa):** Digite `Validado, gere a minuta`[cite: 1]. A IA redigirá o parecer integral de alta densidade (6 a 10 páginas / 2.500 a 4.000 palavras) pronto para cópia e colagem no Word[cite: 1].
+### 🏛️ Fluxo em 3 Etapas Integradas:
+1. **Etapa 1 (Upload & Raio-X):** Anexe os PDFs dos autos e clique em `⚡ Iniciar Análise do Processo`. A IA lerá as peças e apresentará o diagnóstico com os precedentes reais sugeridos.
+2. **Etapa 2 (Ementa & Relatório):** Digite `Aprovado` (ou indique uma diretriz específica). A IA gerará a Ementa Técnica e o Relatório Fluido de até 500 palavras.
+3. **Etapa 3 (Minuta Completa):** Digite `Validado, gere a minuta`. A IA redigirá o parecer integral de alta densidade (6 a 10 páginas / 2.500 a 4.000 palavras) pronto para cópia e colagem no Word.
             """
         )
 
@@ -180,8 +180,8 @@ def exibir_manual_ajuda():
     with tab3:
         st.markdown(
             """
-* **Prevalência STJ/STF:** Precedentes superiores sobrepõem-se a normas administrativas[cite: 1].
-* **Aderência aos Autos:** Cada parecer respeita estritamente a matéria e os fatos do processo analisado[cite: 1].
+* **Prevalência STJ/STF:** Precedentes superiores sobrepõem-se a normas administrativas.
+* **Aderência aos Autos:** Cada parecer respeita estritamente a matéria e os fatos do processo analisado.
             """
         )
 
@@ -291,7 +291,7 @@ for msg in chat_atual["messages"]:
 auto_prompt = None
 if st.session_state.get("trigger_auto_start", False):
     st.session_state["trigger_auto_start"] = False
-    auto_prompt = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."[cite: 1]
+    auto_prompt = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."
 
 prompt_input = st.chat_input("Digite sua resposta, orientação ou valide a etapa anterior...")
 prompt_final = auto_prompt or prompt_input
@@ -320,20 +320,19 @@ if prompt_final:
 
                 # Montagem das partes da mensagem atual
                 user_parts = []
-                # Se for a primeira mensagem, anexa os arquivos PDF
                 if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
                     for f in uploaded_files:
                         user_parts.append(types.Part.from_bytes(data=f.getvalue(), mime_type="application/pdf"))
-                        user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))[cite: 1]
+                        user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))
 
                 user_parts.append(types.Part.from_text(text=prompt_final))
 
-                # Registra a mensagem do usuário no histórico do Gemini
+                # Registra no histórico do Gemini
                 chat_atual["gemini_history"].append(
                     types.Content(role="user", parts=user_parts)
                 )
 
-                # Executa a geração com TODO o histórico acumulado
+                # Gera com todo o histórico acumulado
                 response = client.models.generate_content(
                     model="gemini-2.5-flash",
                     contents=chat_atual["gemini_history"],
@@ -346,7 +345,7 @@ if prompt_final:
 
                 texto_resposta = response.text
 
-                # Registra a resposta do modelo no histórico do Gemini
+                # Salva resposta no histórico do Gemini
                 chat_atual["gemini_history"].append(
                     types.Content(role="model", parts=[types.Part.from_text(text=texto_resposta)])
                 )

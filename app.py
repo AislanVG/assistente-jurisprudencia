@@ -4,13 +4,56 @@ from google import genai
 from google.genai import types
 
 # ----------------------------------------------------
-# 1. Configurações da Página
+# 1. Configurações da Página e CSS Customizado
 # ----------------------------------------------------
 st.set_page_config(
-    page_title="JusAssist IA - MPMS",
+    page_title="JusAssist MPMS",
     page_icon="⚖️",
     layout="wide"
 )
+
+# Estilização para aumentar fontes, botões e dar o tom sóbrio (Estilo Inner AI / Jus IA)
+st.markdown("""
+<style>
+    /* Estilização dos Botões de Modo */
+    div[data-testid="stSidebar"] button[kind="secondary"] {
+        border-radius: 8px;
+        font-size: 15px !important;
+        font-weight: 500;
+        padding: 10px 14px;
+        text-align: left;
+        margin-bottom: 6px;
+    }
+    
+    /* Destaque do Botão Principal (Novo Chat) */
+    div[data-testid="stSidebar"] button[kind="primary"] {
+        border-radius: 8px;
+        font-size: 16px !important;
+        font-weight: 600;
+        padding: 12px 14px;
+        background-color: #3b82f6 !important;
+        border: none;
+    }
+    
+    /* Títulos da Barra Lateral */
+    .sidebar-section-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 18px;
+        margin-bottom: 8px;
+    }
+    
+    /* Ajuste do botão de ajuda fixo no rodapé */
+    .help-button-container {
+        margin-top: 30px;
+        padding-top: 15px;
+        border-top: 1px solid #e2e8f0;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # ----------------------------------------------------
 # 2. Carregamento da Chave
@@ -22,7 +65,7 @@ if not GEMINI_API_KEY:
     st.stop()
 
 # ----------------------------------------------------
-# 3. Prompts Especializados (Jurisprudência & Parecer MPMS)
+# 3. Prompts Especializados
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -50,30 +93,30 @@ Disponibilize o trecho mais relevante de um acórdão representativo em bloco fo
 """
 
 SUPERPROMPT_PARECER = """
-Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, auxiliando diretamente a Procuradora de Justiça, Dra. Luciana Moreira Schenk. Seu objetivo é elaborar minutas de PARECER DO MINISTÉRIO PÚBLICO EM SEGUNDO GRAU completas, densas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral.
+Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, auxiliando diretamente a Procuradora de Justiça, Dra. Luciana Moreira Schenk[cite: 1]. Seu objetivo é elaborar minutas de PARECER DO MINISTÉRIO PÚBLICO EM SEGUNDO GRAU completas, densas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral[cite: 1].
 
 ### 🛡️ BLINDAGEM E REGRAS ESTRITAS:
-1. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS. Proibido inventar números ou ementas.
-2. TRAVA DE HIERARQUIA: Precedentes das Turmas de Direito Privado do STJ (3ª e 4ª Turmas) e STF PREVALECEM ABSOLUTAMENTE sobre pareceres de Conselhos de Classe (CREMESP/COFFITO), notas do e-NATJus ou resoluções da ANS.
-3. DIRETRIZ PROTETIVA: Em saúde, vida e vulneráveis (TEA, paralisia, oncologia, alimentos), a orientação institucional é pela tutela integral da dignidade humana quando amparada por laudo idôneo.
-4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade.
-5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *rebus sic stantibus*). Jurisprudências citadas em bloco recuado (`>`), em itálico.
+1. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS[cite: 1]. Proibido inventar números ou ementas[cite: 1].
+2. TRAVA DE HIERARQUIA: Precedentes das Turmas de Direito Privado do STJ (3ª e 4ª Turmas) e STF PREVALECEM ABSOLUTAMENTE sobre pareceres de Conselhos de Classe (CREMESP/COFFITO), notas do e-NATJus ou resoluções da ANS[cite: 1].
+3. DIRETRIZ PROTETIVA: Em saúde, vida e vulneráveis (TEA, paralisia, oncologia, alimentos), a orientação institucional é pela tutela integral da dignidade humana quando amparada por laudo idôneo[cite: 1].
+4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade[cite: 1].
+5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *rebus sic stantibus*)[cite: 1]. Jurisprudências citadas em bloco recuado (`>`), em itálico[cite: 1].
 
 ### 🔄 FLUXO INTERATIVO AUTOMATIZADO:
 Quando o usuário pedir "Analise os autos e gere o parecer" (com arquivo PDF ou texto anexado):
 
 - ETAPA 1 (Diagnóstico & Consulta Ativa de Precedentes):
-  Apresente o Raio-X dos autos (Fatos, Preliminares mapeadas, Dispositivos legais).
-  EXECUTE UMA BUSCA NA INTERNET por precedentes recentes do STJ/STF/TJMS aderentes ao caso e APRESENTE:
+  Apresente o Raio-X dos autos (Fatos, Preliminares mapeadas, Dispositivos legais)[cite: 1].
+  EXECUTE UMA BUSCA NA INTERNET por precedentes recentes do STJ/STF/TJMS aderentes ao caso e APRESENTE[cite: 1]:
   "🔍 Precedentes localizados para o caso: [Liste 2 a 3 acórdãos/Temas reais encontrados com número e tese].
-  👉 PERGUNTA OBRIGATÓRIA: Deseja aplicar os precedentes acima sugeridos ou a Procuradoria deseja indicar outro acórdão específico para este parecer?"
-  PARE AQUI e aguarde a confirmação do analista.
+  👉 PERGUNTA OBRIGATÓRIA: Deseja aplicar os precedentes acima sugeridos ou a Procuradoria deseja indicar outro acórdão específico para este parecer?"[cite: 1]
+  PARE AQUI e aguarde a confirmação do analista[cite: 1].
 
 - ETAPA 2 (Ementa Técnica e Relatório Institucional):
-  Após o "de acordo" do analista, gere a Ementa Técnica Formal e o Relatório Sucinto Fluido (até 500 palavras, sem tópicos). PARE AQUI e aguarde validação.
+  Após o "de acordo" do analista, gere a Ementa Técnica Formal e o Relatório Sucinto Fluido (até 500 palavras, sem tópicos)[cite: 1]. PARE AQUI e aguarde validação[cite: 1].
 
 - ETAPA 3 (Minuta Integral de Alta Densidade - 6 a 10 páginas):
-  Redija a peça completa: Cabeçalho institucional, Ementa, "COLENDA CÂMARA CÍVEL,", Relatório, I – Da controvérsia recursal (ou Preliminares), II – Do mérito (Fundamentação exaustiva de 2.500 a 4.000 palavras, rebatendo todos os argumentos), III – Conclusão (Opinamento expresso), Datação (Campo Grande/MS) e Assinatura de Luciana Moreira Schenk.
+  Redija a peça completa: Cabeçalho institucional, Ementa, "COLENDA CÂMARA CÍVEL,", Relatório, I – Da controvérsia recursal (ou Preliminares), II – Do mérito (Fundamentação exaustiva de 2.500 a 4.000 palavras, rebatendo todos os argumentos), III – Conclusão (Opinamento expresso), Datação (Campo Grande/MS) e Assinatura de Luciana Moreira Schenk[cite: 1].
 """
 
 # ----------------------------------------------------
@@ -96,92 +139,89 @@ if "current_chat_id" not in st.session_state or st.session_state.current_chat_id
 chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 
 # ----------------------------------------------------
-# 5. Modal de Ajuda e Instruções
+# 5. Modal de Ajuda
 # ----------------------------------------------------
-@st.dialog("📖 Como Funciona a IA & Exemplos de Uso", width="large")
+@st.dialog("❓ Central de Ajuda & Guia Operacional", width="large")
 def exibir_manual_ajuda():
-    st.markdown("### ⚖️ Modos de Atuação da IA")
+    st.markdown("### ⚖️ Modos de Atuação do Assistente")
     st.markdown(
         """
-| Modo | Objetivo Principal | Como a IA Responde | Como a Assessora Deve Entrar |
+| Modo de Trabalho | Objetivo Principal | Como a IA Responde | Entrada da Assessora |
 | :--- | :--- | :--- | :--- |
-| **🔍 Pesquisa de Jurisprudência** | Consultas rápidas de teses, súmulas e julgados no STF, STJ e TJs. | Estrutura analítica: Tese Central, Precedentes Favoráveis, Contrapontos, Critérios e Ementa para Cópia. | Apenas digite a dúvida jurídica no chat. |
-| **📄 Minuta de Parecer (MPMS)** | Elaboração da peça completa de segundo grau (6 a 10 páginas). | Lê o PDF, faz o raio-x fático, pesquisa acórdãos recentes e gera a minuta densa institucional. | Anexa o PDF do processo e digita: *'Analise os autos e gere o parecer'*. |
+| **📄 Minuta de Parecer (MPMS)** | Elaboração de parecer de 2º Grau (6 a 10 páginas)[cite: 1]. | Lê o PDF, faz o diagnóstico, pesquisa acórdãos reais e gera a peça institucional[cite: 1]. | Anexa o PDF dos autos e digita: *'Analise os autos e gere o parecer'*. |
+| **🔍 Pesquisa de Jurisprudência** | Busca de teses, súmulas e julgados do STF, STJ e TJs. | Resumo analítico: Tese Central, Precedentes Favoráveis, Contrapontos e Ementa para Cópia. | Digite livremente a dúvida no chat. |
         """
     )
-    
     st.divider()
-    st.markdown("### 💡 Exemplos Práticos de Entrada")
-    
-    st.markdown("#### 1. Para Pesquisa de Jurisprudência:")
-    st.code("Qual o entendimento do STJ sobre responsabilidade do Estado por erro médico que causa sequelas permanentes em menor?", language="text")
-    st.code("Pesquise a jurisprudência do TJMS sobre rescisão de contrato imobiliário por culpa da construtora.", language="text")
-
-    st.markdown("#### 2. Para Minuta de Parecer (MPMS):")
-    st.markdown("1. Selecione o modo **📄 Minuta de Parecer (MPMS)** na barra lateral.")
-    st.markdown("2. Anexe o PDF da petição inicial, sentença ou apelação no campo **📂 Anexar Autos (PDF)**.")
-    st.markdown("3. Digite no chat:")
-    st.code("Analise os autos e gere o parecer.", language="text")
-    st.caption("A IA apresentará o raio-x e sugerirá os acórdãos reais encontrados. Basta responder 'Aprovado, prossiga' para que ela gere a ementa, o relatório e a minuta completa.")
+    st.markdown("### 💡 Como Operar no Dia a Dia")
+    st.markdown("**Para emitir um Parecer do MPMS:**")
+    st.markdown("1. Clique no botão **📄 Minuta de Parecer (MPMS)** na barra lateral.")
+    st.markdown("2. Anexe a apelação, sentença ou inicial no campo de upload.")
+    st.markdown("3. Digite `Analise os autos e gere o parecer` e envie.")
+    st.markdown("4. A IA apresentará o raio-x e os acórdãos reais sugeridos[cite: 1]. Responda com `Aprovado` para receber a ementa, o relatório e a minuta completa[cite: 1].")
 
 # ----------------------------------------------------
-# 6. Barra Lateral
+# 6. Barra Lateral (Layout Sóbrio e Estruturado)
 # ----------------------------------------------------
 with st.sidebar:
-    st.title("⚖️ JusAssist MPMS")
+    st.markdown("## ⚖️ **JusAssist MPMS**")
+    st.caption("Assessoria Jurídica de Segundo Grau")
     
-    modo_selecionado = st.radio(
-        "Modo de Atuação:",
-        ["📄 Minuta de Parecer (MPMS)", "🔍 Pesquisa de Jurisprudência"],
-        index=0 if chat_atual.get("mode") == "📄 Minuta de Parecer (MPMS)" else 1,
-        help="Alterne entre a elaboração do parecer completo do processo ou pesquisa livre de teses."
-    )
-    chat_atual["mode"] = modo_selecionado
+    # SEÇÃO 1: AÇÃO PRINCIPAL E MODO
+    if st.button("➕ Novo Chat", use_container_width=True, type="primary"):
+        if len(chat_atual["messages"]) > 0:
+            novo_id = str(uuid.uuid4())
+            st.session_state.chats[novo_id] = {
+                "title": "",
+                "mode": chat_atual["mode"],
+                "messages": []
+            }
+            st.session_state.current_chat_id = novo_id
+            st.rerun()
 
-    st.divider()
+    st.markdown('<div class="sidebar-section-title">Modo de Trabalho</div>', unsafe_allow_html=True)
+    
+    col_m1, col_m2 = st.columns(2)
+    with col_m1:
+        is_parecer = chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)"
+        btn_parecer_label = "📄 Parecer" if not is_parecer else "🔹 **Parecer**"
+        if st.button(btn_parecer_label, key="btn_mode_parecer", use_container_width=True):
+            chat_atual["mode"] = "📄 Minuta de Parecer (MPMS)"
+            st.rerun()
+            
+    with col_m2:
+        is_juris = chat_atual["mode"] == "🔍 Pesquisa de Jurisprudência"
+        btn_juris_label = "🔍 Pesquisa" if not is_juris else "🔹 **Pesquisa**"
+        if st.button(btn_juris_label, key="btn_mode_juris", use_container_width=True):
+            chat_atual["mode"] = "🔍 Pesquisa de Jurisprudência"
+            st.rerun()
 
-    col_btn1, col_btn2 = st.columns(2)
-    with col_btn1:
-        if st.button("📝 Nova Conversa", use_container_width=True, type="primary"):
-            if len(chat_atual["messages"]) > 0:
-                novo_id = str(uuid.uuid4())
-                st.session_state.chats[novo_id] = {
-                    "title": "",
-                    "mode": modo_selecionado,
-                    "messages": []
-                }
-                st.session_state.current_chat_id = novo_id
-                st.rerun()
-    with col_btn2:
-        if st.button("ℹ️ Ajuda & Exemplos", use_container_width=True):
-            exibir_manual_ajuda()
-
+    # Upload condicional para o modo parecer
     uploaded_file = None
-    if modo_selecionado == "📄 Minuta de Parecer (MPMS)":
-        st.markdown("### 📂 Anexar Autos (PDF)")
+    if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
+        st.markdown('<div class="sidebar-section-title">Anexar Processo (PDF)</div>', unsafe_allow_html=True)
         uploaded_file = st.file_uploader(
-            "Envie a Inicial, Sentença ou Apelação",
+            "Upload dos autos processuais",
             type=["pdf"],
-            help="O arquivo será lido integralmente pela IA para extração dos fatos e emissão do parecer."
+            help="Inicial, Sentença, Apelação ou Laudos Técnicos",
+            label_visibility="collapsed"
         )
 
-    st.divider()
-
-    # Histórico de Conversas
+    # SEÇÃO 2: HISTÓRICO DE CONVERSAS
     conversas_com_historico = {
         cid: cdata for cid, cdata in st.session_state.chats.items() if len(cdata["messages"]) > 0
     }
 
     if conversas_com_historico:
-        st.caption("ÚLTIMAS CONSULTAS / PARECERES")
+        st.markdown('<div class="sidebar-section-title">Histórico Recente</div>', unsafe_allow_html=True)
         for chat_id, chat_data in list(conversas_com_historico.items()):
             icone = "📄" if chat_data.get("mode") == "📄 Minuta de Parecer (MPMS)" else "🔍"
             titulo_exibicao = chat_data["title"] if chat_data["title"] else "Consulta"
-            if len(titulo_exibicao) > 24:
-                titulo_exibicao = titulo_exibicao[:21] + "..."
+            if len(titulo_exibicao) > 22:
+                titulo_exibicao = titulo_exibicao[:20] + "..."
             
             is_active = (chat_id == st.session_state.current_chat_id)
-            btn_style = f"{icone} {titulo_exibicao}" if not is_active else f"🔹 **{titulo_exibicao}**"
+            btn_style = f"{icone} {titulo_exibicao}" if not is_active else f"👉 **{titulo_exibicao}**"
             
             col1, col2 = st.columns([0.85, 0.15])
             with col1:
@@ -197,31 +237,37 @@ with st.sidebar:
                             st.session_state.current_chat_id = restantes[0]
                         else:
                             novo_id = str(uuid.uuid4())
-                            st.session_state.chats[novo_id] = {"title": "", "mode": modo_selecionado, "messages": []}
+                            st.session_state.chats[novo_id] = {"title": "", "mode": chat_atual["mode"], "messages": []}
                             st.session_state.current_chat_id = novo_id
                     st.rerun()
+
+    # SEÇÃO 3: RODAPÉ / AJUDA
+    st.markdown('<div class="help-button-container"></div>', unsafe_allow_html=True)
+    if st.button("❓ Ajuda & Guia", use_container_width=True):
+        exibir_manual_ajuda()
 
 # ----------------------------------------------------
 # 7. Interface Principal de Chat
 # ----------------------------------------------------
-st.header(f"⚖️ {chat_atual['mode']}")
+st.subheader(f"⚖️ {chat_atual['mode']}")
 if chat_atual["title"]:
-    st.caption(f"Assunto: **{chat_atual['title']}**")
+    st.caption(f"Caso em análise: **{chat_atual['title']}**")
 else:
-    if modo_selecionado == "📄 Minuta de Parecer (MPMS)":
-        st.caption("Anexe os autos em PDF na barra lateral e digite: 'Analise os autos e gere o parecer'.")
+    if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
+        st.caption("Anexe o PDF do processo na barra lateral e digite: 'Analise os autos e gere o parecer'.")
     else:
-        st.caption("Pesquisa analítica de jurisprudência em Tribunais Superiores e Estaduais.")
+        st.caption("Pesquise teses, acórdãos e súmulas dos Tribunais Superiores e Estaduais.")
 
 # Exibição do histórico de mensagens
 for msg in chat_atual["messages"]:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
+# Placeholder contextual
 placeholder_texto = (
-    "Ex.: Analise os autos e gere o parecer..."
-    if modo_selecionado == "📄 Minuta de Parecer (MPMS)"
-    else "Ex.: Qual o entendimento do STJ sobre apropriação indébita tributária?"
+    "Ex.: Analise os autos anexados e gere o parecer..."
+    if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)"
+    else "Ex.: Qual o entendimento do STJ sobre responsabilidade por erro médico em menor?"
 )
 
 if prompt := st.chat_input(placeholder_texto):
@@ -239,7 +285,7 @@ if prompt := st.chat_input(placeholder_texto):
 
                 instrucao_ativa = (
                     SUPERPROMPT_PARECER
-                    if modo_selecionado == "📄 Minuta de Parecer (MPMS)"
+                    if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)"
                     else PROMPT_JURISPRUDENCIA
                 )
 

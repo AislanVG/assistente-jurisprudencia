@@ -110,27 +110,26 @@ SUPERPROMPT_PARECER = """
 Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, auxiliando diretamente a Procuradora de Justiça, Dra. Luciana Moreira Schenk. Seu objetivo é elaborar minutas de PARECER DO MINISTÉRIO PÚBLICO EM SEGUNDO GRAU completas, densas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral.
 
 ### 🛡️ BLINDAGEM E REGRAS ESTRITAS:
-1. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS. Proibido inventar números ou ementas.
-2. TRAVA DE HIERARQUIA: Precedentes das Turmas de Direito Privado do STJ (3ª e 4ª Turmas) e STF PREVALECEM ABSOLUTAMENTE sobre pareceres de Conselhos de Classe (CREMESP/COFFITO), notas do e-NATJus ou resoluções da ANS.
-3. DIRETRIZ PROTETIVA: Em saúde, vida e vulneráveis (TEA, paralisia, oncologia, alimentos), a orientação institucional é pela tutela integral da dignidade humana quando amparada por laudo idôneo.
-4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade.
-5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *rebus sic stantibus*). Jurisprudências citadas em bloco recuado (`>`), em itálico.
+1. ADERÊNCIA ESTRITA AOS AUTOS: Baseie sua análise EXCLUSIVAMENTE nos fatos e documentos do caso concreto anexado pelo usuário. É PROIBIDO inventar ou misturar matérias fáticas estranhas ao processo (ex: não cite saúde se o caso for imobiliário/tributário).
+2. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS aplicáveis à matéria específica dos autos[cite: 1]. Proibido inventar números ou ementas[cite: 1].
+3. TRAVA DE HIERARQUIA: Precedentes das Turmas do STJ e teses vinculantes do STF prevalecem sobre atos administrativos ou pareceres técnicos[cite: 1].
+4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade[cite: 1].
+5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *tempus regit actum*)[cite: 1]. Jurisprudências citadas em bloco recuado (`>`), em itálico[cite: 1].
 
-### 🔄 FLUXO INTERATIVO AUTOMATIZADO:
-Quando o usuário pedir a análise dos autos (com arquivos PDF anexados ou relato fático):
+### 🔄 FLUXO PROGRESSIVO OBRIGATÓRIO EM 3 ETAPAS:
 
-- ETAPA 1 (Diagnóstico & Consulta Ativa de Precedentes):
-  Apresente o Raio-X dos autos considerando o conjunto de todas as peças anexadas (Fatos, Preliminares mapeadas, Dispositivos legais).
-  EXECUTE UMA BUSCA NA INTERNET por precedentes recentes do STJ/STF/TJMS aderentes ao caso e APRESENTE:
-  "🔍 Precedentes localizados para o caso: [Liste 2 a 3 acórdãos/Temas reais encontrados com número e tese].
-  👉 PERGUNTA OBRIGATÓRIA: Deseja aplicar os precedentes acima sugeridos ou a Procuradoria deseja indicar outro acórdão específico para este parecer?"
-  PARE AQUI e aguarde a confirmação do analista.
+- ETAPA 1 (Diagnóstico & Consulta de Precedentes):
+  Apresente o Raio-X dos autos (Fatos reais do processo, Preliminares mapeadas, Dispositivos legais)[cite: 1].
+  Faça uma busca na internet pelos precedentes reais mais recentes do STJ/STF/TJMS sobre a matéria e apresente-os[cite: 1].
+  Ao final, faça a PERGUNTA OBRIGATÓRIA: "Deseja aplicar os precedentes acima sugeridos ou indicar outro julgado específico?" e PARE AQUI[cite: 1].
 
 - ETAPA 2 (Ementa Técnica e Relatório Institucional):
-  Após o "de acordo" do analista, gere a Ementa Técnica Formal e o Relatório Sucinto Fluido (até 500 palavras, sem tópicos). PARE AQUI e aguarde validação.
+  Quando o analista aprovar ou orientar a tese, elabore a Ementa Técnica Formal (com as palavras-chave da matéria dos autos e opinião final) e o Relatório Sucinto Fluido (máximo 500 palavras, corrido)[cite: 1].
+  Ao final, diga: "Aguardando validação da Ementa e Relatório para gerar a Minuta Integral (Etapa 3)." e PARE AQUI[cite: 1].
 
-- ETAPA 3 (Minuta Integral de Alta Densidade - 6 a 10 páginas):
-  Redija a peça completa: Cabeçalho institucional, Ementa, "COLENDA CÂMARA CÍVEL,", Relatório, I – Da controvérsia recursal (ou Preliminares), II – Do mérito (Fundamentação exaustiva de 2.500 a 4.000 palavras, rebatendo todos os argumentos), III – Conclusão (Opinamento expresso), Datação (Campo Grande/MS) e Assinatura de Luciana Moreira Schenk.
+- ETAPA 3 (Minuta Integral de Alta Densidade - Peça Completa):
+  Quando o analista responder "validado", "aprovado" ou "prossiga", REDIJA IMEDIATAMENTE A PEÇA COMPLETA DE SEGUNDO GRAU, sem cortes e sem placeholders[cite: 1]:
+  Cabeçalho Oficial (Autos, Classe, Órgão Julgador, Relator, Partes), Ementa Formal, "COLENDA CÂMARA CÍVEL,", Relatório, I – Das Preliminares (se houver), II – Do Mérito (Fundamentação exaustiva e densa de 2.500 a 4.000 palavras, enfrentando todas as teses dos autos com doutrina e precedentes), III – Conclusão (Opinamento formal), Datação (Campo Grande/MS) e Assinatura institucional de Luciana Moreira Schenk[cite: 1]. NÃO REINICIE O FLUXO[cite: 1].
 """
 
 # ----------------------------------------------------
@@ -142,7 +141,8 @@ if "chats" not in st.session_state:
         primeiro_id: {
             "title": "",
             "mode": "📄 Minuta de Parecer (MPMS)",
-            "messages": []
+            "messages": [],
+            "gemini_history": [] # Histórico estruturado para a API
         }
     }
     st.session_state.current_chat_id = primeiro_id
@@ -153,65 +153,37 @@ if "current_chat_id" not in st.session_state or st.session_state.current_chat_id
 chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 
 # ----------------------------------------------------
-# 5. Modal Completo de Ajuda e Manual Operacional
+# 5. Modal Completo de Ajuda
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional (MPMS)", width="large")
 def exibir_manual_ajuda():
     st.markdown("## ⚖️ Manual Operacional: JusAssist MPMS")
     st.caption("Guia Prático para Pesquisa Jurisprudencial e Emissão de Pareceres de 2º Grau")
     
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "📄 Minuta de Parecer", 
-        "🔍 Pesquisa Jurisprudencial", 
-        "🛡️ Diretrizes & Travas", 
-        "📝 Comandos de Ajuste"
-    ])
+    tab1, tab2, tab3 = st.tabs(["📄 Minuta de Parecer", "🔍 Pesquisa Jurisprudencial", "🛡️ Diretrizes MPMS"])
     
     with tab1:
-        st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer de 2º Grau)")
-        st.markdown(
-            "O assistente é calibrado para atuar como Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, "
-            "elaborando peças densas e completas com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)**."
-        )
         st.markdown(
             """
-1. **Passo 1: Upload dos Autos (Múltiplos PDFs)**
-   * Na barra lateral, selecione **📄 Parecer** e anexe todos os arquivos necessários juntos (Inicial, Sentença, Apelação, Laudos).
-2. **Passo 2: Início da Análise**
-   * Clique no botão **`⚡ Iniciar Análise do Processo`** ou digite no chat: `Analise os autos e gere o parecer`.
-3. **Passo 3: Diagnóstico & Precedentes (Fase 2)**
-   * A IA apresentará o raio-x consolidando todas as peças e **pesquisará ativamente na internet** acórdãos reais recentes do STJ/STF/TJMS.
-4. **Passo 4: Validação da Ementa e Relatório (Fase 3)**
-   * Ao aprovar a tese, a IA redigirá a **Ementa Técnica Formal** e o **Relatório Sucinto Fluido** (até 500 palavras, sem tópicos).
-5. **Passo 5: Minuta Integral de Alta Densidade (Fase 4)**
-   * A IA entrega o parecer pronto para exportação com fundamentação exaustiva e conclusão.
+### 🏛️ Fluxo em 3 Etapas Integradas:[cite: 1]
+1. **Etapa 1 (Upload & Raio-X):** Anexe os PDFs dos autos e clique em `⚡ Iniciar Análise do Processo`[cite: 1]. A IA lerá as peças e apresentará o diagnóstico com os precedentes reais sugeridos[cite: 1].
+2. **Etapa 2 (Ementa & Relatório):** Digite `Aprovado` (ou indique uma diretriz específica)[cite: 1]. A IA gerará a Ementa Técnica e o Relatório Fluido de até 500 palavras[cite: 1].
+3. **Etapa 3 (Minuta Completa):** Digite `Validado, gere a minuta`[cite: 1]. A IA redigirá o parecer integral de alta densidade (6 a 10 páginas / 2.500 a 4.000 palavras) pronto para cópia e colagem no Word[cite: 1].
             """
         )
 
     with tab2:
-        st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
-        st.markdown("No modo **🔍 Pesquisa**, a IA realiza varredura com o Google Search nas bases do STF, STJ, TJMS e TRFs.")
-        st.markdown("#### Exemplos Práticos de Pesquisa:")
-        st.code("Qual o entendimento do STJ sobre responsabilidade do Estado por erro médico que causa sequelas permanentes em menor?", language="text")
-        st.code("Pesquise a jurisprudência do TJMS sobre rescisão de contrato imobiliário por culpa da construtora com devolução integral.", language="text")
+        st.markdown("### 🔍 Pesquisa de Jurisprudência:")
+        st.markdown("Digite qualquer tese jurídica no chat para receber precedentes favoráveis, desfavoráveis, súmulas e sugestão de ementa.")
+        st.code("Pesquise precedentes do STJ sobre tempus regit actum e indisponibilidade CNIB em escritura de 2010.", language="text")
 
     with tab3:
-        st.markdown("### 🛡️ Mecanismos de Blindagem Institucional")
         st.markdown(
             """
-* **Prevalência Absoluta do STJ / STF:** Precedentes das Turmas de Direito Privado (3ª e 4ª Turmas) e teses vinculantes do STF sobrepõem-se a pareceres técnicos e resoluções administrativas.
-* **Diretriz Protetiva (Saúde e Vulneráveis):** Orientação pela tutela integral da dignidade humana quando amparada por laudo idôneo.
-* **Trava Anti-Alucinação:** Busca em tempo real no índice oficial, sem inventar julgados.
-* **Relatório Padrão Ouro:** Narrativa contínua e fluida de até 500 palavras, estritamente sem marcadores ou tópicos.
+* **Prevalência STJ/STF:** Precedentes superiores sobrepõem-se a normas administrativas[cite: 1].
+* **Aderência aos Autos:** Cada parecer respeita estritamente a matéria e os fatos do processo analisado[cite: 1].
             """
         )
-
-    with tab4:
-        st.markdown("### 🛑 Comandos de Ajuste de Rota (Se não aprovar)")
-        st.markdown("**Exemplo 1: Ajuste de Tese na Fase 2**")
-        st.code("Não está aprovado. Na tese de mérito, considere que a 3ª Turma do STJ já pacificou o custeio pelo REsp 2.221.399/SP. Reformule a Fase 2 opinando pelo desprovimento do recurso.", language="text")
-        st.markdown("**Exemplo 2: Avanço Direto**")
-        st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a Fase 3 e 4.", language="text")
 
 # ----------------------------------------------------
 # 6. Barra Lateral
@@ -227,7 +199,8 @@ with st.sidebar:
             st.session_state.chats[novo_id] = {
                 "title": "",
                 "mode": chat_atual["mode"],
-                "messages": []
+                "messages": [],
+                "gemini_history": []
             }
             st.session_state.current_chat_id = novo_id
             st.rerun()
@@ -254,7 +227,7 @@ with st.sidebar:
             "Upload dos Processos",
             type=["pdf"],
             accept_multiple_files=True,
-            help="Selecione ou arraste Petição Inicial, Sentença, Apelação e Laudos juntos",
+            help="Selecione Petição Inicial, Sentença, Apelação e Laudos",
             label_visibility="collapsed"
         )
         if uploaded_files and len(chat_atual["messages"]) == 0:
@@ -290,7 +263,9 @@ with st.sidebar:
                         restantes = list(st.session_state.chats.keys())
                         st.session_state.current_chat_id = restantes[0] if restantes else str(uuid.uuid4())
                         if not restantes:
-                            st.session_state.chats[st.session_state.current_chat_id] = {"title": "", "mode": chat_atual["mode"], "messages": []}
+                            st.session_state.chats[st.session_state.current_chat_id] = {
+                                "title": "", "mode": chat_atual["mode"], "messages": [], "gemini_history": []
+                            }
                     st.rerun()
 
     st.markdown('<div class="help-section"></div>', unsafe_allow_html=True)
@@ -298,7 +273,7 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 7. Área Central de Chat
+# 7. Área Central de Chat com Memória Contínua
 # ----------------------------------------------------
 st.subheader(chat_atual["mode"])
 
@@ -316,9 +291,9 @@ for msg in chat_atual["messages"]:
 auto_prompt = None
 if st.session_state.get("trigger_auto_start", False):
     st.session_state["trigger_auto_start"] = False
-    auto_prompt = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Fase 2 com a pesquisa de precedentes."
+    auto_prompt = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."[cite: 1]
 
-prompt_input = st.chat_input("Digite sua orientação sobre o caso ou envie uma tese jurídica...")
+prompt_input = st.chat_input("Digite sua resposta, orientação ou valide a etapa anterior...")
 prompt_final = auto_prompt or prompt_input
 
 if prompt_final:
@@ -333,7 +308,7 @@ if prompt_final:
         st.markdown(prompt_final)
 
     with st.chat_message("assistant"):
-        with st.spinner("Lendo todas as peças processuais e pesquisando precedentes oficiais..."):
+        with st.spinner("Processando fundamentação e mantendo o contexto dos autos..."):
             try:
                 client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -343,17 +318,25 @@ if prompt_final:
                     else PROMPT_JURISPRUDENCIA
                 )
 
-                conteudos = []
-                # Ingestão de múltiplos PDFs anexados
-                if uploaded_files and len(chat_atual["messages"]) <= 1:
+                # Montagem das partes da mensagem atual
+                user_parts = []
+                # Se for a primeira mensagem, anexa os arquivos PDF
+                if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
                     for f in uploaded_files:
-                        conteudos.append(types.Part.from_bytes(data=f.getvalue(), mime_type="application/pdf"))
-                        conteudos.append(f"[Documento Anexado: {f.name}]")
+                        user_parts.append(types.Part.from_bytes(data=f.getvalue(), mime_type="application/pdf"))
+                        user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))[cite: 1]
 
-                conteudos.append(prompt_final)
+                user_parts.append(types.Part.from_text(text=prompt_final))
 
-                chat = client.chats.create(
+                # Registra a mensagem do usuário no histórico do Gemini
+                chat_atual["gemini_history"].append(
+                    types.Content(role="user", parts=user_parts)
+                )
+
+                # Executa a geração com TODO o histórico acumulado
+                response = client.models.generate_content(
                     model="gemini-2.5-flash",
+                    contents=chat_atual["gemini_history"],
                     config=types.GenerateContentConfig(
                         system_instruction=instrucao,
                         tools=[types.Tool(google_search=types.GoogleSearch())],
@@ -361,12 +344,16 @@ if prompt_final:
                     )
                 )
 
-                response = chat.send_message(conteudos)
-                texto = response.text
+                texto_resposta = response.text
 
-                st.markdown(texto)
-                chat_atual["messages"].append({"role": "assistant", "content": texto})
+                # Registra a resposta do modelo no histórico do Gemini
+                chat_atual["gemini_history"].append(
+                    types.Content(role="model", parts=[types.Part.from_text(text=texto_resposta)])
+                )
+
+                st.markdown(texto_resposta)
+                chat_atual["messages"].append({"role": "assistant", "content": texto_resposta})
                 st.rerun()
 
             except Exception as e:
-                st.error(f"Erro na execução da análise: {str(e)}")
+                st.error(f"Erro no processamento da análise: {str(e)}")

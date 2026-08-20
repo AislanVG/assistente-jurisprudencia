@@ -43,7 +43,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico (SaaS Enterprise / UX Premium)
+# 4. Injeção de CSS Dinâmico (Tipografia Expandida & UX Aprimorada)
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -83,7 +83,7 @@ css_customizado = """
     }
 
     .sidebar-label {
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 700;
         color: #64748b;
         text-transform: uppercase;
@@ -99,8 +99,8 @@ css_customizado = """
     }
 
     .hero-title {
-        font-size: 34px;
-        font-weight: 700;
+        font-size: 36px;
+        font-weight: 800;
         color: #1e293b;
         text-align: center;
         margin-top: 4vh;
@@ -108,7 +108,7 @@ css_customizado = """
     }
 
     .feed-header {
-        font-size: 13px;
+        font-size: 14px;
         font-weight: 700;
         color: #475569;
         text-transform: uppercase;
@@ -127,92 +127,107 @@ css_customizado = """
         margin-bottom: 20px;
     }
 
-    /* Unificação e Elevação Visual do Card de Login */
-    div[data-testid="stForm"] {
-        border: none !important;
-        padding: 0 !important;
-    }
+    /* --- ESTILIZAÇÃO E EXPANSÃO DA TELA DE LOGIN --- */
     
-    .auth-wrapper {
-        max-width: 480px;
-        margin: 4vh auto 2vh auto;
+    /* Cabeçalho da Autenticação */
+    .auth-header-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 20px;
-        padding: 40px 36px 32px 36px;
-        box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
+        border-radius: 18px;
+        padding: 36px 30px 24px 30px;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06);
         text-align: center;
-    }
-    
-    .auth-logo-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 64px;
-        height: 64px;
-        background: #eff6ff;
-        border-radius: 50%;
-        font-size: 32px;
-        margin-bottom: 16px;
-        border: 1px solid #dbeafe;
+        margin-top: 3vh;
+        margin-bottom: 18px;
     }
     
     .auth-badge {
         display: inline-block;
-        background: #f1f5f9;
+        background: #eff6ff;
         color: #1e3a8a;
-        font-size: 11px;
+        font-size: 13px;
         font-weight: 700;
         letter-spacing: 0.8px;
         text-transform: uppercase;
-        padding: 4px 14px;
+        padding: 6px 16px;
         border-radius: 20px;
-        margin-bottom: 12px;
-        border: 1px solid #e2e8f0;
+        margin-bottom: 14px;
+        border: 1px solid #dbeafe;
     }
     
     .auth-title {
-        font-size: 30px;
+        font-size: 34px;
         font-weight: 800;
         color: #0f172a;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         letter-spacing: -0.5px;
     }
     
     .auth-subtitle {
-        font-size: 14px;
-        color: #64748b;
-        margin-bottom: 20px;
-        line-height: 1.5;
+        font-size: 16px;
+        color: #475569;
+        margin-bottom: 22px;
+        line-height: 1.6;
     }
     
     .feature-pills {
         display: flex;
         justify-content: center;
-        gap: 10px;
-        margin-bottom: 26px;
+        gap: 12px;
     }
     
     .pill {
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         color: #334155;
-        font-size: 12px;
+        font-size: 13.5px;
         font-weight: 600;
-        padding: 6px 12px;
+        padding: 8px 16px;
         border-radius: 8px;
     }
     
+    /* Abas de Login/Cadastro Maiores */
+    div[data-testid="stTabs"] button {
+        font-size: 17px !important;
+        font-weight: 700 !important;
+        padding: 12px 20px !important;
+    }
+    
+    /* Rótulos dos Campos Maiores e Mais Nítidos */
+    div[data-testid="stWidgetLabel"] label p {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: #1e293b !important;
+        margin-bottom: 4px !important;
+    }
+    
+    /* Caixas de Texto (Inputs) Maiores */
+    div[data-testid="stTextInput"] input {
+        font-size: 16px !important;
+        padding: 12px 14px !important;
+        border-radius: 10px !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    
+    /* Botão de Entrar Grande e Institucional */
+    div[data-testid="stForm"] {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 16px !important;
+        padding: 24px 28px !important;
+        background: #ffffff !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03) !important;
+    }
+
     div[data-testid="stForm"] button[kind="primary"],
     div[data-testid="stForm"] button {
         background-color: #1e3a8a !important;
         border-color: #1e3a8a !important;
         color: #ffffff !important;
-        font-size: 16px !important;
+        font-size: 18px !important;
         font-weight: 700 !important;
-        height: 48px !important;
+        height: 52px !important;
         border-radius: 10px !important;
-        margin-top: 10px !important;
+        margin-top: 14px !important;
         transition: all 0.2s ease !important;
     }
     div[data-testid="stForm"] button:hover {
@@ -220,12 +235,18 @@ css_customizado = """
         border-color: #2563eb !important;
     }
     
-    .auth-footer {
-        margin-top: 24px;
-        font-size: 11.5px;
-        color: #94a3b8;
-        border-top: 1px solid #f1f5f9;
-        padding-top: 16px;
+    /* Rodapé de Segurança Centralizado */
+    .auth-security-footer {
+        text-align: center !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        color: #64748b !important;
+        margin-top: 24px !important;
+        margin-bottom: 40px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 6px !important;
     }
 </style>
 """
@@ -238,14 +259,13 @@ if "user_session" not in st.session_state:
     st.session_state.user_session = None
 
 def exibir_tela_autenticacao():
-    col_l1, col_l2, col_l3 = st.columns([1, 1.3, 1])
+    col_l1, col_l2, col_l3 = st.columns([1, 1.4, 1])
     with col_l2:
         st.markdown(
             """
-            <div class="auth-wrapper">
-                <div class="auth-logo-badge">⚖️</div><br>
+            <div class="auth-header-card">
                 <div class="auth-badge">4ª Procuradoria de Justiça Cível • MPMS</div>
-                <div class="auth-title">JusAssist MPMS</div>
+                <div class="auth-title">⚖️ JusAssist MPMS</div>
                 <div class="auth-subtitle">
                     Ecossistema de Inteligência Jurídica: Pesquisa Analítica de Precedentes e Elaboração de Pareceres de 2º Grau
                 </div>
@@ -253,6 +273,7 @@ def exibir_tela_autenticacao():
                     <span class="pill">🔍 Jurisprudência STF/STJ/TJMS</span>
                     <span class="pill">📄 Minutas Densas (6-10 págs)</span>
                 </div>
+            </div>
             """,
             unsafe_allow_html=True
         )
@@ -305,9 +326,8 @@ def exibir_tela_autenticacao():
 
         st.markdown(
             """
-                <div class="auth-footer">
-                    🔒 Ambiente Seguro & Criptografado • Gabinete Dra. Luciana Moreira Schenk
-                </div>
+            <div class="auth-security-footer">
+                🔒 <strong>Ambiente Seguro & Criptografado</strong> • Gabinete Dra. Luciana Moreira Schenk
             </div>
             """,
             unsafe_allow_html=True
@@ -791,7 +811,6 @@ if prompt_final:
                 types.Content(role="user", parts=user_parts)
             )
 
-            # Otimização de latência ultra-baixa
             config_params = {
                 "system_instruction": instrucao,
                 "temperature": 0.1,
@@ -801,7 +820,6 @@ if prompt_final:
             if not is_parecer_mode:
                 config_params["tools"] = [types.Tool(google_search=types.GoogleSearch())]
 
-            # Streaming com resiliência a limites
             def stream_generator():
                 for tentativa in range(3):
                     try:

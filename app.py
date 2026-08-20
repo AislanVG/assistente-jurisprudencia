@@ -43,7 +43,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico (SaaS Enterprise)
+# 4. Injeção de CSS Dinâmico (SaaS Enterprise / UX Premium)
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -127,63 +127,105 @@ css_customizado = """
         margin-bottom: 20px;
     }
 
-    /* Estilização da Tela de Autenticação */
-    .auth-card {
+    /* Unificação e Elevação Visual do Card de Login */
+    div[data-testid="stForm"] {
+        border: none !important;
+        padding: 0 !important;
+    }
+    
+    .auth-wrapper {
+        max-width: 480px;
+        margin: 4vh auto 2vh auto;
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 18px;
-        padding: 38px 32px 30px 32px;
-        box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-        text-align: center;
-        margin-top: 5vh;
-    }
-    .auth-badge {
-        display: inline-block;
-        background: #eff6ff;
-        color: #1e40af;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.6px;
-        text-transform: uppercase;
-        padding: 5px 14px;
         border-radius: 20px;
-        margin-bottom: 14px;
+        padding: 40px 36px 32px 36px;
+        box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
+        text-align: center;
+    }
+    
+    .auth-logo-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px;
+        height: 64px;
+        background: #eff6ff;
+        border-radius: 50%;
+        font-size: 32px;
+        margin-bottom: 16px;
         border: 1px solid #dbeafe;
     }
+    
+    .auth-badge {
+        display: inline-block;
+        background: #f1f5f9;
+        color: #1e3a8a;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        padding: 4px 14px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+        border: 1px solid #e2e8f0;
+    }
+    
     .auth-title {
-        font-size: 28px;
+        font-size: 30px;
         font-weight: 800;
         color: #0f172a;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
         letter-spacing: -0.5px;
     }
+    
     .auth-subtitle {
-        font-size: 13.5px;
-        color: #475569;
-        margin-bottom: 18px;
+        font-size: 14px;
+        color: #64748b;
+        margin-bottom: 20px;
         line-height: 1.5;
     }
+    
     .feature-pills {
         display: flex;
         justify-content: center;
-        gap: 8px;
-        margin-bottom: 24px;
+        gap: 10px;
+        margin-bottom: 26px;
     }
+    
     .pill {
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         color: #334155;
-        font-size: 11.5px;
+        font-size: 12px;
         font-weight: 600;
-        padding: 4px 10px;
-        border-radius: 6px;
+        padding: 6px 12px;
+        border-radius: 8px;
     }
+    
+    div[data-testid="stForm"] button[kind="primary"],
+    div[data-testid="stForm"] button {
+        background-color: #1e3a8a !important;
+        border-color: #1e3a8a !important;
+        color: #ffffff !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        height: 48px !important;
+        border-radius: 10px !important;
+        margin-top: 10px !important;
+        transition: all 0.2s ease !important;
+    }
+    div[data-testid="stForm"] button:hover {
+        background-color: #2563eb !important;
+        border-color: #2563eb !important;
+    }
+    
     .auth-footer {
         margin-top: 24px;
-        font-size: 11px;
+        font-size: 11.5px;
         color: #94a3b8;
         border-top: 1px solid #f1f5f9;
-        padding-top: 14px;
+        padding-top: 16px;
     }
 </style>
 """
@@ -196,13 +238,14 @@ if "user_session" not in st.session_state:
     st.session_state.user_session = None
 
 def exibir_tela_autenticacao():
-    col_l1, col_l2, col_l3 = st.columns([1, 1.2, 1])
+    col_l1, col_l2, col_l3 = st.columns([1, 1.3, 1])
     with col_l2:
         st.markdown(
             """
-            <div class="auth-card">
+            <div class="auth-wrapper">
+                <div class="auth-logo-badge">⚖️</div><br>
                 <div class="auth-badge">4ª Procuradoria de Justiça Cível • MPMS</div>
-                <div class="auth-title">⚖️ JusAssist MPMS</div>
+                <div class="auth-title">JusAssist MPMS</div>
                 <div class="auth-subtitle">
                     Ecossistema de Inteligência Jurídica: Pesquisa Analítica de Precedentes e Elaboração de Pareceres de 2º Grau
                 </div>
@@ -218,8 +261,8 @@ def exibir_tela_autenticacao():
         
         with tab_login:
             with st.form("form_login"):
-                email = st.text_input("E-mail cadastrado", placeholder="exemplo@mpms.mp.br")
-                senha = st.text_input("Senha", type="password", placeholder="••••••••")
+                email = st.text_input("E-mail institucional / cadastrado", placeholder="exemplo@mpms.mp.br")
+                senha = st.text_input("Senha de Acesso", type="password", placeholder="••••••••")
                 btn_entrar = st.form_submit_button("Entrar no JusAssist", type="primary", use_container_width=True)
                 
                 if btn_entrar:
@@ -270,7 +313,7 @@ def exibir_tela_autenticacao():
             unsafe_allow_html=True
         )
 
-# Bloqueia a renderização caso o usuário não esteja logado
+# Bloqueia a renderização da aplicação caso o usuário não esteja logado
 if not st.session_state.user_session:
     exibir_tela_autenticacao()
     st.stop()
@@ -722,7 +765,7 @@ if prompt_final:
 
             user_parts = []
             
-            # Consulta DataJud por número
+            # Consulta DataJud por número de processo
             dados_cnj = None
             if not is_parecer_mode and re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
                 match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)
@@ -730,6 +773,7 @@ if prompt_final:
                 if dados_cnj:
                     user_parts.append(types.Part.from_text(text=f"[Consulta Oficial DataJud/CNJ]:\n{dados_cnj}"))
 
+            # Ingestão binária direta de múltiplos PDFs na 1ª mensagem
             if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
                 for f in uploaded_files:
                     pdf_bytes = f.getvalue()
@@ -747,6 +791,7 @@ if prompt_final:
                 types.Content(role="user", parts=user_parts)
             )
 
+            # Otimização de latência ultra-baixa
             config_params = {
                 "system_instruction": instrucao,
                 "temperature": 0.1,
@@ -756,6 +801,7 @@ if prompt_final:
             if not is_parecer_mode:
                 config_params["tools"] = [types.Tool(google_search=types.GoogleSearch())]
 
+            # Streaming com resiliência a limites
             def stream_generator():
                 for tentativa in range(3):
                     try:

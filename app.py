@@ -5,7 +5,7 @@ from google import genai
 from google.genai import types
 
 # ----------------------------------------------------
-# 1. Configurações da Página
+# 1. Configurações da Página (Estilo Jus IA)
 # ----------------------------------------------------
 st.set_page_config(
     page_title="Assistente de Jurisprudência IA",
@@ -14,23 +14,23 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Barra Lateral (Credenciais e Fontes)
+# 2. Carregamento Automático e Invisível das Chaves
+# ----------------------------------------------------
+GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
+CNJ_API_KEY = st.secrets.get("CNJ_API_KEY")
+
+if not GEMINI_API_KEY:
+    st.error("⚠️ Chave de API não configurada nos Secrets do servidor.")
+    st.stop()
+
+# ----------------------------------------------------
+# 3. Barra Lateral Limpa (Apenas Filtros Jurídicos)
 # ----------------------------------------------------
 with st.sidebar:
-    st.title("⚖️ Painel de Configuração")
-    st.markdown("Defina a base prioritária de pesquisa:")
-
-    gemini_key = st.secrets.get("GEMINI_API_KEY") if "GEMINI_API_KEY" in st.secrets else st.text_input(
-        "Gemini API Key", type="password", help="Chave obtida no Google AI Studio"
-    )
-    cnj_key = st.secrets.get("CNJ_API_KEY") if "CNJ_API_KEY" in st.secrets else st.text_input(
-        "DataJud / CNJ API Key (Opcional)", type="password", help="Chave pública do DataJud"
-    )
-
-    st.divider()
-
+    st.title("⚖️ Filtros de Jurisprudência")
+    
     fonte_escolhida = st.selectbox(
-        "Base Jurisprudencial Prioritária:",
+        "Base Jurisprudencial:",
         [
             "STF e STJ (Tribunais Superiores)",
             "STF - Supremo Tribunal Federal",
@@ -42,28 +42,26 @@ with st.sidebar:
     tribunal_datajud = "tjsp"
     if fonte_escolhida == "DataJud / CNJ (TJs e TRFs)":
         tribunal_datajud = st.selectbox(
-            "Selecione o Tribunal (DataJud):",
+            "Tribunal Estadual / Federal:",
             ["tjsp", "tjrj", "tjmg", "tjrs", "tjpr", "tjsc", "trf1", "trf2", "trf3", "trf4", "trf5"]
         )
 
     st.divider()
-    if st.button("🗑️ Limpar Conversa"):
+    if st.button("🗑️ Nova Consulta / Limpar Chat"):
         st.session_state.messages = []
         st.rerun()
 
 # ----------------------------------------------------
-# 3. Ferramenta para Consulta ao DataJud
+# 4. Ferramenta de Consulta DataJud
 # ----------------------------------------------------
 def consultar_processos_datajud(termo_busca: str, sigla_tribunal: str = "tjsp") -> str:
-    """
-    Consulta processos e movimentações no DataJud/CNJ (TJs e TRFs).
-    """
-    if not cnj_key:
-        return "Chave do DataJud/CNJ não informada na barra lateral."
+    """Consulta processos ativos e movimentações no DataJud/CNJ."""
+    if not CNJ_API_KEY:
+        return "Chave do DataJud não configurada no servidor."
 
     tribunal_limpo = sigla_tribunal.lower().strip()
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal_limpo}/_search"
-    headers = {"Authorization": f"APIKey {cnj_key}", "Content-Type": "application/json"}
+    headers = {"Authorization": f"APIKey {CNJ_API_KEY}", "Content-Type": "application/json"}
 
     payload = {
         "size": 5,
@@ -95,14 +93,10 @@ def consultar_processos_datajud(termo_busca: str, sigla_tribunal: str = "tjsp") 
         return f"Erro de conexão com DataJud: {str(e)}"
 
 # ----------------------------------------------------
-# 4. Interface Principal de Chat
+# 5. Interface Principal de Chat
 # ----------------------------------------------------
-st.header("⚖️ Consulta Jurisprudencial com IA")
-st.info(f"📍 Foco Selecionado: **{fonte_escolhida}**" + (f" ({tribunal_datajud.upper()})" if fonte_escolhida == "DataJud / CNJ (TJs e TRFs)" else ""))
-
-if not gemini_key:
-    st.warning("👈 Insira sua **Gemini API Key** na barra lateral para começar.")
-    st.stop()
+st.header("⚖️ Consulta Jurisprudencial Inteligente")
+st.caption(f"Foco ativo: **{fonte_escolhida}**" + (f" ({tribunal_datajud.upper()})" if fonte_escolhida == "DataJud / CNJ (TJs e TRFs)" else ""))
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -111,32 +105,43 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-if prompt := st.chat_input("Ex.: Qual o entendimento do STJ sobre dano moral presumido em inscrição indevida?"):
+if prompt := st.chat_input("Ex.: Pesquise jurisprudência sobre responsabilidade civil do Estado por erro médico..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        with st.spinner("Pesquisando teses, súmulas e julgados oficiais..."):
+        with st.spinner("Analisando precedentes, ementas e teses vinculantes..."):
             try:
-                client = genai.Client(api_key=gemini_key)
+                client = genai.Client(api_key=GEMINI_API_KEY)
 
-                # Roteamento de ferramentas para não conflitar tipos
+                # Instrução estruturada no padrão do Jus IA
+                instrucoes = (
+                    "Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica. "
+                    f"Base prioritária selecionada: '{fonte_escolhida}'.\n\n"
+                    "REGRAS DE FORMATAÇÃO E ESTRUTURA (ESTILO PARECER JURÍDICO):\n"
+                    "Estruture rigorosamente sua resposta nas seguintes seções:\n\n"
+                    "### 📌 Tese Jurídica Central\n"
+                    "Apresente em 1 ou 2 frases qual é o ponto decisivo exigido pelos tribunais (nexo causal, requisitos objetivos, ônus da prova).\n\n"
+                    "### ⚖️ Precedentes Favoráveis\n"
+                    "Liste de 2 a 4 decisões favoráveis, no formato exato:\n"
+                    "* **[Tribunal] – [Classe Processual] nº [Número do Processo]**: [Resumo fático em 2 linhas explicando por que houve procedência]. [Link Oficial/Fonte]\n\n"
+                    "### 🛑 Precedentes Desfavoráveis ou Restritivos\n"
+                    "Apresente 1 ou 2 decisões contrárias, demonstrando em quais circunstâncias o pedido costuma ser rejeitado.\n\n"
+                    "### 📋 Critérios Objetivos Extraídos dos Julgados\n"
+                    "Enumere os requisitos práticos indispensáveis para o acolhimento da tese.\n\n"
+                    "### 🏛️ Precedentes Vinculantes (STF / STJ)\n"
+                    "Indique se há Súmula, Tema de Repercussão Geral (STF) ou Recurso Repetitivo (STJ) aplicável.\n\n"
+                    "### 📝 Sugestão de Ementa para Cópia\n"
+                    "Forneça o trecho mais representativo de uma das ementas dentro de um bloco de citação pronto para uso em petições."
+                )
+
                 if fonte_escolhida == "DataJud / CNJ (TJs e TRFs)":
                     ferramentas = [consultar_processos_datajud]
-                    instrucoes = (
-                        f"Você é um consultor jurídico. Utilize a ferramenta do DataJud para consultar processos no tribunal '{tribunal_datajud}'. "
-                        "Apresente os números de processos, classes e órgãos julgadores encontrados."
-                    )
                     prompt_envio = f"[Tribunal: {tribunal_datajud}] {prompt}"
                 else:
                     ferramentas = [types.Tool(google_search=types.GoogleSearch())]
-                    instrucoes = (
-                        f"Você é um especialista em jurisprudência brasileira com foco em: '{fonte_escolhida}'. "
-                        "Utilize a busca do Google para localizar súmulas, teses repetitivas do STJ, repercussão geral do STF e acórdãos oficiais. "
-                        "Estruture a resposta com clareza, citando o número dos precedentes (ex: Súmula, Tema Repetitivo ou REsp/RE) e a fundamentação jurídica."
-                    )
-                    prompt_envio = f"[Foco: {fonte_escolhida}] {prompt}"
+                    prompt_envio = f"[Base Prioritária: {fonte_escolhida}] {prompt}"
 
                 chat = client.chats.create(
                     model="gemini-2.5-flash",
@@ -154,4 +159,4 @@ if prompt := st.chat_input("Ex.: Qual o entendimento do STJ sobre dano moral pre
                 st.session_state.messages.append({"role": "assistant", "content": texto_resposta})
 
             except Exception as e:
-                st.error(f"Erro na pesquisa: {str(e)}")
+                st.error(f"Erro ao processar consulta: {str(e)}")

@@ -43,7 +43,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico (SaaS Enterprise / Fundo Refinado)
+# 4. Injeção de CSS Dinâmico (+1px Geral e Containers Adequados)
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -51,26 +51,26 @@ css_customizado = """
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* Fundo neutro sofisticado para contraste */
+    /* Fundo neutro e sem cabeçalho padrão */
     .stApp {
         background-color: #f8fafc !important;
     }
     
-    /* Oculta header nativo do Streamlit */
     header[data-testid="stHeader"] {
         display: none !important;
     }
     
     .block-container {
-        padding-top: 1.5rem !important;
+        padding-top: 1.2rem !important;
         padding-bottom: 0.5rem !important;
         max-width: 100% !important;
     }
     
+    /* Botões da Barra Lateral */
     div[data-testid="stSidebar"] button[kind="primary"],
     div.stButton > button[kind="primary"] {
         border-radius: 8px !important;
-        font-size: 15px !important;
+        font-size: 16px !important;
         font-weight: 600 !important;
         padding: 10px 16px !important;
         background-color: #1e3a8a !important;
@@ -86,7 +86,7 @@ css_customizado = """
     div[data-testid="stSidebar"] button[kind="secondary"],
     div.stButton > button[kind="secondary"] {
         border-radius: 8px !important;
-        font-size: 14px !important;
+        font-size: 15px !important;
         font-weight: 500 !important;
         padding: 8px 14px !important;
         border: 1px solid #cbd5e1 !important;
@@ -99,7 +99,7 @@ css_customizado = """
     }
 
     .sidebar-label {
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 700;
         color: #64748b;
         text-transform: uppercase;
@@ -115,7 +115,7 @@ css_customizado = """
     }
 
     .hero-title {
-        font-size: 34px;
+        font-size: 35px;
         font-weight: 800;
         color: #1e293b;
         text-align: center;
@@ -124,7 +124,7 @@ css_customizado = """
     }
 
     .feed-header {
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 700;
         color: #475569;
         text-transform: uppercase;
@@ -148,18 +148,18 @@ css_customizado = """
         background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 20px;
-        padding: 28px 32px 20px 32px;
+        padding: 26px 32px 18px 32px;
         box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
         text-align: center;
-        max-width: 490px;
-        margin: 1vh auto 0 auto;
+        max-width: 510px;
+        margin: 0.5vh auto 0 auto;
     }
     
     .auth-badge {
         display: inline-block;
         background: #eff6ff;
         color: #1e3a8a;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 700;
         letter-spacing: 0.6px;
         text-transform: uppercase;
@@ -170,7 +170,7 @@ css_customizado = """
     }
     
     .auth-title {
-        font-size: 28px;
+        font-size: 29px;
         font-weight: 800;
         color: #0f172a;
         margin-bottom: 6px;
@@ -178,7 +178,7 @@ css_customizado = """
     }
     
     .auth-subtitle {
-        font-size: 14px;
+        font-size: 15px;
         color: #475569;
         margin-bottom: 14px;
         line-height: 1.45;
@@ -188,24 +188,24 @@ css_customizado = """
         display: flex;
         justify-content: center;
         gap: 10px;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
     }
     
     .pill {
         background: #f1f5f9;
         border: 1px solid #e2e8f0;
         color: #334155;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 600;
         padding: 5px 12px;
         border-radius: 6px;
     }
     
-    /* Abas de Login com Linha Azul */
+    /* Abas de Login com Tipografia Expandida (+1px) */
     div[data-testid="stTabs"] button {
-        font-size: 15.5px !important;
+        font-size: 16.5px !important;
         font-weight: 700 !important;
-        padding: 8px 16px !important;
+        padding: 8px 14px !important;
         color: #64748b !important;
     }
     div[data-testid="stTabs"] button[aria-selected="true"] {
@@ -216,19 +216,20 @@ css_customizado = """
         border-color: #e2e8f0 !important;
     }
     
-    /* Rótulos dos Inputs */
+    /* Rótulos dos Inputs (+1px) */
     div[data-testid="stWidgetLabel"] label p {
-        font-size: 14.5px !important;
+        font-size: 15.5px !important;
         font-weight: 600 !important;
         color: #1e293b !important;
         margin-bottom: 2px !important;
         text-align: left !important;
     }
     
-    /* Caixas de Texto */
+    /* Caixas de Texto Expandidas (+1px) */
     div[data-testid="stTextInput"] input {
-        font-size: 15px !important;
+        font-size: 16px !important;
         padding: 10px 14px !important;
+        height: 46px !important;
         border-radius: 8px !important;
         border: 1px solid #cbd5e1 !important;
         background-color: #ffffff !important;
@@ -241,15 +242,15 @@ css_customizado = """
         box-shadow: none !important;
     }
 
-    /* Botão de Entrar */
+    /* Botão de Ação Institucional */
     div[data-testid="stForm"] button[kind="primary"],
     div[data-testid="stForm"] button {
         background-color: #1e3a8a !important;
         border-color: #1e3a8a !important;
         color: #ffffff !important;
-        font-size: 16px !important;
+        font-size: 17px !important;
         font-weight: 700 !important;
-        height: 46px !important;
+        height: 48px !important;
         border-radius: 8px !important;
         margin-top: 10px !important;
         transition: all 0.2s ease !important;
@@ -259,33 +260,33 @@ css_customizado = """
         border-color: #2563eb !important;
     }
     
-    /* Rodapé de Segurança Integrado */
+    /* Rodapé de Segurança Integrado (+1px) */
     .auth-security-footer {
         text-align: center !important;
-        font-size: 12px !important;
+        font-size: 12.5px !important;
         font-weight: 500 !important;
         color: #64748b !important;
-        margin-top: 16px !important;
+        margin-top: 14px !important;
         margin-bottom: 0px !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
         gap: 6px !important;
         border-top: 1px solid #f1f5f9;
-        padding-top: 12px;
+        padding-top: 10px;
     }
 </style>
 """
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 5. Fluxo de Autenticação (Login & Cadastro com Supabase)
+# 5. Fluxo de Autenticação (Login, Cadastro & Esqueci a Senha)
 # ----------------------------------------------------
 if "user_session" not in st.session_state:
     st.session_state.user_session = None
 
 def exibir_tela_autenticacao():
-    col_l1, col_l2, col_l3 = st.columns([1, 1.35, 1])
+    col_l1, col_l2, col_l3 = st.columns([1, 1.38, 1])
     with col_l2:
         st.markdown(
             """
@@ -303,7 +304,7 @@ def exibir_tela_autenticacao():
             unsafe_allow_html=True
         )
         
-        tab_login, tab_cadastro = st.tabs(["🔑 Acessar Conta", "✨ Criar Novo Acesso"])
+        tab_login, tab_cadastro, tab_recuperar = st.tabs(["🔑 Entrar", "✨ Criar Acesso", "🔄 Esqueci a Senha"])
         
         with tab_login:
             with st.form("form_login"):
@@ -348,6 +349,24 @@ def exibir_tela_autenticacao():
                                 st.success("Conta criada com sucesso! Você já pode realizar o login.")
                         except Exception as e:
                             st.error(f"Erro ao cadastrar: {str(e)}")
+
+        with tab_recuperar:
+            with st.form("form_recuperar"):
+                st.caption("Informe seu e-mail para enviarmos o link seguro de redefinição de senha.")
+                email_recuperacao = st.text_input("E-mail cadastrado", placeholder="seu.email@mpms.mp.br")
+                btn_recuperar = st.form_submit_button("Enviar Link de Redefinição", use_container_width=True)
+                
+                if btn_recuperar:
+                    if not email_recuperacao:
+                        st.warning("Por favor, digite seu e-mail cadastrado.")
+                    elif not supabase:
+                        st.error("Credenciais do Supabase não configuradas nos Secrets.")
+                    else:
+                        try:
+                            supabase.auth.reset_password_email(email_recuperacao)
+                            st.success("Link de redefinição enviado para seu e-mail! Verifique sua caixa de entrada.")
+                        except Exception as e:
+                            st.error(f"Erro ao solicitar recuperação: {str(e)}")
 
         st.markdown(
             """

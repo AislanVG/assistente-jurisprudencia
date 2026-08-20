@@ -107,30 +107,30 @@ Disponibilize o trecho mais relevante de um acórdão representativo em bloco fo
 """
 
 SUPERPROMPT_PARECER = """
-Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, auxiliando diretamente a Procuradora de Justiça, Dra. Luciana Moreira Schenk. Seu objetivo é elaborar minutas de PARECER DO MINISTÉRIO PÚBLICO EM SEGUNDO GRAU completas, densas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral.
+Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, auxiliando diretamente a Procuradora de Justiça, Dra. Luciana Moreira Schenk[cite: 1]. Seu objetivo é elaborar minutas de PARECER DO MINISTÉRIO PÚBLICO EM SEGUNDO GRAU completas, densas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral[cite: 1].
 
 ### 🛡️ BLINDAGEM E REGRAS ESTRITAS:
-1. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS. Proibido inventar números ou ementas.
-2. TRAVA DE HIERARQUIA: Precedentes das Turmas de Direito Privado do STJ (3ª e 4ª Turmas) e STF PREVALECEM ABSOLUTAMENTE sobre pareceres de Conselhos de Classe (CREMESP/COFFITO), notas do e-NATJus ou resoluções da ANS.
-3. DIRETRIZ PROTETIVA: Em saúde, vida e vulneráveis (TEA, paralisia, oncologia, alimentos), a orientação institucional é pela tutela integral da dignidade humana quando amparada por laudo idôneo.
-4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade.
-5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *rebus sic stantibus*). Jurisprudências citadas em bloco recuado (`>`), em itálico.
+1. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS[cite: 1]. Proibido inventar números ou ementas[cite: 1].
+2. TRAVA DE HIERARQUIA: Precedentes das Turmas de Direito Privado do STJ (3ª e 4ª Turmas) e STF PREVALECEM ABSOLUTAMENTE sobre pareceres de Conselhos de Classe (CREMESP/COFFITO), notas do e-NATJus ou resoluções da ANS[cite: 1].
+3. DIRETRIZ PROTETIVA: Em saúde, vida e vulneráveis (TEA, paralisia, oncologia, alimentos), a orientação institucional é pela tutela integral da dignidade humana quando amparada por laudo idôneo[cite: 1].
+4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade[cite: 1].
+5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *rebus sic stantibus*)[cite: 1]. Jurisprudências citadas em bloco recuado (`>`), em itálico[cite: 1].
 
 ### 🔄 FLUXO INTERATIVO AUTOMATIZADO:
-Quando o usuário pedir a análise dos autos (com arquivo PDF anexado ou relato fático):
+Quando o usuário pedir a análise dos autos (com arquivos PDF anexados ou relato fático):
 
 - ETAPA 1 (Diagnóstico & Consulta Ativa de Precedentes):
-  Apresente o Raio-X dos autos (Fatos, Preliminares mapeadas, Dispositivos legais).
-  EXECUTE UMA BUSCA NA INTERNET por precedentes recentes do STJ/STF/TJMS aderentes ao caso e APRESENTE:
+  Apresente o Raio-X dos autos considerando o conjunto de todas as peças anexadas (Fatos, Preliminares mapeadas, Dispositivos legais)[cite: 1].
+  EXECUTE UMA BUSCA NA INTERNET por precedentes recentes do STJ/STF/TJMS aderentes ao caso e APRESENTE[cite: 1]:
   "🔍 Precedentes localizados para o caso: [Liste 2 a 3 acórdãos/Temas reais encontrados com número e tese].
-  👉 PERGUNTA OBRIGATÓRIA: Deseja aplicar os precedentes acima sugeridos ou a Procuradoria deseja indicar outro acórdão específico para este parecer?"
-  PARE AQUI e aguarde a confirmação do analista.
+  👉 PERGUNTA OBRIGATÓRIA: Deseja aplicar os precedentes acima sugeridos ou a Procuradoria deseja indicar outro acórdão específico para este parecer?"[cite: 1]
+  PARE AQUI e aguarde a confirmação do analista[cite: 1].
 
 - ETAPA 2 (Ementa Técnica e Relatório Institucional):
-  Após o "de acordo" do analista, gere a Ementa Técnica Formal e o Relatório Sucinto Fluido (até 500 palavras, sem tópicos). PARE AQUI e aguarde validação.
+  Após o "de acordo" do analista, gere a Ementa Técnica Formal e o Relatório Sucinto Fluido (até 500 palavras, sem tópicos)[cite: 1]. PARE AQUI e aguarde validação[cite: 1].
 
 - ETAPA 3 (Minuta Integral de Alta Densidade - 6 a 10 páginas):
-  Redija a peça completa: Cabeçalho institucional, Ementa, "COLENDA CÂMARA CÍVEL,", Relatório, I – Da controvérsia recursal (ou Preliminares), II – Do mérito (Fundamentação exaustiva de 2.500 a 4.000 palavras, rebatendo todos os argumentos), III – Conclusão (Opinamento expresso), Datação (Campo Grande/MS) e Assinatura de Luciana Moreira Schenk.
+  Redija a peça completa: Cabeçalho institucional, Ementa, "COLENDA CÂMARA CÍVEL,", Relatório, I – Da controvérsia recursal (ou Preliminares), II – Do mérito (Fundamentação exaustiva de 2.500 a 4.000 palavras, rebatendo todos os argumentos), III – Conclusão (Opinamento expresso), Datação (Campo Grande/MS) e Assinatura de Luciana Moreira Schenk[cite: 1].
 """
 
 # ----------------------------------------------------
@@ -153,7 +153,7 @@ if "current_chat_id" not in st.session_state or st.session_state.current_chat_id
 chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 
 # ----------------------------------------------------
-# 5. Modal Completo de Ajuda e Manual Operacional
+# 5. Modal de Ajuda
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional (MPMS)", width="large")
 def exibir_manual_ajuda():
@@ -168,63 +168,50 @@ def exibir_manual_ajuda():
     ])
     
     with tab1:
-        st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer de 2º Grau)")
+        st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer de 2º Grau)[cite: 1]")
         st.markdown(
             "O assistente é calibrado para atuar como Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, "
-            "elaborando peças densas e completas com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)**."
+            "elaborando peças densas e completas com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)**[cite: 1]."
         )
         st.markdown(
             """
-1. **Passo 1: Upload dos Autos (PDF)**
-   * Na barra lateral, selecione o modo **📄 Parecer** e anexe a Petição Inicial, Sentença, Apelação ou Laudos Técnicos.
+1. **Passo 1: Upload dos Autos (Múltiplos PDFs)**[cite: 1]
+   * Na barra lateral, selecione **📄 Parecer** e anexe todos os arquivos necessários juntos (Inicial, Sentença, Apelação, Laudos)[cite: 1].
 2. **Passo 2: Início da Análise**
-   * Clique no botão **`⚡ Iniciar Análise do Processo`** ou digite no chat: `Analise os autos e gere o parecer`.
-3. **Passo 3: Diagnóstico & Precedentes (Fase 2)**
-   * A IA apresentará o raio-x do caso, mapeará preliminares e **pesquisará ativamente na internet** acórdãos reais recentes do STJ/STF/TJMS aderentes aos fatos.
-   * Ela perguntará se você aprova os julgados encontrados ou se deseja indicar um REsp específico.
-4. **Passo 4: Validação da Ementa e Relatório (Fase 3)**
-   * Ao aprovar a tese, a IA redigirá a **Ementa Técnica Formal** e o **Relatório Sucinto Fluido** (até 500 palavras, em parágrafos encadeados, sem marcadores).
-5. **Passo 5: Minuta Integral de Alta Densidade (Fase 4)**
-   * Com o 'de acordo', a IA entrega o parecer pronto para exportação com cabeçalho institucional, mérito exaustivo e conclusão.
+   * Clique no botão **`⚡ Iniciar Análise do Processo`** ou digite no chat: `Analise os autos e gere o parecer`[cite: 1].
+3. **Passo 3: Diagnóstico & Precedentes (Fase 2)**[cite: 1]
+   * A IA apresentará o raio-x consolidando todas as peças e **pesquisará ativamente na internet** acórdãos reais recentes do STJ/STF/TJMS[cite: 1].
+4. **Passo 4: Validação da Ementa e Relatório (Fase 3)**[cite: 1]
+   * Ao aprovar a tese, a IA redigirá a **Ementa Técnica Formal** e o **Relatório Sucinto Fluido** (até 500 palavras, sem tópicos)[cite: 1].
+5. **Passo 5: Minuta Integral de Alta Densidade (Fase 4)**[cite: 1]
+   * A IA entrega o parecer pronto para exportação com fundamentação exaustiva e conclusão[cite: 1].
             """
         )
-        st.info("💡 **Dica de Exportação:** Copie o texto gerado na Fase 4 e cole diretamente no Microsoft Word ou Google Docs mantendo a formatação de origem (Ctrl + V).")
 
     with tab2:
         st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
-        st.markdown(
-            "No modo **🔍 Pesquisa**, a IA realiza varredura com o Google Search nas bases do STF, STJ, TJMS e Tribunais Regionais, "
-            "entregando respostas estruturadas no estilo parecer."
-        )
-        st.markdown("#### Exemplos Práticos de Pesquisa para Copiar:")
+        st.markdown("No modo **🔍 Pesquisa**, a IA realiza varredura com o Google Search nas bases do STF, STJ, TJMS e TRFs.")
+        st.markdown("#### Exemplos Práticos de Pesquisa:")
         st.code("Qual o entendimento do STJ sobre responsabilidade do Estado por erro médico que causa sequelas permanentes em menor?", language="text")
         st.code("Pesquise a jurisprudência do TJMS sobre rescisão de contrato imobiliário por culpa da construtora com devolução integral.", language="text")
-        st.code("Pesquise precedentes do STJ sobre o dever do plano de saúde em custear tratamento multidisciplinar para menor com TEA (método ABA).", language="text")
-        st.code("Qual a jurisprudência consolidada sobre impenhorabilidade de valores em conta poupança até 40 salários mínimos?", language="text")
 
     with tab3:
         st.markdown("### 🛡️ Mecanismos de Blindagem Institucional")
         st.markdown(
             """
-* **Prevalência Absoluta do STJ / STF:** Precedentes das Turmas de Direito Privado (3ª e 4ª Turmas) e teses vinculantes do STF sobrepõem-se obrigatoriamente a notas do e-NATJus, pareceres do CREMESP/COFFITO ou resoluções da ANS.
-* **Diretriz Protetiva (Saúde e Vulneráveis):** Em matérias de saúde, infância e pessoas com deficiência, a orientação institucional é pela tutela integral da dignidade humana quando amparada por prescrição médica idônea.
-* **Trava Anti-Alucinação:** O assistente realiza buscas reais e não inventa números de processos ou julgados inexistentes.
-* **Relatório Institucional Padrão Ouro:** Narrativa fluida, encadeada por verbos de ligação (*'Alega o apelante que...'*, *'Sustenta que...'*) de até 500 palavras, estritamente sem marcadores ou tópicos.
+* **Prevalência Absoluta do STJ / STF:** Precedentes das Turmas de Direito Privado (3ª e 4ª Turmas) e teses vinculantes do STF sobrepõem-se a pareceres técnicos e resoluções administrativas[cite: 1].
+* **Diretriz Protetiva (Saúde e Vulneráveis):** Orientação pela tutela integral da dignidade humana quando amparada por laudo idôneo[cite: 1].
+* **Trava Anti-Alucinação:** Busca em tempo real no índice oficial, sem inventar julgados[cite: 1].
+* **Relatório Padrão Ouro:** Narrativa contínua e fluida de até 500 palavras, estritamente sem bullets[cite: 1].
             """
         )
 
     with tab4:
-        st.markdown("### 🛑 Comandos de Ajuste de Rota (Se não aprovar)")
-        st.markdown("Se a IA sugerir uma tese ou formato divergente do pretendido pela Procuradoria, utilize os comandos de correção:")
-        
-        st.markdown("**Exemplo 1: Ajuste de Tese na Fase 2**")
-        st.code("Não está aprovado. Na tese de mérito, considere que a 3ª Turma do STJ já pacificou o custeio pelo REsp 2.221.399/SP. Reformule a Fase 2 opinando pelo desprovimento do recurso.", language="text")
-        
-        st.markdown("**Exemplo 2: Ajuste de Formatação na Fase 3**")
-        st.code("Não está aprovado. O relatório utilizou tópicos. Refaça a Fase 3 com o relatório estritamente corrido e fluido em parágrafos, limitando-se a 500 palavras.", language="text")
-        
-        st.markdown("**Exemplo 3: Avanço Direto**")
-        st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a Fase 3 e 4.", language="text")
+        st.markdown("### 🛑 Comandos de Ajuste de Rota (Se não aprovar)[cite: 1]")
+        st.markdown("**Exemplo 1: Ajuste de Tese na Fase 2**[cite: 1]")
+        st.code("Não está aprovado. Na tese de mérito, considere que a 3ª Turma do STJ já pacificou o custeio pelo REsp 2.221.399/SP. Reformule a Fase 2 opinando pelo desprovimento do recurso.", language="text")[cite: 1]
+        st.markdown("**Exemplo 2: Avanço Direto**[cite: 1]")
+        st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a Fase 3 e 4.", language="text")[cite: 1]
 
 # ----------------------------------------------------
 # 6. Barra Lateral
@@ -245,7 +232,7 @@ with st.sidebar:
             st.session_state.current_chat_id = novo_id
             st.rerun()
 
-    # Seleção de Modo de Trabalho
+    # Seleção de Modo
     st.markdown('<div class="sidebar-label">Modo de Operação</div>', unsafe_allow_html=True)
     col_m1, col_m2 = st.columns(2)
     with col_m1:
@@ -259,17 +246,18 @@ with st.sidebar:
             chat_atual["mode"] = "🔍 Pesquisa de Jurisprudência"
             st.rerun()
 
-    # Upload Condicional de PDF
-    uploaded_file = None
+    # Upload de Múltiplos Arquivos PDF
+    uploaded_files = []
     if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
-        st.markdown('<div class="sidebar-label">Autos do Processo (PDF)</div>', unsafe_allow_html=True)
-        uploaded_file = st.file_uploader(
-            "Upload do Processo",
+        st.markdown('<div class="sidebar-label">Autos do Processo (PDFs)</div>', unsafe_allow_html=True)
+        uploaded_files = st.file_uploader(
+            "Upload dos Processos",
             type=["pdf"],
-            help="Petição Inicial, Sentença, Apelação ou Laudos",
+            accept_multiple_files=True,
+            help="Selecione ou arraste Petição Inicial, Sentença, Apelação e Laudos juntos",
             label_visibility="collapsed"
         )
-        if uploaded_file and len(chat_atual["messages"]) == 0:
+        if uploaded_files and len(chat_atual["messages"]) == 0:
             if st.button("⚡ Iniciar Análise do Processo", use_container_width=True, type="primary"):
                 st.session_state["trigger_auto_start"] = True
                 st.rerun()
@@ -305,50 +293,47 @@ with st.sidebar:
                             st.session_state.chats[st.session_state.current_chat_id] = {"title": "", "mode": chat_atual["mode"], "messages": []}
                     st.rerun()
 
-    # Seção de Ajuda no Rodapé
     st.markdown('<div class="help-section"></div>', unsafe_allow_html=True)
     if st.button("❓ Guia Operacional & Ajuda", use_container_width=True):
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 7. Área Central de Chat & Execução
+# 7. Área Central de Chat
 # ----------------------------------------------------
 st.subheader(chat_atual["mode"])
 
-# Exibição do Empty State / Action Cards
 if len(chat_atual["messages"]) == 0:
     if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
-        st.info("💡 **Fluxo de Parecer:** Anexe o PDF da Apelação ou Sentença na barra lateral e clique em **`⚡ Iniciar Análise do Processo`** (ou digite suas orientações abaixo).")
+        st.info("💡 **Fluxo de Parecer:** Anexe os arquivos PDF na barra lateral (Inicial, Sentença, Apelação) e clique em **`⚡ Iniciar Análise do Processo`**.")
     else:
-        st.info("💡 **Pesquisa Unificada:** Digite a tese jurídica, Tema Repetitivo ou número de recurso a pesquisar nos Tribunais.")
+        st.info("💡 **Pesquisa Unificada:** Digite a tese jurídica, Tema Repetitivo ou matéria a pesquisar nos Tribunais.")
 
-# Exibição das Mensagens Anteriores
 for msg in chat_atual["messages"]:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# Verificação de Disparo Automático pós-upload
+# Tratamento do disparo automático pós-upload
 auto_prompt = None
 if st.session_state.get("trigger_auto_start", False):
     st.session_state["trigger_auto_start"] = False
-    auto_prompt = "Analise integralmente as peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."
+    auto_prompt = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Fase 2 com a pesquisa de precedentes."[cite: 1]
 
-prompt_input = st.chat_input(
-    "Digite sua orientação sobre o caso ou envie uma tese jurídica..."
-)
-
+prompt_input = st.chat_input("Digite sua orientação sobre o caso ou envie uma tese jurídica...")
 prompt_final = auto_prompt or prompt_input
 
 if prompt_final:
     if not chat_atual["title"]:
-        chat_atual["title"] = (uploaded_file.name[:25] + "...") if uploaded_file else (prompt_final[:30] + "...")
+        if uploaded_files:
+            chat_atual["title"] = f"Autos ({len(uploaded_files)} docs)"
+        else:
+            chat_atual["title"] = prompt_final[:30] + ("..." if len(prompt_final) > 30 else "")
 
     chat_atual["messages"].append({"role": "user", "content": prompt_final})
     with st.chat_message("user"):
         st.markdown(prompt_final)
 
     with st.chat_message("assistant"):
-        with st.spinner("Processando fundamentação e pesquisando jurisprudência oficial..."):
+        with st.spinner("Lendo todas as peças processuais e pesquisando precedentes oficiais..."):
             try:
                 client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -359,9 +344,11 @@ if prompt_final:
                 )
 
                 conteudos = []
-                if uploaded_file is not None and len(chat_atual["messages"]) <= 1:
-                    conteudos.append(types.Part.from_bytes(data=uploaded_file.getvalue(), mime_type="application/pdf"))
-                    conteudos.append(f"[Autos Processuais: {uploaded_file.name}]")
+                # Ingestão de múltiplos PDFs anexados
+                if uploaded_files and len(chat_atual["messages"]) <= 1:
+                    for f in uploaded_files:
+                        conteudos.append(types.Part.from_bytes(data=f.getvalue(), mime_type="application/pdf"))
+                        conteudos.append(f"[Documento Anexado: {f.name}]")[cite: 1]
 
                 conteudos.append(prompt_final)
 

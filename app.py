@@ -1,6 +1,9 @@
 import streamlit as st
 import uuid
 import time
+import json
+import re
+import requests
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from google import genai
@@ -19,13 +22,14 @@ st.set_page_config(
 # 2. Carregamento Seguro de Chaves (Secrets)
 # ----------------------------------------------------
 GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
+CNJ_API_KEY = st.secrets.get("CNJ_API_KEY", "")
 
 if not GEMINI_API_KEY:
     st.error("⚠️ Chave GEMINI_API_KEY não configurada nos Secrets do Streamlit.")
     st.stop()
 
 # ----------------------------------------------------
-# 3. Gerenciamento de Sessões
+# 3. Gerenciamento de Sessões e Feedbacks
 # ----------------------------------------------------
 if "chats" not in st.session_state:
     primeiro_id = str(uuid.uuid4())
@@ -39,6 +43,9 @@ if "chats" not in st.session_state:
     }
     st.session_state.current_chat_id = primeiro_id
 
+if "feedbacks_coletados" not in st.session_state:
+    st.session_state.feedbacks_coletados = []
+
 if "current_chat_id" not in st.session_state or st.session_state.current_chat_id not in st.session_state.chats:
     st.session_state.current_chat_id = list(st.session_state.chats.keys())[0]
 
@@ -46,7 +53,7 @@ chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 chat_vazio = len(chat_atual["messages"]) == 0
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Aprimorado
+# 4. Injeção de CSS Dinâmico
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -121,9 +128,8 @@ css_customizado = """
         text-align: center;
     }
 
-    /* Margem inferior para a última mensagem não colidir com o chat_input */
     .main-chat-container {
-        padding-bottom: 100px;
+        padding-bottom: 110px;
     }
 
     .action-bar {
@@ -135,7 +141,57 @@ css_customizado = """
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 5. Prompts Especializados
+# 5. Módulo de Integração com API DataJud (CNJ)
+# ----------------------------------------------------
+def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjms"):
+    """Consulta metadados processuais na API pública do DataJud (CNJ)."""
+    if not CNJ_API_KEY:
+        return None
+    
+    num_limpo = re.sub(r"\D", "", numero_processo)
+    if len(num_limpo) != 20:
+        return None
+
+    url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal}/_search"
+    headers = {
+        "Authorization": f"APIKey {CNJ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "query": {
+            "match": {
+                "numeroProcesso": num_limpo
+            }
+        }
+    }
+    
+    try:
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        if response.status_code == 200:
+            dados = response.json()
+            hits = dados.get("hits", {}).get("hits", [])
+            if hits:
+                proc = hits[0].get("_source", {})
+                classe = proc.get("classe", {}).get("nome", "Não informada")
+                orgao = proc.get("orgaoJulgador", {}).get("nome", "Não informado")
+                assuntos = [a.get("nome", "") for a in proc.get("assuntos", [])]
+                movs = proc.get("movimentos", [])
+                ultimas_movs = [f"{m.get('dataHora', '')[:10]}: {m.get('nome', '')}" for m in movs[-3:]] if movs else []
+                
+                return (
+                    f"**[Dados Oficiais do DataJud/CNJ - {tribunal.upper()}]**\n"
+                    f"* **Processo:** {numero_processo}\n"
+                    f"* **Classe:** {classe}\n"
+                    f"* **Órgão Julgador:** {orgao}\n"
+                    f"* **Assuntos:** {', '.join(assuntos)}\n"
+                    f"* **Últimas Movimentações:**\n  - " + "\n  - ".join(ultimas_movs)
+                )
+    except Exception:
+        return None
+    return None
+
+# ----------------------------------------------------
+# 6. Prompts Especializados
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -189,7 +245,7 @@ Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do
 """
 
 # ----------------------------------------------------
-# 6. Feed de Precedentes (Cache 12h)
+# 7. Feed de Precedentes (Cache 12h)
 # ----------------------------------------------------
 @st.cache_data(ttl=43200)
 def carregar_feed_precedentes():
@@ -203,57 +259,7 @@ def carregar_feed_precedentes():
     ]
 
 # ----------------------------------------------------
-# 7. Funções de Execução com Modelos Oficiais e Retry
-# ----------------------------------------------------
-def extrair_texto_resposta(response) -> str:
-    if hasattr(response, "text") and response.text:
-        return response.text
-    if hasattr(response, "candidates") and response.candidates:
-        for cand in response.candidates:
-            if hasattr(cand, "content") and hasattr(cand.content, "parts"):
-                textos = [p.text for p in cand.content.parts if hasattr(p, "text") and p.text]
-                if textos:
-                    return "".join(textos)
-    return "A análise foi processada, mas a resposta de texto retornou vazia. Por favor, reenvie a mensagem."
-
-def executar_geracao_com_retry(client, contents, instrucao, usar_pesquisa_web=False):
-    modelos_disponiveis = ["gemini-2.5-flash", "gemini-2.5-pro"]
-    tentativas_max = 3
-
-    ferramentas = [types.Tool(google_search=types.GoogleSearch())] if usar_pesquisa_web else None
-
-    for modelo in modelos_disponiveis:
-        for tentativa in range(tentativas_max):
-            try:
-                config_params = {
-                    "system_instruction": instrucao,
-                    "temperature": 0.1
-                }
-                if ferramentas:
-                    config_params["tools"] = ferramentas
-
-                response = client.models.generate_content(
-                    model=modelo,
-                    contents=contents,
-                    config=types.GenerateContentConfig(**config_params)
-                )
-                texto = extrair_texto_resposta(response)
-                if texto and "retornou vazia" not in texto:
-                    return texto
-            except Exception as e:
-                erro_str = str(e).lower()
-                if "503" in erro_str or "unavailable" in erro_str or "high demand" in erro_str:
-                    time.sleep(2 * (tentativa + 1))
-                    continue
-                elif "404" in erro_str:
-                    break
-                else:
-                    raise e
-
-    raise Exception("Servidor da API do Google sobrecarregado no momento. Por favor, tente novamente em instantes.")
-
-# ----------------------------------------------------
-# 8. Modal Completo de Ajuda e Manual Operacional
+# 8. Modais: Manual de Ajuda & Avaliação Negativa
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional (MPMS)", width="large")
 def exibir_manual_ajuda():
@@ -291,10 +297,10 @@ def exibir_manual_ajuda():
 
     with tab2:
         st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
-        st.markdown("Varredura em tempo real com Google Search nas bases do STF, STJ, TJMS e TRFs.")
+        st.markdown("Varredura em tempo real integrada ao Google Search e à **API do DataJud (CNJ)**.")
         st.markdown("#### Exemplos Práticos de Pesquisa:")
         st.code("Qual o entendimento do STJ sobre responsabilidade do Estado por erro médico que causa sequelas em menor?", language="text")
-        st.code("Pesquise a jurisprudência do TJMS sobre rescisão de contrato imobiliário por culpa da construtora com devolução integral.", language="text")
+        st.code("0845374-56.2024.8.12.0001 (Consulta direta ao DataJud/TJMS)", language="text")
 
     with tab3:
         st.markdown("### 🛡️ Mecanismos de Blindagem Institucional")
@@ -313,6 +319,47 @@ def exibir_manual_ajuda():
         st.code("Não está aprovado. Na proposta de mérito, considere que a 3ª Turma do STJ já pacificou o dever de custeio pelo REsp 2.221.399/SP. Reformule a Fase 2 opinando pelo desprovimento do recurso.", language="text")
         st.markdown("**2. Avanço Direto:**")
         st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a emissão da Fase 3 e da Minuta Completa.", language="text")
+
+@st.dialog("O que motivou a sua avaliação negativa?", width="medium")
+def modal_feedback_negativo(msg_index, msg_content):
+    st.markdown("### Descreva o principal motivo")
+    motivo_texto = st.text_area("Conte mais sobre o que aconteceu:", placeholder="Descreva brevemente o erro na fundamentação ou na peça...", label_visibility="collapsed")
+    
+    st.markdown("### Selecione as categorias")
+    categorias_disponiveis = [
+        "Leis/decisões inexistentes",
+        "Leis/decisões irrelevantes",
+        "Resposta superficial ou incompleta",
+        "Resposta confusa",
+        "Ignorou mensagens anteriores",
+        "Problemas técnicos ou lentidão",
+        "Problemas na análise de documentos",
+        "Outro motivo"
+    ]
+    
+    col_k1, col_k2 = st.columns(2)
+    categorias_selecionadas = []
+    for i, cat in enumerate(categorias_disponiveis):
+        alvo = col_k1 if i % 2 == 0 else col_k2
+        if alvo.checkbox(cat, key=f"cat_{msg_index}_{i}"):
+            categorias_selecionadas.append(cat)
+            
+    st.markdown("<br>", unsafe_allow_html=True)
+    col_b1, col_b2 = st.columns([1, 1])
+    with col_b1:
+        if st.button("Cancelar", use_container_width=True):
+            st.rerun()
+    with col_b2:
+        if st.button("Enviar agora", type="primary", use_container_width=True):
+            st.session_state.feedbacks_coletados.append({
+                "data_hora": datetime.now().isoformat(),
+                "tipo": "negativo",
+                "motivo_texto": motivo_texto,
+                "categorias": categorias_selecionadas,
+                "trecho_resposta": msg_content[:250]
+            })
+            st.toast("Feedback registrado com sucesso! Obrigado pela colaboração.", icon="✅")
+            st.rerun()
 
 # ----------------------------------------------------
 # 9. Barra Lateral
@@ -398,7 +445,7 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 10. Horário Local
+# 10. Horário Local (MS / Brasília)
 # ----------------------------------------------------
 try:
     fuso_ms = ZoneInfo("America/Campo_Grande")
@@ -468,10 +515,15 @@ else:
                     )
                 with col_act2:
                     if st.button("👍", key=f"like_{i}", help="Aprovar resposta"):
-                        st.toast("Feedback positivo registrado!", icon="✅")
+                        st.session_state.feedbacks_coletados.append({
+                            "data_hora": datetime.now().isoformat(),
+                            "tipo": "positivo",
+                            "trecho_resposta": msg["content"][:250]
+                        })
+                        st.toast("Avaliação positiva registrada!", icon="✅")
                 with col_act3:
-                    if st.button("👎", key=f"dislike_{i}", help="Sinalizar ajuste"):
-                        st.toast("Feedback registrado para melhoria.", icon="📝")
+                    if st.button("👎", key=f"dislike_{i}", help="Avaliar negativamente / relatar problema"):
+                        modal_feedback_negativo(i, msg["content"])
                 st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -494,49 +546,66 @@ if prompt_final:
         st.markdown(prompt_final)
 
     with st.chat_message("assistant"):
-        with st.spinner("Processando fundamentação jurídica com rigor analítico..."):
-            try:
-                client = genai.Client(api_key=GEMINI_API_KEY)
+        try:
+            client = genai.Client(api_key=GEMINI_API_KEY)
 
-                is_parecer_mode = chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)"
-                instrucao = SUPERPROMPT_PARECER if is_parecer_mode else PROMPT_JURISPRUDENCIA
+            is_parecer_mode = chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)"
+            instrucao = SUPERPROMPT_PARECER if is_parecer_mode else PROMPT_JURISPRUDENCIA
 
-                user_parts = []
-                
-                # Ingestão limpa e direta em memória na primeira mensagem
-                if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
-                    for f in uploaded_files:
-                        pdf_bytes = f.getvalue()
-                        user_parts.append(
-                            types.Part.from_bytes(
-                                data=pdf_bytes,
-                                mime_type="application/pdf"
-                            )
+            user_parts = []
+            
+            # Verificação de consulta CNJ por número no modo pesquisa
+            dados_cnj = None
+            if not is_parecer_mode and re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
+                match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)
+                dados_cnj = consultar_datajud_por_numero(match_cnj, tribunal="tjms")
+                if dados_cnj:
+                    user_parts.append(types.Part.from_text(text=f"[Consulta Oficial DataJud/CNJ]:\n{dados_cnj}"))
+
+            # Anexa os PDFs em binário somente na 1ª mensagem
+            if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
+                for f in uploaded_files:
+                    pdf_bytes = f.getvalue()
+                    user_parts.append(
+                        types.Part.from_bytes(
+                            data=pdf_bytes,
+                            mime_type="application/pdf"
                         )
-                        user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))
+                    )
+                    user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))
 
-                user_parts.append(types.Part.from_text(text=prompt_final))
+            user_parts.append(types.Part.from_text(text=prompt_final))
 
-                chat_atual["gemini_history"].append(
-                    types.Content(role="user", parts=user_parts)
-                )
+            chat_atual["gemini_history"].append(
+                types.Content(role="user", parts=user_parts)
+            )
 
-                usar_web = not is_parecer_mode
+            config_params = {
+                "system_instruction": instrucao,
+                "temperature": 0.1,
+                "thinking_config": types.ThinkingConfig(thinking_budget=0)
+            }
 
-                texto_resposta = executar_geracao_com_retry(
-                    client=client,
+            if not is_parecer_mode:
+                config_params["tools"] = [types.Tool(google_search=types.GoogleSearch())]
+
+            def stream_generator():
+                response_stream = client.models.generate_content_stream(
+                    model="gemini-2.5-flash",
                     contents=chat_atual["gemini_history"],
-                    instrucao=instrucao,
-                    usar_pesquisa_web=usar_web
+                    config=types.GenerateContentConfig(**config_params)
                 )
+                for chunk in response_stream:
+                    if chunk.text:
+                        yield chunk.text
 
-                chat_atual["gemini_history"].append(
-                    types.Content(role="model", parts=[types.Part.from_text(text=texto_resposta)])
-                )
+            texto_resposta = st.write_stream(stream_generator())
 
-                st.markdown(texto_resposta)
-                chat_atual["messages"].append({"role": "assistant", "content": texto_resposta})
-                st.rerun()
+            chat_atual["gemini_history"].append(
+                types.Content(role="model", parts=[types.Part.from_text(text=texto_resposta)])
+            )
+            chat_atual["messages"].append({"role": "assistant", "content": texto_resposta})
+            st.rerun()
 
-            except Exception as e:
-                st.error(f"Erro no processamento da análise: {str(e)}")
+        except Exception as e:
+            st.error(f"Erro no processamento da análise: {str(e)}")

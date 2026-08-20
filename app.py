@@ -4,7 +4,7 @@ from google import genai
 from google.genai import types
 
 # ----------------------------------------------------
-# 1. Configurações da Página e CSS Profissional
+# 1. Configurações da Página e CSS Institucional
 # ----------------------------------------------------
 st.set_page_config(
     page_title="JusAssist MPMS",
@@ -12,28 +12,48 @@ st.set_page_config(
     layout="wide"
 )
 
+# Estilização CSS institucional (Azul Marinho / Navy Blue)
 st.markdown("""
 <style>
-    /* Tipografia e Base */
+    /* Tipografia Global */
     html, body, [class*="css"] {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* Botão Principal Novo Chat (Azul Institucional) */
-    div[data-testid="stSidebar"] button[kind="primary"] {
+    /* Botões Primários (Substituição do Vermelho pelo Azul Institucional) */
+    div[data-testid="stSidebar"] button[kind="primary"],
+    div.stButton > button[kind="primary"] {
         border-radius: 8px !important;
         font-size: 15px !important;
         font-weight: 600 !important;
         padding: 10px 16px !important;
-        background-color: #1e3a8a !important; /* Navy Blue Institucional */
-        border: none !important;
+        background-color: #1e3a8a !important; /* Azul Marinho Institucional */
+        border: 1px solid #1e3a8a !important;
         color: #ffffff !important;
     }
-    div[data-testid="stSidebar"] button[kind="primary"]:hover {
-        background-color: #1d4ed8 !important;
+    div[data-testid="stSidebar"] button[kind="primary"]:hover,
+    div.stButton > button[kind="primary"]:hover {
+        background-color: #2563eb !important;
+        border-color: #2563eb !important;
     }
-    
-    /* Títulos de Seções da Barra Lateral */
+
+    /* Botões Secundários */
+    div[data-testid="stSidebar"] button[kind="secondary"],
+    div.stButton > button[kind="secondary"] {
+        border-radius: 8px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        padding: 8px 14px !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #1e293b !important;
+    }
+    div[data-testid="stSidebar"] button[kind="secondary"]:hover,
+    div.stButton > button[kind="secondary"]:hover {
+        border-color: #94a3b8 !important;
+        background-color: #f8fafc !important;
+    }
+
+    /* Títulos e Rótulos da Barra Lateral */
     .sidebar-label {
         font-size: 11px;
         font-weight: 700;
@@ -44,25 +64,17 @@ st.markdown("""
         margin-bottom: 6px;
     }
 
-    /* Cards de Atalho no Centro da Tela */
-    .prompt-card {
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 16px;
-        background-color: #ffffff;
-        margin-bottom: 10px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    .prompt-card:hover {
-        border-color: #3b82f6;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    /* Rodapé da Barra Lateral */
+    .help-section {
+        margin-top: 25px;
+        padding-top: 15px;
+        border-top: 1px solid #e2e8f0;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 2. Carregamento Seguro de Chave
+# 2. Carregamento Seguro de Chaves (Secrets)
 # ----------------------------------------------------
 GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
 
@@ -71,7 +83,7 @@ if not GEMINI_API_KEY:
     st.stop()
 
 # ----------------------------------------------------
-# 3. Prompts Especializados
+# 3. Prompts Especializados (Jurisprudência & Parecer MPMS)
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -109,6 +121,8 @@ Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do
 5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *rebus sic stantibus*)[cite: 1]. Jurisprudências citadas em bloco recuado (`>`), em itálico[cite: 1].
 
 ### 🔄 FLUXO INTERATIVO AUTOMATIZADO:
+Quando o usuário pedir a análise dos autos (com arquivo PDF anexado ou relato fático):
+
 - ETAPA 1 (Diagnóstico & Consulta Ativa de Precedentes):
   Apresente o Raio-X dos autos (Fatos, Preliminares mapeadas, Dispositivos legais)[cite: 1].
   EXECUTE UMA BUSCA NA INTERNET por precedentes recentes do STJ/STF/TJMS aderentes ao caso e APRESENTE[cite: 1]:
@@ -124,7 +138,7 @@ Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do
 """
 
 # ----------------------------------------------------
-# 4. Gestão de Sessões
+# 4. Gerenciamento de Sessões
 # ----------------------------------------------------
 if "chats" not in st.session_state:
     primeiro_id = str(uuid.uuid4())
@@ -143,24 +157,81 @@ if "current_chat_id" not in st.session_state or st.session_state.current_chat_id
 chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 
 # ----------------------------------------------------
-# 5. Modal de Ajuda
+# 5. Modal Completo de Ajuda e Manual Operacional
 # ----------------------------------------------------
-@st.dialog("❓ Central de Ajuda & Guia Operacional", width="large")
+@st.dialog("📖 Central de Ajuda & Manual Operacional (MPMS)", width="large")
 def exibir_manual_ajuda():
-    st.markdown("### ⚖️ Guia de Utilização do JusAssist")
-    st.markdown(
-        """
-| Modo | Finalidade | Como Iniciar |
-| :--- | :--- | :--- |
-| **📄 Minuta de Parecer (MPMS)** | Elaboração de parecer institucional denso (6 a 10 páginas)[cite: 1]. | Anexe o PDF do processo e clique em *Iniciar Análise*[cite: 1]. |
-| **🔍 Pesquisa de Jurisprudência** | Varredura de teses, acórdãos e súmulas no STF, STJ e TJs. | Digite livremente a tese jurídica no chat. |
-        """
-    )
-    st.divider()
-    st.markdown("### 🚀 Fluxo de Elaboração de Parecer:")
-    st.markdown("1. **Upload:** Faça o upload do arquivo PDF dos autos na lateral.")
-    st.markdown("2. **Diagnóstico:** A IA apresentará o relatório preliminar com os acórdãos reais encontrados na internet[cite: 1].")
-    st.markdown("3. **Aprovação:** Responda no chat com `Aprovado, prossiga` para a IA redigir a Ementa, o Relatório e a Minuta Final[cite: 1].")
+    st.markdown("## ⚖️ Manual Operacional: JusAssist MPMS")
+    st.caption("Guia Prático para Pesquisa Jurisprudencial e Emissão de Pareceres de 2º Grau")
+    
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📄 Minuta de Parecer", 
+        "🔍 Pesquisa Jurisprudencial", 
+        "🛡️ Diretrizes & Travas", 
+        "📝 Comandos de Ajuste"
+    ])
+    
+    with tab1:
+        st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer de 2º Grau)[cite: 1]")
+        st.markdown(
+            """
+O assistente é calibrado para atuar como Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, 
+elaborando peças densas e completas com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)**[cite: 1].
+            """
+        )
+        st.markdown(
+            """
+1. **Passo 1: Upload dos Autos (PDF)**
+   * Na barra lateral, selecione o modo **📄 Parecer** e anexe a Petição Inicial, Sentença, Apelação ou Laudos Técnicos[cite: 1].
+2. **Passo 2: Início da Análise**
+   * Clique no botão **`⚡ Iniciar Análise do Processo`** ou digite no chat: `Analise os autos e gere o parecer`[cite: 1].
+3. **Passo 3: Diagnóstico & Precedentes (Fase 2)**
+   * A IA apresentará o raio-x do caso, mapeará preliminares e **pesquisará ativamente na internet** acórdãos reais recentes do STJ/STF/TJMS aderentes aos fatos[cite: 1].
+   * Ela perguntará se você aprova os julgados encontrados ou se deseja indicar um REsp específico[cite: 1].
+4. **Passo 4: Validação da Ementa e Relatório (Fase 3)**
+   * Ao aprovar a tese, a IA redigirá a **Ementa Técnica Formal** e o **Relatório Sucinto Fluido** (até 500 palavras, em parágrafos encadeados, sem marcadores)[cite: 1].
+5. **Passo 5: Minuta Integral de Alta Densidade (Fase 4)**
+   * Com o 'de acordo', a IA entrega o parecer pronto para exportação com cabeçalho institucional, mérito exaustivo e conclusão[cite: 1].
+            """
+        )
+        st.info("💡 **Dica de Exportação:** Copie o texto gerado na Fase 4 e cole diretamente no Microsoft Word ou Google Docs mantendo a formatação de origem (Ctrl + V)[cite: 1].")
+
+    with tab2:
+        st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
+        st.markdown(
+            """
+No modo **🔍 Pesquisa**, a IA realiza varredura com o Google Search nas bases do STF, STJ, TJMS e Tribunais Regionais, entregando respostas estruturadas no estilo parecer.
+            """
+        )
+        st.markdown("#### Exemplos Práticos de Pesquisa para Copiar:")
+        st.code("Qual o entendimento do STJ sobre responsabilidade do Estado por erro médico que causa sequelas permanentes em menor?", language="text")
+        st.code("Pesquise a jurisprudência do TJMS sobre rescisão de contrato imobiliário por culpa da construtora com devolução integral.", language="text")
+        st.code("Pesquise precedentes do STJ sobre o dever do plano de saúde em custear tratamento multidisciplinar para menor com TEA (método ABA).", language="text")
+        st.code("Qual a jurisprudência consolidada sobre impenhorabilidade de valores em conta poupança até 40 salários mínimos?", language="text")
+
+    with tab3:
+        st.markdown("### 🛡️ Mecanismos de Blindagem Institucional")
+        st.markdown(
+            """
+* **Prevalência Absoluta do STJ / STF:** Precedentes das Turmas de Direito Privado (3ª e 4ª Turmas) e teses vinculantes do STF sobrepõem-se obrigatoriamente a notas do e-NATJus, pareceres do CREMESP/COFFITO ou resoluções da ANS[cite: 1].
+* **Diretriz Protetiva (Saúde e Vulneráveis):** Em matérias de saúde, infância e pessoas com deficiência, a orientação institucional é pela tutela integral da dignidade humana quando amparada por prescrição médica idônea[cite: 1].
+* **Trava Anti-Alucinação:** O assistente realiza buscas reais e não inventa números de processos ou julgados inexistentes[cite: 1].
+* **Relatório Institucional Padrão Ouro:** Narrativa fluida, encadeada por verbos de ligação (*'Alega o apelante que...'*, *'Sustenta que...'*) de até 500 palavras, estritamente sem marcadores ou tópicos[cite: 1].
+            """
+        )
+
+    with tab4:
+        st.markdown("### 🛑 Comandos de Ajuste de Rota (Se não aprovar)[cite: 1]")
+        st.markdown("Se a IA sugerir uma tese ou formato divergente do pretendido pela Procuradoria, utilize os comandos de correção[cite: 1]:")
+        
+        st.markdown("**Exemplo 1: Ajuste de Tese na Fase 2**[cite: 1]")
+        st.code("Não está aprovado. Na tese de mérito, considere que a 3ª Turma do STJ já pacificou o custeio pelo REsp 2.221.399/SP. Reformule a Fase 2 opinando pelo desprovimento do recurso.", language="text")[cite: 1]
+        
+        st.markdown("**Exemplo 2: Ajuste de Formatação na Fase 3**[cite: 1]")
+        st.code("Não está aprovado. O relatório utilizou tópicos. Refaça a Fase 3 com o relatório estritamente corrido e fluido em parágrafos, limitando-se a 500 palavras.", language="text")[cite: 1]
+        
+        st.markdown("**Exemplo 3: Avanço Direto**[cite: 1]")
+        st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a Fase 3 e 4.", language="text")[cite: 1]
 
 # ----------------------------------------------------
 # 6. Barra Lateral
@@ -169,7 +240,7 @@ with st.sidebar:
     st.markdown("### ⚖️ **JusAssist MPMS**")
     st.caption("4ª Procuradoria de Justiça Cível")
     
-    # Ação Principal
+    # Ação Primária
     if st.button("➕ Novo Atendimento", use_container_width=True, type="primary"):
         if len(chat_atual["messages"]) > 0:
             novo_id = str(uuid.uuid4())
@@ -181,7 +252,7 @@ with st.sidebar:
             st.session_state.current_chat_id = novo_id
             st.rerun()
 
-    # Seleção de Modo
+    # Seleção de Modo de Trabalho
     st.markdown('<div class="sidebar-label">Modo de Operação</div>', unsafe_allow_html=True)
     col_m1, col_m2 = st.columns(2)
     with col_m1:
@@ -206,7 +277,7 @@ with st.sidebar:
             label_visibility="collapsed"
         )
         if uploaded_file and len(chat_atual["messages"]) == 0:
-            if st.button("⚡ Iniciar Análise do Processo", use_container_width=True):
+            if st.button("⚡ Iniciar Análise do Processo", use_container_width=True, type="primary"):
                 st.session_state["trigger_auto_start"] = True
                 st.rerun()
 
@@ -241,23 +312,24 @@ with st.sidebar:
                             st.session_state.chats[st.session_state.current_chat_id] = {"title": "", "mode": chat_atual["mode"], "messages": []}
                     st.rerun()
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("❓ Guia Operacional", use_container_width=True):
+    # Seção de Ajuda no Rodapé
+    st.markdown('<div class="help-section"></div>', unsafe_allow_html=True)
+    if st.button("❓ Guia Operacional & Ajuda", use_container_width=True):
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 7. Área Principal de Conteúdo
+# 7. Área Central de Chat & Execução
 # ----------------------------------------------------
 st.subheader(chat_atual["mode"])
 
-# Exibição do Empty State com Sugestões
+# Exibição do Empty State / Action Cards
 if len(chat_atual["messages"]) == 0:
     if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
-        st.info("💡 **Fluxo de Trabalho:** Anexe o PDF da Apelação ou Sentença na barra lateral e clique no botão de início ou envie orientações abaixo.")
+        st.info("💡 **Fluxo de Parecer:** Anexe o PDF da Apelação ou Sentença na barra lateral e clique em **`⚡ Iniciar Análise do Processo`** (ou digite suas orientações abaixo).")
     else:
-        st.info("💡 **Pesquisa Unificada:** Digite a matéria jurídica, Tema Repetitivo ou número de recurso a pesquisar nos Tribunais.")
+        st.info("💡 **Pesquisa Unificada:** Digite a tese jurídica, Tema Repetitivo ou número de recurso a pesquisar nos Tribunais.")
 
-# Exibição das Mensagens
+# Exibição das Mensagens Anteriores
 for msg in chat_atual["messages"]:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])

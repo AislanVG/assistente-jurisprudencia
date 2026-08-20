@@ -43,7 +43,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico (Topo Alinhado / Zero Margem Superior)
+# 4. Injeção de CSS Dinâmico (SaaS Enterprise / Fundo Refinado)
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -51,13 +51,18 @@ css_customizado = """
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* Elimina o espaço vazio do topo no Streamlit */
+    /* Fundo neutro sofisticado para contraste */
+    .stApp {
+        background-color: #f8fafc !important;
+    }
+    
+    /* Oculta header nativo do Streamlit */
     header[data-testid="stHeader"] {
         display: none !important;
     }
     
     .block-container {
-        padding-top: 1rem !important;
+        padding-top: 1.5rem !important;
         padding-bottom: 0.5rem !important;
         max-width: 100% !important;
     }
@@ -90,7 +95,7 @@ css_customizado = """
     div[data-testid="stSidebar"] button[kind="secondary"]:hover,
     div.stButton > button[kind="secondary"]:hover {
         border-color: #94a3b8 !important;
-        background-color: #f8fafc !important;
+        background-color: #ffffff !important;
     }
 
     .sidebar-label {
@@ -138,89 +143,97 @@ css_customizado = """
         margin-bottom: 16px;
     }
 
-    /* --- CARD DE AUTENTICAÇÃO COMPACTO E PERFEITAMENTE ALINHADO AO TOPO --- */
+    /* --- CARD CENTRALIZADO E INTEGRADO --- */
     .auth-unified-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 18px;
-        padding: 22px 30px 16px 30px;
-        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+        border-radius: 20px;
+        padding: 28px 32px 20px 32px;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
         text-align: center;
-        max-width: 480px;
-        margin: 0.5vh auto 0 auto;
+        max-width: 490px;
+        margin: 1vh auto 0 auto;
     }
     
     .auth-badge {
         display: inline-block;
         background: #eff6ff;
         color: #1e3a8a;
-        font-size: 11.5px;
+        font-size: 12px;
         font-weight: 700;
         letter-spacing: 0.6px;
         text-transform: uppercase;
-        padding: 4px 14px;
+        padding: 5px 14px;
         border-radius: 20px;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         border: 1px solid #dbeafe;
     }
     
     .auth-title {
-        font-size: 27px;
+        font-size: 28px;
         font-weight: 800;
         color: #0f172a;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
         letter-spacing: -0.5px;
     }
     
     .auth-subtitle {
-        font-size: 13.5px;
+        font-size: 14px;
         color: #475569;
-        margin-bottom: 12px;
-        line-height: 1.4;
+        margin-bottom: 14px;
+        line-height: 1.45;
     }
     
     .feature-pills {
         display: flex;
         justify-content: center;
         gap: 10px;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
     }
     
     .pill {
-        background: #f8fafc;
+        background: #f1f5f9;
         border: 1px solid #e2e8f0;
         color: #334155;
-        font-size: 11.5px;
+        font-size: 12px;
         font-weight: 600;
-        padding: 4px 10px;
+        padding: 5px 12px;
         border-radius: 6px;
     }
     
-    /* Abas de Login/Cadastro */
+    /* Abas de Login com Linha Azul */
     div[data-testid="stTabs"] button {
-        font-size: 15px !important;
+        font-size: 15.5px !important;
         font-weight: 700 !important;
-        padding: 6px 14px !important;
+        padding: 8px 16px !important;
+        color: #64748b !important;
+    }
+    div[data-testid="stTabs"] button[aria-selected="true"] {
+        color: #1e3a8a !important;
+        border-bottom-color: #1e3a8a !important;
+    }
+    div[data-testid="stTabs"] hr {
+        border-color: #e2e8f0 !important;
     }
     
-    /* Rótulos dos Campos */
+    /* Rótulos dos Inputs */
     div[data-testid="stWidgetLabel"] label p {
-        font-size: 14px !important;
+        font-size: 14.5px !important;
         font-weight: 600 !important;
         color: #1e293b !important;
         margin-bottom: 2px !important;
         text-align: left !important;
     }
     
-    /* Caixas de Texto (Inputs) */
+    /* Caixas de Texto */
     div[data-testid="stTextInput"] input {
         font-size: 15px !important;
-        padding: 8px 12px !important;
+        padding: 10px 14px !important;
         border-radius: 8px !important;
         border: 1px solid #cbd5e1 !important;
+        background-color: #ffffff !important;
     }
     
-    /* Form Container */
     div[data-testid="stForm"] {
         border: none !important;
         padding: 0 !important;
@@ -228,7 +241,7 @@ css_customizado = """
         box-shadow: none !important;
     }
 
-    /* Botão de Ação Institucional */
+    /* Botão de Entrar */
     div[data-testid="stForm"] button[kind="primary"],
     div[data-testid="stForm"] button {
         background-color: #1e3a8a !important;
@@ -236,9 +249,9 @@ css_customizado = """
         color: #ffffff !important;
         font-size: 16px !important;
         font-weight: 700 !important;
-        height: 44px !important;
+        height: 46px !important;
         border-radius: 8px !important;
-        margin-top: 8px !important;
+        margin-top: 10px !important;
         transition: all 0.2s ease !important;
     }
     div[data-testid="stForm"] button:hover {
@@ -246,18 +259,20 @@ css_customizado = """
         border-color: #2563eb !important;
     }
     
-    /* Rodapé de Segurança */
+    /* Rodapé de Segurança Integrado */
     .auth-security-footer {
         text-align: center !important;
-        font-size: 11.5px !important;
+        font-size: 12px !important;
         font-weight: 500 !important;
         color: #64748b !important;
-        margin-top: 10px !important;
+        margin-top: 16px !important;
         margin-bottom: 0px !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
         gap: 6px !important;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 12px;
     }
 </style>
 """
@@ -270,7 +285,7 @@ if "user_session" not in st.session_state:
     st.session_state.user_session = None
 
 def exibir_tela_autenticacao():
-    col_l1, col_l2, col_l3 = st.columns([1, 1.3, 1])
+    col_l1, col_l2, col_l3 = st.columns([1, 1.35, 1])
     with col_l2:
         st.markdown(
             """
@@ -508,7 +523,7 @@ def exibir_manual_ajuda():
     with tab1:
         st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer de 2º Grau)")
         st.markdown(
-            "O assistente é rigorosamente calibrado para atuar como Assessor Juriddico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, "
+            "O assistente é rigorosamente calibrado para atuar como Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, "
             "elaborando peças densas e completas com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)** no corpo da minuta."
         )
         st.markdown(

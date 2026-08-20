@@ -527,7 +527,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 12. Processamento de Mensagens com Streaming e Multi-Model Fallback
+# 12. Processamento de Mensagens com Streaming Seguro
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua matéria jurídica ou use para pesquisar acórdãos..." if chat_vazio else "Digite sua resposta ou orientação para a próxima fase..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -553,7 +553,7 @@ if prompt_final:
 
             user_parts = []
             
-            # Verificação de consulta CNJ por número no modo pesquisa
+            # Consulta DataJud por número
             dados_cnj = None
             if not is_parecer_mode and re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
                 match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)
@@ -588,29 +588,31 @@ if prompt_final:
             if not is_parecer_mode:
                 config_params["tools"] = [types.Tool(google_search=types.GoogleSearch())]
 
-            # Gerador com Streaming resiliente e fallback automático contra limites (429/503)
+            # Gerador com Streaming focado no modelo oficial estável
             def stream_generator():
-                modelos = ["gemini-2.5-flash", "gemini-2.5-pro"]
-                for modelo in modelos:
-                    for tentativa in range(3):
-                        try:
-                            response_stream = client.models.generate_content_stream(
-                                model=modelo,
-                                contents=chat_atual["gemini_history"],
-                                config=types.GenerateContentConfig(**config_params)
-                            )
-                            for chunk in response_stream:
-                                if chunk.text:
-                                    yield chunk.text
-                            return
-                        except Exception as err:
-                            err_msg = str(err).lower()
-                            if "429" in err_msg or "resource_exhausted" in err_msg or "503" in err_msg:
-                                time.sleep(2 * (tentativa + 1))
-                                continue
-                            else:
-                                raise err
-                raise Exception("Limite temporário de requisições da conta atingido (429). Ative o faturamento no Google AI Studio para uso ilimitado.")
+                for tentativa in range(3):
+                    try:
+                        response_stream = client.models.generate_content_stream(
+                            model="gemini-2.5-flash",
+                            contents=chat_atual["gemini_history"],
+                            config=types.GenerateContentConfig(**config_params)
+                        )
+                        for chunk in response_stream:
+                            if chunk.text:
+                                yield chunk.text
+                        return
+                    except Exception as err:
+                        err_msg = str(err).lower()
+                        if "429" in err_msg or "resource_exhausted" in err_msg or "503" in err_msg:
+                            time.sleep(2 * (tentativa + 1))
+                            if tentativa == 2:
+                                raise Exception(
+                                    "A cota de requisições da chave do Google foi temporariamente atingida (429). "
+                                    "Para remover esse limite, ative o faturamento (Pay-As-You-Go) no Google AI Studio."
+                                )
+                            continue
+                        else:
+                            raise err
 
             texto_resposta = st.write_stream(stream_generator())
 

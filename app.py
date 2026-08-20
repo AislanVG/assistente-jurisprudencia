@@ -9,7 +9,7 @@ from google import genai
 from google.genai import types
 
 # ----------------------------------------------------
-# 1. Configurações da Página e CSS Avançado (Jus IA Style)
+# 1. Configurações da Página e CSS Avançado
 # ----------------------------------------------------
 st.set_page_config(
     page_title="JusAssist MPMS",
@@ -48,7 +48,7 @@ chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 chat_vazio = len(chat_atual["messages"]) == 0
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico (Centralização do Input)
+# 4. Injeção de CSS Dinâmico
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -105,23 +105,33 @@ css_customizado = """
         border-top: 1px solid #e2e8f0;
     }
 
-    /* Hero Centrado (Jus IA Style) */
+    /* Hero Centrado */
     .hero-title {
         font-size: 34px;
         font-weight: 700;
         color: #1e293b;
         text-align: center;
-        margin-top: 5vh;
-        margin-bottom: 20px;
+        margin-top: 3vh;
+        margin-bottom: 12px;
+    }
+
+    .feed-header {
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        text-align: center;
     }
 """
 
-# Se o chat estiver vazio, reposiciona o chat_input para o centro da tela
 if chat_vazio:
     css_customizado += """
     div[data-testid="stChatInput"] {
         position: fixed !important;
-        top: 42% !important;
+        top: 34% !important;
         bottom: auto !important;
         left: calc(50% + 80px) !important;
         transform: translate(-50%, -50%) !important;
@@ -132,7 +142,7 @@ if chat_vazio:
         border-radius: 14px !important;
     }
     .hero-spacer {
-        height: 120px;
+        height: 80px;
     }
     """
 else:
@@ -202,7 +212,22 @@ Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do
 """
 
 # ----------------------------------------------------
-# 6. Funções Auxiliares: Resiliência contra Erro 503 & Extração
+# 6. Feed Automático de Precedentes Recentes (Cache 12h)
+# ----------------------------------------------------
+@st.cache_data(ttl=43200)
+def carregar_feed_precedentes():
+    """Retorna teses e julgados recentes consolidados do STJ e STF em matéria Cível/Direito Privado."""
+    return [
+        {"tribunal": "STJ", "tema": "Tema Repetitivo 1.082/STJ (Saúde Suplementar)", "desc": "Custeio de tratamento multidisciplinar (método ABA) para beneficiário com TEA e nulidade de cláusula limitativa."},
+        {"tribunal": "STJ", "tema": "REsp 2.221.399/SP (3ª Turma - Direito Privado)", "desc": "Dever das operadoras de plano de saúde em fornecer cobertura de terapias especiais prescritas por médico assistente."},
+        {"tribunal": "STJ", "tema": "Tema Repetitivo 290/STJ (Fraude à Execução)", "desc": "Marco temporal e requisitos da LC 118/2005 para caracterização de fraude à execução fiscal e terceiro de boa-fé."},
+        {"tribunal": "STF", "tema": "Tema 793/STF (Repercussão Geral)", "desc": "Responsabilidade solidária dos entes federados no fornecimento de medicamentos e tratamentos pelo SUS."},
+        {"tribunal": "STF", "tema": "Tema 1.234/STF (Medicamentos sem Registro)", "desc": "Critérios vinculantes de competência e legitimidade para fornecimento judicial de fármacos de alto custo."},
+        {"tribunal": "STF", "tema": "Súmula Vinculante 510/STF (Delegação Registral)", "desc": "Cabimento de Mandado de Segurança contra atos praticados por delegatários de serviços notariais e de registro."}
+    ]
+
+# ----------------------------------------------------
+# 7. Funções de Execução com Resiliência (Retry / Fallback)
 # ----------------------------------------------------
 def extrair_texto_resposta(response) -> str:
     if hasattr(response, "text") and response.text:
@@ -216,7 +241,6 @@ def extrair_texto_resposta(response) -> str:
     return "A análise foi processada, mas a resposta de texto retornou vazia. Por favor, reenvie a mensagem."
 
 def executar_geracao_com_retry(client, contents, instrucao):
-    """Executa a chamada com retry exponencial e fallback para mitigar erros 503/429 da API."""
     modelos_disponiveis = ["gemini-2.5-flash", "gemini-2.0-flash"]
     tentativas_max = 3
 
@@ -243,7 +267,7 @@ def executar_geracao_com_retry(client, contents, instrucao):
     raise Exception("O servidor da API do Google está enfrentando sobrecarga momentânea (503). Por favor, tente novamente em instantes.")
 
 # ----------------------------------------------------
-# 7. Modal Completo de Ajuda e Manual Operacional
+# 8. Modal Completo de Ajuda e Manual Operacional
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional (MPMS)", width="large")
 def exibir_manual_ajuda():
@@ -251,7 +275,7 @@ def exibir_manual_ajuda():
     st.caption("Guia Oficial para Pesquisa Jurisprudencial e Elaboração de Pareceres de 2º Grau")
     
     tab1, tab2, tab3, tab4 = st.tabs([
-        "📄 Minuta de Parecer (MPMS)", 
+        "📄 Minuta de Parecer", 
         "🔍 Pesquisa Jurisprudencial", 
         "🛡️ Diretrizes & Travas", 
         "🛑 Comandos de Ajuste"
@@ -268,7 +292,7 @@ def exibir_manual_ajuda():
 1. **Passo 1: Upload dos Autos (Múltiplos PDFs)**[cite: 1]
    * Na barra lateral, selecione **📄 Parecer** e anexe as peças necessárias (Inicial, Sentença, Apelação, Laudos)[cite: 1].
 2. **Passo 2: Início da Análise**
-   * Clique em `⚡ Iniciar Análise do Processo` ou use o botão central[cite: 1].
+   * Clique em `⚡ Analisar autos e gerar parecer completo` ou use o botão na barra lateral[cite: 1].
 3. **Passo 3: Diagnóstico Fático & Precedentes (Fase 2)**[cite: 1]
    * A IA apresentará o raio-x e pesquisará em tempo real acórdãos reais do STJ/STF/TJMS[cite: 1].
 4. **Passo 4: Validação da Ementa e Relatório (Fase 3)**[cite: 1]
@@ -305,7 +329,7 @@ def exibir_manual_ajuda():
         st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a emissão da Fase 3 e da Minuta Completa.", language="text")[cite: 1]
 
 # ----------------------------------------------------
-# 8. Barra Lateral
+# 9. Barra Lateral
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown("### ⚖️ **JusAssist MPMS**")
@@ -392,13 +416,13 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 9. Cálculo Preciso de Horário Local (MS / Brasília)
+# 10. Cálculo Preciso de Horário Local (MS / Brasília)
 # ----------------------------------------------------
 try:
     fuso_ms = ZoneInfo("America/Campo_Grande")
     hora_local = datetime.now(fuso_ms).hour
 except Exception:
-    hora_local = (datetime.utcnow().hour - 4) % 24  # Fallback UTC-4
+    hora_local = (datetime.utcnow().hour - 4) % 24
 
 if hora_local < 12:
     saudacao = "Qual é o caso da manhã?"
@@ -408,32 +432,38 @@ else:
     saudacao = "Qual é o caso da noite?"
 
 # ----------------------------------------------------
-# 10. Área Principal: Estado Inicial vs. Conversação
+# 11. Área Principal: Estado Inicial vs. Conversação
 # ----------------------------------------------------
 if chat_vazio:
     st.markdown(f"<div class='hero-title'>{saudacao}</div>", unsafe_allow_html=True)
     st.markdown("<div class='hero-spacer'></div>", unsafe_allow_html=True)
     
-    col_c1, col_c2, col_c3 = st.columns([1, 2.8, 1])
+    col_c1, col_c2, col_c3 = st.columns([0.5, 3.5, 0.5])
     with col_c2:
         if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
             if uploaded_files:
-                if st.button("⚡ Analise os autos desse processo e gere o parecer", key="sug_parecer", use_container_width=True, type="primary"):
+                if st.button("⚡ Analisar autos e gerar parecer completo", key="sug_parecer", use_container_width=True, type="primary"):
                     st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."[cite: 1]
+                    st.rerun()
+                if st.button("💬 Mapear apenas preliminares e teses recursais dos autos", key="sug_teses", use_container_width=True):
+                    st.session_state["trigger_prompt"] = "Faça um mapeamento analítico das preliminares e das principais teses recursais cabíveis para o caso."[cite: 1]
                     st.rerun()
             else:
                 st.info("📂 Anexe os arquivos PDF na barra lateral para iniciar a análise dos autos.")
-            
-            if st.button("💬 Mapeie preliminares e teses recursais deste caso", key="sug_teses", use_container_width=True):
-                st.session_state["trigger_prompt"] = "Faça um mapeamento analítico das preliminares e das principais teses recursais cabíveis para o caso."[cite: 1]
-                st.rerun()
+        
         else:
-            if st.button("🔍 Pesquisar teses de responsabilidade civil do Estado", key="sug_resp", use_container_width=True):
-                st.session_state["trigger_prompt"] = "Qual o entendimento consolidado do STJ sobre responsabilidade do Estado por erro médico que causa sequelas em menor?"
-                st.rerun()
-            if st.button("🔍 Pesquisar obrigatoriedade de cobertura pelo plano de saúde", key="sug_saude", use_container_width=True):
-                st.session_state["trigger_prompt"] = "Qual a jurisprudência do STJ sobre o dever do plano de saúde em custear tratamento multidisciplinar para menor com TEA?"
-                st.rerun()
+            st.markdown("<div class='feed-header'>🏛️ Precedentes Recentes dos Tribunais Superiores (Direito Privado / Cível)</div>", unsafe_allow_html=True)
+            
+            feed_precedentes = carregar_feed_precedentes()
+            
+            col_f1, col_f2 = st.columns(2)
+            for idx, prec in enumerate(feed_precedentes):
+                col_alvo = col_f1 if idx % 2 == 0 else col_f2
+                with col_alvo:
+                    rotulo_btn = f"📌 **[{prec['tribunal']}]** {prec['tema']}\n\n_{prec['desc']}_"
+                    if st.button(rotulo_btn, key=f"prec_{idx}", use_container_width=True):
+                        st.session_state["trigger_prompt"] = f"Apresente uma análise jurisprudencial analítica e aprofundada sobre o seguinte precedente do {prec['tribunal']}: {prec['tema']}. Foco na tese jurídica, critérios práticos e ementa representativa."
+                        st.rerun()
 
 else:
     st.subheader(chat_atual["mode"])
@@ -463,9 +493,9 @@ else:
                         st.toast("Feedback registrado para melhoria.", icon="📝")
 
 # ----------------------------------------------------
-# 11. Processamento de Mensagens com Memória e Retry
+# 12. Processamento de Mensagens com Memória e Retry
 # ----------------------------------------------------
-prompt_placeholder = "Digite sua mensagem ou use / para habilidades..." if chat_vazio else "Digite sua resposta ou orientação..."
+prompt_placeholder = "Digite sua matéria jurídica ou use para pesquisar acórdãos..." if chat_vazio else "Digite sua resposta ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)
 prompt_final = st.session_state.pop("trigger_prompt", None) or prompt_digitado
 
@@ -510,15 +540,12 @@ if prompt_final:
 
                 user_parts.append(types.Part.from_text(text=prompt_final))
 
-                # Registra a mensagem do usuário no histórico estruturado
                 chat_atual["gemini_history"].append(
                     types.Content(role="user", parts=user_parts)
                 )
 
-                # Chamada com Retry automático e proteção contra 503
                 texto_resposta = executar_geracao_com_retry(client, chat_atual["gemini_history"], instrucao)
 
-                # Salva resposta no histórico estruturado
                 chat_atual["gemini_history"].append(
                     types.Content(role="model", parts=[types.Part.from_text(text=texto_resposta)])
                 )

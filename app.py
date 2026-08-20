@@ -43,7 +43,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico
+# 4. Injeção de CSS Dinâmico (SaaS Enterprise)
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -126,15 +126,64 @@ css_customizado = """
         margin-top: 8px;
         margin-bottom: 20px;
     }
-    
-    .auth-container {
-        max-width: 440px;
-        margin: 8vh auto 0 auto;
-        padding: 30px;
+
+    /* Estilização da Tela de Autenticação */
+    .auth-card {
         background: #ffffff;
-        border-radius: 12px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        border-radius: 18px;
+        padding: 38px 32px 30px 32px;
+        box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+        text-align: center;
+        margin-top: 5vh;
+    }
+    .auth-badge {
+        display: inline-block;
+        background: #eff6ff;
+        color: #1e40af;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: 20px;
+        margin-bottom: 14px;
+        border: 1px solid #dbeafe;
+    }
+    .auth-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+        letter-spacing: -0.5px;
+    }
+    .auth-subtitle {
+        font-size: 13.5px;
+        color: #475569;
+        margin-bottom: 18px;
+        line-height: 1.5;
+    }
+    .feature-pills {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+    .pill {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #334155;
+        font-size: 11.5px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+    .auth-footer {
+        margin-top: 24px;
+        font-size: 11px;
+        color: #94a3b8;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 14px;
     }
 </style>
 """
@@ -149,17 +198,29 @@ if "user_session" not in st.session_state:
 def exibir_tela_autenticacao():
     col_l1, col_l2, col_l3 = st.columns([1, 1.2, 1])
     with col_l2:
-        st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
-        st.markdown("### ⚖️ JusAssist MPMS")
-        st.caption("Acesso Restrito à Assessoria da 4ª Procuradoria de Justiça")
+        st.markdown(
+            """
+            <div class="auth-card">
+                <div class="auth-badge">4ª Procuradoria de Justiça Cível • MPMS</div>
+                <div class="auth-title">⚖️ JusAssist MPMS</div>
+                <div class="auth-subtitle">
+                    Ecossistema de Inteligência Jurídica: Pesquisa Analítica de Precedentes e Elaboração de Pareceres de 2º Grau
+                </div>
+                <div class="feature-pills">
+                    <span class="pill">🔍 Jurisprudência STF/STJ/TJMS</span>
+                    <span class="pill">📄 Minutas Densas (6-10 págs)</span>
+                </div>
+            """,
+            unsafe_allow_html=True
+        )
         
-        tab_login, tab_cadastro = st.tabs(["Entrar", "Criar Conta"])
+        tab_login, tab_cadastro = st.tabs(["🔑 Acessar Conta", "✨ Criar Novo Acesso"])
         
         with tab_login:
             with st.form("form_login"):
-                email = st.text_input("E-mail institucional / pessoal")
-                senha = st.text_input("Senha", type="password")
-                btn_entrar = st.form_submit_button("Acessar Plataforma", type="primary", use_container_width=True)
+                email = st.text_input("E-mail cadastrado", placeholder="exemplo@mpms.mp.br")
+                senha = st.text_input("Senha", type="password", placeholder="••••••••")
+                btn_entrar = st.form_submit_button("Entrar no JusAssist", type="primary", use_container_width=True)
                 
                 if btn_entrar:
                     if not email or not senha:
@@ -172,23 +233,23 @@ def exibir_tela_autenticacao():
                             if res.user:
                                 st.session_state.user_session = res.user
                                 st.rerun()
-                        except Exception as e:
+                        except Exception:
                             st.error("E-mail ou senha incorretos. Verifique suas credenciais.")
 
         with tab_cadastro:
             with st.form("form_cadastro"):
-                novo_email = st.text_input("Seu E-mail")
-                nova_senha = st.text_input("Crie uma Senha (mínimo 6 caracteres)", type="password")
-                confirma_senha = st.text_input("Confirme a Senha", type="password")
-                btn_cadastrar = st.form_submit_button("Cadastrar", use_container_width=True)
+                novo_email = st.text_input("Seu E-mail", placeholder="seu.email@mpms.mp.br")
+                nova_senha = st.text_input("Crie uma Senha (mínimo 6 dígitos)", type="password", placeholder="••••••••")
+                confirma_senha = st.text_input("Confirme a Senha", type="password", placeholder="••••••••")
+                btn_cadastrar = st.form_submit_button("Criar Acesso", use_container_width=True)
                 
                 if btn_cadastrar:
                     if not novo_email or not nova_senha:
                         st.warning("Preencha todos os campos.")
                     elif nova_senha != confirma_senha:
-                        st.error("As senhas digitadas não coincidem.")
+                        st.error("As senhas não coincidem.")
                     elif len(nova_senha) < 6:
-                        st.warning("A senha deve ter pelo menos 6 caracteres.")
+                        st.warning("A senha deve ter no mínimo 6 caracteres.")
                     elif not supabase:
                         st.error("Credenciais do Supabase não configuradas nos Secrets.")
                     else:
@@ -198,10 +259,18 @@ def exibir_tela_autenticacao():
                                 st.success("Conta criada com sucesso! Você já pode realizar o login.")
                         except Exception as e:
                             st.error(f"Erro ao cadastrar: {str(e)}")
-                            
-        st.markdown("</div>", unsafe_allow_html=True)
 
-# Se o usuário não estiver logado, bloqueia a exibição do aplicativo e mostra a tela de login
+        st.markdown(
+            """
+                <div class="auth-footer">
+                    🔒 Ambiente Seguro & Criptografado • Gabinete Dra. Luciana Moreira Schenk
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+# Bloqueia a renderização caso o usuário não esteja logado
 if not st.session_state.user_session:
     exibir_tela_autenticacao()
     st.stop()
@@ -653,6 +722,7 @@ if prompt_final:
 
             user_parts = []
             
+            # Consulta DataJud por número
             dados_cnj = None
             if not is_parecer_mode and re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
                 match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)

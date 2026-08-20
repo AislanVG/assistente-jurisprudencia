@@ -185,16 +185,16 @@ Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do
 
 ### 🛡️ BLINDAGEM E REGRAS ESTRITAS:
 1. ADERÊNCIA ESTRITA AOS AUTOS: Baseie sua análise EXCLUSIVAMENTE nos fatos e documentos do caso concreto anexado pelo usuário. É PROIBIDO inventar ou misturar matérias fáticas estranhas ao processo.
-2. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS aplicáveis à matéria específica dos autos. Proibido inventar números ou ementas.
+2. PRECEDENTES REAIS: Indique precedentes consolidados, números de REsps, Temas Vinculantes e acórdãos REAIS do STF, STJ e TJMS aplicáveis à matéria dos autos. Proibido inventar números ou ementas.
 3. TRAVA DE HIERARQUIA: Precedentes das Turmas do STJ e teses vinculantes do STF prevalecem sobre atos administrativos ou pareceres técnicos.
 4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade.
 5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *tempus regit actum*). Jurisprudências citadas em bloco recuado (`>`), em itálico.
 
 ### 🔄 FLUXO PROGRESSIVO OBRIGATÓRIO EM 3 ETAPAS:
 
-- ETAPA 1 (Diagnóstico & Consulta de Precedentes):
-  Apresente o Raio-X dos autos (Fatos reais do processo, Preliminares mapeadas, Dispositivos legais).
-  Faça uma busca na internet pelos precedentes reais mais recentes do STJ/STF/TJMS sobre a matéria e apresente-os.
+- ETAPA 1 (Diagnóstico & Precedentes Aplicáveis):
+  Apresente o Raio-X dos autos (Fatos reais do processo, Preliminares mapeadas, Dispositivos legais envolvidos).
+  Apresente a linha de precedentes do STJ/STF/TJMS consolidada para a matéria.
   Ao final, faça a PERGUNTA OBRIGATÓRIA: "Deseja aplicar os precedentes acima sugeridos ou indicar outro julgado específico?" e PARE AQUI.
 
 - ETAPA 2 (Ementa Técnica e Relatório Institucional):
@@ -221,7 +221,7 @@ def carregar_feed_precedentes():
     ]
 
 # ----------------------------------------------------
-# 7. Funções de Execução com Resiliência (Retry / Fallback)
+# 7. Funções de Execução com Modelos Oficiais e Retry
 # ----------------------------------------------------
 def extrair_texto_resposta(response) -> str:
     if hasattr(response, "text") and response.text:
@@ -234,21 +234,26 @@ def extrair_texto_resposta(response) -> str:
                     return "".join(textos)
     return "A análise foi processada, mas a resposta de texto retornou vazia. Por favor, reenvie a mensagem."
 
-def executar_geracao_com_retry(client, contents, instrucao):
-    modelos_disponiveis = ["gemini-2.5-flash", "gemini-2.0-flash"]
+def executar_geracao_com_retry(client, contents, instrucao, usar_pesquisa_web=False):
+    modelos_disponiveis = ["gemini-2.5-flash", "gemini-2.5-pro"]
     tentativas_max = 3
+
+    ferramentas = [types.Tool(google_search=types.GoogleSearch())] if usar_pesquisa_web else None
 
     for modelo in modelos_disponiveis:
         for tentativa in range(tentativas_max):
             try:
+                config_params = {
+                    "system_instruction": instrucao,
+                    "temperature": 0.1
+                }
+                if ferramentas:
+                    config_params["tools"] = ferramentas
+
                 response = client.models.generate_content(
                     model=modelo,
                     contents=contents,
-                    config=types.GenerateContentConfig(
-                        system_instruction=instrucao,
-                        tools=[types.Tool(google_search=types.GoogleSearch())],
-                        temperature=0.1
-                    )
+                    config=types.GenerateContentConfig(**config_params)
                 )
                 texto = extrair_texto_resposta(response)
                 if texto and "retornou vazia" not in texto:
@@ -258,9 +263,12 @@ def executar_geracao_com_retry(client, contents, instrucao):
                 if "503" in erro_str or "unavailable" in erro_str or "high demand" in erro_str:
                     time.sleep(2 * (tentativa + 1))
                     continue
+                elif "404" in erro_str:
+                    break
                 else:
                     raise e
-    raise Exception("O servidor da API do Google está enfrentando sobrecarga momentânea (503). Por favor, tente novamente em instantes.")
+
+    raise Exception("Servidor da API do Google sobrecarregado no momento. Por favor, tente novamente em instantes.")
 
 # ----------------------------------------------------
 # 8. Modal Completo de Ajuda e Manual Operacional
@@ -290,7 +298,7 @@ def exibir_manual_ajuda():
 2. **Passo 2: Início da Análise**
    * Clique em `⚡ Analisar autos e gerar parecer completo` ou use o botão na barra lateral.
 3. **Passo 3: Diagnóstico Fático & Precedentes (Fase 2)**
-   * A IA apresentará o raio-x e pesquisará em tempo real acórdãos reais do STJ/STF/TJMS.
+   * A IA apresentará o raio-x e indicará os precedentes aplicáveis do STJ/STF/TJMS.
 4. **Passo 4: Validação da Ementa e Relatório (Fase 3)**
    * Responda `Aprovado` para gerar a Ementa Técnica e o Relatório Fluido (até 500 palavras, sem marcadores).
 5. **Passo 5: Minuta Final de Alta Densidade (Fase 4)**
@@ -408,7 +416,7 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 10. Cálculo Preciso de Horário Local (MS / Brasília)
+# 10. Horário Local
 # ----------------------------------------------------
 try:
     fuso_ms = ZoneInfo("America/Campo_Grande")
@@ -483,7 +491,7 @@ else:
                         st.toast("Feedback registrado para melhoria.", icon="📝")
 
 # ----------------------------------------------------
-# 12. Processamento de Mensagens com Ingestão Multimodal Direta
+# 12. Processamento de Mensagens com Ingestão Otimizada
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua matéria jurídica ou use para pesquisar acórdãos..." if chat_vazio else "Digite sua resposta ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -501,19 +509,16 @@ if prompt_final:
         st.markdown(prompt_final)
 
     with st.chat_message("assistant"):
-        with st.spinner("Processando fundamentação jurídica e pesquisando precedentes oficiais..."):
+        with st.spinner("Processando fundamentação jurídica com rigor analítico..."):
             try:
                 client = genai.Client(api_key=GEMINI_API_KEY)
 
-                instrucao = (
-                    SUPERPROMPT_PARECER
-                    if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)"
-                    else PROMPT_JURISPRUDENCIA
-                )
+                is_parecer_mode = chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)"
+                instrucao = SUPERPROMPT_PARECER if is_parecer_mode else PROMPT_JURISPRUDENCIA
 
                 user_parts = []
                 
-                # Ingestão síncrona direta via bytes nativos (inline PDF)
+                # Ingestão limpa e direta em memória na primeira mensagem
                 if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
                     for f in uploaded_files:
                         pdf_bytes = f.getvalue()
@@ -531,7 +536,15 @@ if prompt_final:
                     types.Content(role="user", parts=user_parts)
                 )
 
-                texto_resposta = executar_geracao_com_retry(client, chat_atual["gemini_history"], instrucao)
+                # Busca externa ativada apenas no modo pesquisa para evitar sobrecarga no modo parecer
+                usar_web = not is_parecer_mode
+
+                texto_resposta = executar_geracao_com_retry(
+                    client=client,
+                    contents=chat_atual["gemini_history"],
+                    instrucao=instrucao,
+                    usar_pesquisa_web=usar_web
+                )
 
                 chat_atual["gemini_history"].append(
                     types.Content(role="model", parts=[types.Part.from_text(text=texto_resposta)])

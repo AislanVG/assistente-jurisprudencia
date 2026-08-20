@@ -153,37 +153,91 @@ if "current_chat_id" not in st.session_state or st.session_state.current_chat_id
 chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 
 # ----------------------------------------------------
-# 5. Modal Completo de Ajuda
+# 5. Modal de Ajuda e Manual Operacional
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional (MPMS)", width="large")
 def exibir_manual_ajuda():
     st.markdown("## ⚖️ Manual Operacional: JusAssist MPMS")
-    st.caption("Guia Prático para Pesquisa Jurisprudencial e Emissão de Pareceres de 2º Grau")
+    st.caption("Guia Oficial para Pesquisa Jurisprudencial e Elaboração de Pareceres de 2º Grau")
     
-    tab1, tab2, tab3 = st.tabs(["📄 Minuta de Parecer", "🔍 Pesquisa Jurisprudencial", "🛡️ Diretrizes MPMS"])
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📄 Minuta de Parecer (MPMS)", 
+        "🔍 Pesquisa Jurisprudencial", 
+        "🛡️ Diretrizes & Travas Institucionais", 
+        "🛑 Comandos de Ajuste de Rota"
+    ])
     
     with tab1:
+        st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer Institucional de 2º Grau)")
         st.markdown(
             """
-### 🏛️ Fluxo em 3 Etapas Integradas:
-1. **Etapa 1 (Upload & Raio-X):** Anexe os PDFs dos autos e clique em `⚡ Iniciar Análise do Processo`. A IA lerá as peças e apresentará o diagnóstico com os precedentes reais sugeridos.
-2. **Etapa 2 (Ementa & Relatório):** Digite `Aprovado` (ou indique uma diretriz específica). A IA gerará a Ementa Técnica e o Relatório Fluido de até 500 palavras.
-3. **Etapa 3 (Minuta Completa):** Digite `Validado, gere a minuta`. A IA redigirá o parecer integral de alta densidade (6 a 10 páginas / 2.500 a 4.000 palavras) pronto para cópia e colagem no Word.
+O assistente é rigorosamente calibrado para atuar como Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, 
+elaborando peças densas, contínuas e exaustivamente fundamentadas, com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)** no corpo da minuta.
             """
         )
+        
+        st.markdown(
+            """
+1. **Passo 1: Upload dos Autos (Múltiplos PDFs)**
+   * Na barra lateral, selecione o modo **📄 Parecer**.
+   * Anexe conjuntamente as peças necessárias: Petição Inicial, Sentença, Apelação, Contrarrazões e Laudos Periciais.
+2. **Passo 2: Disparo da Análise**
+   * Clique no botão **`⚡ Iniciar Análise do Processo`** ou digite no chat: `Analise os autos e gere o parecer`.
+3. **Passo 3: Diagnóstico Fático & Precedentes (Fase 2)**
+   * A IA apresentará o raio-x do caso, mapeará preliminares, dispositivos legais e **realizará busca ativa em tempo real na internet** por precedentes recentes do STJ, STF e TJMS aderentes aos fatos.
+   * Ela perguntará se a Procuradoria aprova os julgados sugeridos ou se deseja indicar um REsp/Informativo específico.
+4. **Passo 4: Validação da Ementa e Relatório (Fase 3)**
+   * Ao responder com a aprovação da tese, a IA redigirá a **Ementa Técnica Formal** (com recuo institucional e parecer conclusivo em negrito) e o **Relatório Sucinto Fluido** (até 500 palavras, encadeado em parágrafos lógicos e sem marcadores/tópicos).
+5. **Passo 5: Minuta Integral de Alta Densidade (Fase 4)**
+   * Responda `Validado, prossiga`. A IA entregará a minuta completa pronta para exportação: Cabeçalho oficial, Ementa, "COLENDA CÂMARA CÍVEL,", Relatório, I – Das Preliminares, II – Do Mérito (fundamentação densa de 2.500 a 4.000 palavras) e III – Conclusão com assinatura institucional.
+            """
+        )
+        st.info("💡 **Exportação Direta para o Word:** Ao final da Fase 4, copie o texto da resposta e cole diretamente no Microsoft Word ou Google Docs mantendo a formatação de origem (Ctrl + V). A estrutura em blocos recuados e itálicos latinos será preservada.")
 
     with tab2:
-        st.markdown("### 🔍 Pesquisa de Jurisprudência:")
-        st.markdown("Digite qualquer tese jurídica no chat para receber precedentes favoráveis, desfavoráveis, súmulas e sugestão de ementa.")
-        st.code("Pesquise precedentes do STJ sobre tempus regit actum e indisponibilidade CNIB em escritura de 2010.", language="text")
-
-    with tab3:
+        st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
         st.markdown(
             """
-* **Prevalência STJ/STF:** Precedentes superiores sobrepõem-se a normas administrativas.
-* **Aderência aos Autos:** Cada parecer respeita estritamente a matéria e os fatos do processo analisado.
+No modo **🔍 Pesquisa**, a IA utiliza Grounding com o Google Search para varrer as bases oficiais do STF, STJ, TJMS e Tribunais Regionais, entregando respostas estruturadas no padrão analítico de parecer (Tese Central, Precedentes Favoráveis com Links, Distinções/Contrapontos, Critérios Práticos e Ementa para Citação).
             """
         )
+        
+        st.markdown("#### Exemplos Práticos de Pesquisa para Copiar:")
+        st.code("Qual o entendimento do STJ sobre responsabilidade do Estado por erro médico que causa sequelas permanentes em menor?", language="text")
+        st.code("Pesquise a jurisprudência do TJMS sobre rescisão de contrato imobiliário por culpa da construtora com devolução integral das parcelas.", language="text")
+        st.code("Pesquise precedentes do STJ sobre o dever do plano de saúde em custear tratamento multidisciplinar para menor com TEA (método ABA).", language="text")
+        st.code("Qual a jurisprudência consolidada do STJ sobre tempus regit actum e indisponibilidade CNIB superveniente em escritura lavrada em 2010?", language="text")
+        st.code("Qual o entendimento do STJ e TJMS sobre a impenhorabilidade de valores em caderneta de poupança até o limite de 40 salários mínimos?", language="text")
+
+    with tab3:
+        st.markdown("### 🛡️ Diretrizes e Mecanismos de Blindagem Institucional")
+        st.markdown(
+            """
+* **Aderência Estrita aos Autos:** A análise baseia-se exclusivamente nas peças e documentos juntados, sendo terminantemente proibida a contaminação do texto por matérias fáticas alheias ao caso sob exame.
+* **Prevalência Absoluta do STJ / STF:** Precedentes das Turmas de Direito Privado do STJ (3ª e 4ª Turmas) e teses vinculantes do STF sobrepõem-se obrigatoriamente a pareceres de Conselhos de Classe (CREMESP/COFFITO), notas do e-NATJus ou resoluções normativas da ANS.
+* **Diretriz Protetiva Institucional (Saúde, Vida e Vulneráveis):** Em matérias que envolvam saúde, infância, TEA, doenças graves ou alimentos, a orientação é pela tutela integral da dignidade da pessoa humana quando respaldada por laudo médico idôneo.
+* **Trava Anti-Alucinação:** O assistente realiza buscas reais no índice oficial e não inventa números de processos, súmulas ou ementas fictícias.
+* **Relatório Padrão Ouro Institucional:** Redação contínua, encadeada por verbos de ligação (*'Alega o apelante que...'*, *'Sustenta que...'*, *'Argumenta que...'*) de até 500 palavras, estritamente sem o uso de tópicos ou marcadores.
+* **Mimetização de Estilo e Latim em Itálico:** Expressões latinas (*in re ipsa*, *rebus sic stantibus*, *tempus regit actum*, *stare decisis*) são grafadas em itálico e jurisprudências em bloco recuado (`>`).
+            """
+        )
+
+    with tab4:
+        st.markdown("### 🛑 Comandos de Ajuste de Rota (Se não aprovar)")
+        st.markdown(
+            """
+Se a IA apresentar uma proposta de tese divergente do entendimento da Procuradoria ou se for necessário recalibrar o formato, **não autorize o avanço**. Digite um comando corretivo:
+            """
+        )
+        
+        st.markdown("**1. Correção de Tese na Fase 2 (Diagnóstico):**")
+        st.code("Não está aprovado. Na proposta de mérito, considere que a 3ª Turma do STJ já pacificou o dever de custeio pelo REsp 2.221.399/SP. Reformule a Fase 2 alinhando o opinamento pelo desprovimento do recurso.", language="text")
+        
+        st.markdown("**2. Correção de Formatação na Fase 3 (Relatório/Ementa):**")
+        st.code("Não está aprovado. O relatório utilizou tópicos. Refaça a Fase 3 apresentando o relatório estritamente em parágrafos fluidos e corridos, limitando-se a 500 palavras.", language="text")
+        
+        st.markdown("**3. Avanço e Validação Direta:**")
+        st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a emissão da Fase 3 e da Minuta Completa.", language="text")
 
 # ----------------------------------------------------
 # 6. Barra Lateral

@@ -1,7 +1,5 @@
 import streamlit as st
 import uuid
-import tempfile
-import os
 import time
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -229,11 +227,11 @@ def extrair_texto_resposta(response) -> str:
     if hasattr(response, "text") and response.text:
         return response.text
     if hasattr(response, "candidates") and response.candidates:
-        candidato = response.candidates[0]
-        if hasattr(candidato, "content") and hasattr(candidato.content, "parts"):
-            textos = [p.text for p in candidato.content.parts if hasattr(p, "text") and p.text]
-            if textos:
-                return "".join(textos)
+        for cand in response.candidates:
+            if hasattr(cand, "content") and hasattr(cand.content, "parts"):
+                textos = [p.text for p in cand.content.parts if hasattr(p, "text") and p.text]
+                if textos:
+                    return "".join(textos)
     return "A análise foi processada, mas a resposta de texto retornou vazia. Por favor, reenvie a mensagem."
 
 def executar_geracao_com_retry(client, contents, instrucao):
@@ -252,7 +250,9 @@ def executar_geracao_com_retry(client, contents, instrucao):
                         temperature=0.1
                     )
                 )
-                return extrair_texto_resposta(response)
+                texto = extrair_texto_resposta(response)
+                if texto and "retornou vazia" not in texto:
+                    return texto
             except Exception as e:
                 erro_str = str(e).lower()
                 if "503" in erro_str or "unavailable" in erro_str or "high demand" in erro_str:
@@ -483,7 +483,7 @@ else:
                         st.toast("Feedback registrado para melhoria.", icon="📝")
 
 # ----------------------------------------------------
-# 12. Processamento de Mensagens com Memória e Retry
+# 12. Processamento de Mensagens com Ingestão Multimodal Direta
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua matéria jurídica ou use para pesquisar acórdãos..." if chat_vazio else "Digite sua resposta ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -513,23 +513,17 @@ if prompt_final:
 
                 user_parts = []
                 
+                # Ingestão síncrona direta via bytes nativos (inline PDF)
                 if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
                     for f in uploaded_files:
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                            tmp.write(f.getvalue())
-                            tmp_path = tmp.name
-                        
-                        try:
-                            uploaded_gemini_file = client.files.upload(file=tmp_path)
-                            file_part = types.Part.from_uri(
-                                file_uri=uploaded_gemini_file.uri,
-                                mime_type=uploaded_gemini_file.mime_type
+                        pdf_bytes = f.getvalue()
+                        user_parts.append(
+                            types.Part.from_bytes(
+                                data=pdf_bytes,
+                                mime_type="application/pdf"
                             )
-                            user_parts.append(file_part)
-                            user_parts.append(types.Part.from_text(text=f"[Documento dos Autos: {f.name}]"))
-                        finally:
-                            if os.path.exists(tmp_path):
-                                os.remove(tmp_path)
+                        )
+                        user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))
 
                 user_parts.append(types.Part.from_text(text=prompt_final))
 

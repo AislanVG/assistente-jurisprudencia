@@ -1,10 +1,13 @@
 import streamlit as st
 import uuid
+import tempfile
+import os
+from datetime import datetime
 from google import genai
 from google.genai import types
 
 # ----------------------------------------------------
-# 1. Configurações da Página e CSS Institucional
+# 1. Configurações da Página e CSS Avançado
 # ----------------------------------------------------
 st.set_page_config(
     page_title="JusAssist MPMS",
@@ -66,11 +69,21 @@ st.markdown("""
         padding-top: 15px;
         border-top: 1px solid #e2e8f0;
     }
+
+    /* Hero Centrado (Jus IA Style) */
+    .hero-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1e293b;
+        text-align: center;
+        margin-top: 8vh;
+        margin-bottom: 24px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 2. Carregamento Seguro de Chaves (Secrets)
+# 2. Carregamento Seguro de Chaves
 # ----------------------------------------------------
 GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
 
@@ -110,7 +123,7 @@ SUPERPROMPT_PARECER = """
 Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, auxiliando diretamente a Procuradora de Justiça, Dra. Luciana Moreira Schenk. Seu objetivo é elaborar minutas de PARECER DO MINISTÉRIO PÚBLICO EM SEGUNDO GRAU completas, densas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral.
 
 ### 🛡️ BLINDAGEM E REGRAS ESTRITAS:
-1. ADERÊNCIA ESTRITA AOS AUTOS: Baseie sua análise EXCLUSIVAMENTE nos fatos e documentos do caso concreto anexado pelo usuário. É PROIBIDO inventar ou misturar matérias fáticas estranhas ao processo (ex: não cite saúde se o caso for imobiliário/tributário).
+1. ADERÊNCIA ESTRITA AOS AUTOS: Baseie sua análise EXCLUSIVAMENTE nos fatos e documentos do caso concreto anexado pelo usuário. É PROIBIDO inventar ou misturar matérias fáticas estranhas ao processo.
 2. TRAVA ANTI-ALUCINAÇÃO: Utilize a ferramenta de busca do Google para localizar precedentes, números de REsps, Temas e acórdãos REAIS do STF, STJ e TJMS aplicáveis à matéria específica dos autos. Proibido inventar números ou ementas.
 3. TRAVA DE HIERARQUIA: Precedentes das Turmas do STJ e teses vinculantes do STF prevalecem sobre atos administrativos ou pareceres técnicos.
 4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade.
@@ -133,7 +146,21 @@ Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do
 """
 
 # ----------------------------------------------------
-# 4. Gerenciamento de Sessões
+# 4. Função Auxiliar de Extração Segura de Texto
+# ----------------------------------------------------
+def extrair_texto_resposta(response) -> str:
+    if hasattr(response, "text") and response.text:
+        return response.text
+    if hasattr(response, "candidates") and response.candidates:
+        candidato = response.candidates[0]
+        if hasattr(candidato, "content") and hasattr(candidato.content, "parts"):
+            textos = [p.text for p in candidato.content.parts if hasattr(p, "text") and p.text]
+            if textos:
+                return "".join(textos)
+    return "A análise foi processada, mas a resposta de texto retornou vazia. Por favor, reenvie sua mensagem."
+
+# ----------------------------------------------------
+# 5. Gerenciamento de Sessões
 # ----------------------------------------------------
 if "chats" not in st.session_state:
     primeiro_id = str(uuid.uuid4())
@@ -153,7 +180,7 @@ if "current_chat_id" not in st.session_state or st.session_state.current_chat_id
 chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 
 # ----------------------------------------------------
-# 5. Modal de Ajuda e Manual Operacional
+# 6. Modal Completo de Ajuda e Manual Operacional
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional (MPMS)", width="large")
 def exibir_manual_ajuda():
@@ -163,90 +190,65 @@ def exibir_manual_ajuda():
     tab1, tab2, tab3, tab4 = st.tabs([
         "📄 Minuta de Parecer (MPMS)", 
         "🔍 Pesquisa Jurisprudencial", 
-        "🛡️ Diretrizes & Travas Institucionais", 
-        "🛑 Comandos de Ajuste de Rota"
+        "🛡️ Diretrizes & Travas", 
+        "🛑 Comandos de Ajuste"
     ])
     
     with tab1:
-        st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer Institucional de 2º Grau)")
+        st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer de 2º Grau)")
         st.markdown(
-            """
-O assistente é rigorosamente calibrado para atuar como Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, 
-elaborando peças densas, contínuas e exaustivamente fundamentadas, com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)** no corpo da minuta.
-            """
+            "O assistente é rigorosamente calibrado para atuar como Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, "
+            "elaborando peças densas e completas com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)** no corpo da minuta."
         )
-        
         st.markdown(
             """
 1. **Passo 1: Upload dos Autos (Múltiplos PDFs)**
-   * Na barra lateral, selecione o modo **📄 Parecer**.
-   * Anexe conjuntamente as peças necessárias: Petição Inicial, Sentença, Apelação, Contrarrazões e Laudos Periciais.
-2. **Passo 2: Disparo da Análise**
-   * Clique no botão **`⚡ Iniciar Análise do Processo`** ou digite no chat: `Analise os autos e gere o parecer`.
+   * Na barra lateral, selecione o modo **📄 Parecer** e anexe as peças necessárias (Inicial, Sentença, Apelação, Laudos).
+2. **Passo 2: Início da Análise**
+   * Clique em `⚡ Iniciar Análise do Processo` ou clique na sugestão central.
 3. **Passo 3: Diagnóstico Fático & Precedentes (Fase 2)**
-   * A IA apresentará o raio-x do caso, mapeará preliminares, dispositivos legais e **realizará busca ativa em tempo real na internet** por precedentes recentes do STJ, STF e TJMS aderentes aos fatos.
-   * Ela perguntará se a Procuradoria aprova os julgados sugeridos ou se deseja indicar um REsp/Informativo específico.
+   * A IA apresentará o raio-x e pesquisará em tempo real acórdãos reais do STJ/STF/TJMS.
 4. **Passo 4: Validação da Ementa e Relatório (Fase 3)**
-   * Ao responder com a aprovação da tese, a IA redigirá a **Ementa Técnica Formal** (com recuo institucional e parecer conclusivo em negrito) e o **Relatório Sucinto Fluido** (até 500 palavras, encadeado em parágrafos lógicos e sem marcadores/tópicos).
-5. **Passo 5: Minuta Integral de Alta Densidade (Fase 4)**
-   * Responda `Validado, prossiga`. A IA entregará a minuta completa pronta para exportação: Cabeçalho oficial, Ementa, "COLENDA CÂMARA CÍVEL,", Relatório, I – Das Preliminares, II – Do Mérito (fundamentação densa de 2.500 a 4.000 palavras) e III – Conclusão com assinatura institucional.
+   * Responda `Aprovado` para gerar a Ementa Técnica e o Relatório Fluido (até 500 palavras, sem marcadores).
+5. **Passo 5: Minuta Final de Alta Densidade (Fase 4)**
+   * Responda `Validado, prossiga` para a IA entregar a minuta completa pronta para exportação.
             """
         )
-        st.info("💡 **Exportação Direta para o Word:** Ao final da Fase 4, copie o texto da resposta e cole diretamente no Microsoft Word ou Google Docs mantendo a formatação de origem (Ctrl + V). A estrutura em blocos recuados e itálicos latinos será preservada.")
+        st.info("💡 **Dica de Exportação:** Copie o texto da resposta final e cole no Microsoft Word mantendo a formatação de origem (Ctrl + V).")
 
     with tab2:
         st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
-        st.markdown(
-            """
-No modo **🔍 Pesquisa**, a IA utiliza Grounding com o Google Search para varrer as bases oficiais do STF, STJ, TJMS e Tribunais Regionais, entregando respostas estruturadas no padrão analítico de parecer (Tese Central, Precedentes Favoráveis com Links, Distinções/Contrapontos, Critérios Práticos e Ementa para Citação).
-            """
-        )
-        
-        st.markdown("#### Exemplos Práticos de Pesquisa para Copiar:")
-        st.code("Qual o entendimento do STJ sobre responsabilidade do Estado por erro médico que causa sequelas permanentes em menor?", language="text")
-        st.code("Pesquise a jurisprudência do TJMS sobre rescisão de contrato imobiliário por culpa da construtora com devolução integral das parcelas.", language="text")
-        st.code("Pesquise precedentes do STJ sobre o dever do plano de saúde em custear tratamento multidisciplinar para menor com TEA (método ABA).", language="text")
-        st.code("Qual a jurisprudência consolidada do STJ sobre tempus regit actum e indisponibilidade CNIB superveniente em escritura lavrada em 2010?", language="text")
-        st.code("Qual o entendimento do STJ e TJMS sobre a impenhorabilidade de valores em caderneta de poupança até o limite de 40 salários mínimos?", language="text")
+        st.markdown("Varredura em tempo real com Google Search nas bases do STF, STJ, TJMS e TRFs.")
+        st.markdown("#### Exemplos Práticos de Pesquisa:")
+        st.code("Qual o entendimento do STJ sobre responsabilidade do Estado por erro médico que causa sequelas em menor?", language="text")
+        st.code("Pesquise a jurisprudência do TJMS sobre rescisão de contrato imobiliário por culpa da construtora com devolução integral.", language="text")
 
     with tab3:
-        st.markdown("### 🛡️ Diretrizes e Mecanismos de Blindagem Institucional")
+        st.markdown("### 🛡️ Mecanismos de Blindagem Institucional")
         st.markdown(
             """
-* **Aderência Estrita aos Autos:** A análise baseia-se exclusivamente nas peças e documentos juntados, sendo terminantemente proibida a contaminação do texto por matérias fáticas alheias ao caso sob exame.
-* **Prevalência Absoluta do STJ / STF:** Precedentes das Turmas de Direito Privado do STJ (3ª e 4ª Turmas) e teses vinculantes do STF sobrepõem-se obrigatoriamente a pareceres de Conselhos de Classe (CREMESP/COFFITO), notas do e-NATJus ou resoluções normativas da ANS.
-* **Diretriz Protetiva Institucional (Saúde, Vida e Vulneráveis):** Em matérias que envolvam saúde, infância, TEA, doenças graves ou alimentos, a orientação é pela tutela integral da dignidade da pessoa humana quando respaldada por laudo médico idôneo.
-* **Trava Anti-Alucinação:** O assistente realiza buscas reais no índice oficial e não inventa números de processos, súmulas ou ementas fictícias.
-* **Relatório Padrão Ouro Institucional:** Redação contínua, encadeada por verbos de ligação (*'Alega o apelante que...'*, *'Sustenta que...'*, *'Argumenta que...'*) de até 500 palavras, estritamente sem o uso de tópicos ou marcadores.
-* **Mimetização de Estilo e Latim em Itálico:** Expressões latinas (*in re ipsa*, *rebus sic stantibus*, *tempus regit actum*, *stare decisis*) são grafadas em itálico e jurisprudências em bloco recuado (`>`).
+* **Prevalência STJ/STF:** Precedentes de Turmas do STJ e STF sobrepõem-se a notas do e-NATJus ou conselhos.
+* **Aderência aos Autos:** Foco restrito aos documentos do processo anexado.
+* **Trava Anti-Alucinação:** Pesquisa ativa em bases oficiais, sem inventar julgados.
+* **Relatório Padrão Ouro:** Narrativa fluida e encadeada de até 500 palavras, estritamente sem tópicos.
             """
         )
 
     with tab4:
         st.markdown("### 🛑 Comandos de Ajuste de Rota (Se não aprovar)")
-        st.markdown(
-            """
-Se a IA apresentar uma proposta de tese divergente do entendimento da Procuradoria ou se for necessário recalibrar o formato, **não autorize o avanço**. Digite um comando corretivo:
-            """
-        )
-        
         st.markdown("**1. Correção de Tese na Fase 2 (Diagnóstico):**")
-        st.code("Não está aprovado. Na proposta de mérito, considere que a 3ª Turma do STJ já pacificou o dever de custeio pelo REsp 2.221.399/SP. Reformule a Fase 2 alinhando o opinamento pelo desprovimento do recurso.", language="text")
-        
-        st.markdown("**2. Correção de Formatação na Fase 3 (Relatório/Ementa):**")
-        st.code("Não está aprovado. O relatório utilizou tópicos. Refaça a Fase 3 apresentando o relatório estritamente em parágrafos fluidos e corridos, limitando-se a 500 palavras.", language="text")
-        
-        st.markdown("**3. Avanço e Validação Direta:**")
+        st.code("Não está aprovado. Na proposta de mérito, considere que a 3ª Turma do STJ já pacificou o dever de custeio pelo REsp 2.221.399/SP. Reformule a Fase 2 opinando pelo desprovimento do recurso.", language="text")
+        st.markdown("**2. Avanço Direto:**")
         st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a emissão da Fase 3 e da Minuta Completa.", language="text")
 
 # ----------------------------------------------------
-# 6. Barra Lateral
+# 7. Barra Lateral
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown("### ⚖️ **JusAssist MPMS**")
     st.caption("4ª Procuradoria de Justiça Cível")
     
-    # Ação Primária
+    # Novo Chat
     if st.button("➕ Novo Atendimento", use_container_width=True, type="primary"):
         if len(chat_atual["messages"]) > 0:
             novo_id = str(uuid.uuid4())
@@ -286,7 +288,7 @@ with st.sidebar:
         )
         if uploaded_files and len(chat_atual["messages"]) == 0:
             if st.button("⚡ Iniciar Análise do Processo", use_container_width=True, type="primary"):
-                st.session_state["trigger_auto_start"] = True
+                st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."
                 st.rerun()
 
     # Histórico de Atendimentos
@@ -327,28 +329,69 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 7. Área Central de Chat com Memória Contínua
+# 8. Área Principal de Chat & Hero Centralizado
 # ----------------------------------------------------
-st.subheader(chat_atual["mode"])
+hora_atual = datetime.now().hour
+saudacao = "Qual é o caso da manhã?" if hora_atual < 12 else ("Qual é o caso da tarde?" if hora_atual < 18 else "Qual é o caso da noite?")
 
+# ESTADO 1: TELA INICIAL CENTRALIZADA (EMPTY STATE)
 if len(chat_atual["messages"]) == 0:
-    if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
-        st.info("💡 **Fluxo de Parecer:** Anexe os arquivos PDF na barra lateral (Inicial, Sentença, Apelação) e clique em **`⚡ Iniciar Análise do Processo`**.")
-    else:
-        st.info("💡 **Pesquisa Unificada:** Digite a tese jurídica, Tema Repetitivo ou matéria a pesquisar nos Tribunais.")
+    st.markdown(f"<div class='hero-title'>{saudacao}</div>", unsafe_allow_html=True)
+    
+    col_c1, col_c2, col_c3 = st.columns([1, 2.5, 1])
+    with col_c2:
+        if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
+            if uploaded_files:
+                if st.button("⚡ Analise os autos desse processo e gere o parecer", key="sug_parecer", use_container_width=True, type="primary"):
+                    st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."
+                    st.rerun()
+            else:
+                st.info("📂 Anexe os arquivos PDF na barra lateral para iniciar a análise do processo.")
+            
+            if st.button("💬 Mapeie preliminares e teses recursais deste caso", key="sug_teses", use_container_width=True):
+                st.session_state["trigger_prompt"] = "Faça um mapeamento analítico das preliminares e das principais teses recursais cabíveis para o caso."
+                st.rerun()
+        else:
+            if st.button("🔍 Pesquisar teses de responsabilidade civil do Estado", key="sug_resp", use_container_width=True):
+                st.session_state["trigger_prompt"] = "Qual o entendimento consolidado do STJ sobre responsabilidade do Estado por erro médico que causa sequelas em menor?"
+                st.rerun()
+            if st.button("🔍 Pesquisar obrigatoriedade de cobertura pelo plano de saúde", key="sug_saude", use_container_width=True):
+                st.session_state["trigger_prompt"] = "Qual a jurisprudência do STJ sobre o dever do plano de saúde em custear tratamento multidisciplinar para menor com TEA?"
+                st.rerun()
 
-for msg in chat_atual["messages"]:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+# ESTADO 2: CONVERSAÇÃO ATIVA
+else:
+    st.subheader(chat_atual["mode"])
+    if chat_atual["title"]:
+        st.caption(f"Processo: **{chat_atual['title']}**")
+        
+    for i, msg in enumerate(chat_atual["messages"]):
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+            
+            if msg["role"] == "assistant":
+                col_act1, col_act2, col_act3, _ = st.columns([0.15, 0.15, 0.15, 0.55])
+                with col_act1:
+                    st.download_button(
+                        label="📥 Baixar",
+                        data=msg["content"],
+                        file_name=f"Parecer_MPMS_{i}.txt",
+                        mime="text/plain",
+                        key=f"dl_{i}",
+                        help="Baixar o texto desta resposta em formato de texto/minuta"
+                    )
+                with col_act2:
+                    if st.button("👍", key=f"like_{i}", help="Aprovar resposta"):
+                        st.toast("Feedback positivo registrado!", icon="✅")
+                with col_act3:
+                    if st.button("👎", key=f"dislike_{i}", help="Sinalizar ajuste"):
+                        st.toast("Feedback registrado para melhoria.", icon="📝")
 
-# Tratamento do disparo automático pós-upload
-auto_prompt = None
-if st.session_state.get("trigger_auto_start", False):
-    st.session_state["trigger_auto_start"] = False
-    auto_prompt = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."
-
-prompt_input = st.chat_input("Digite sua resposta, orientação ou valide a etapa anterior...")
-prompt_final = auto_prompt or prompt_input
+# ----------------------------------------------------
+# 9. Processamento de Mensagens
+# ----------------------------------------------------
+prompt_digitado = st.chat_input("Digite sua mensagem ou use para habilidades...")
+prompt_final = st.session_state.pop("trigger_prompt", None) or prompt_digitado
 
 if prompt_final:
     if not chat_atual["title"]:
@@ -362,7 +405,7 @@ if prompt_final:
         st.markdown(prompt_final)
 
     with st.chat_message("assistant"):
-        with st.spinner("Processando fundamentação e mantendo o contexto dos autos..."):
+        with st.spinner("Processando fundamentação jurídica e pesquisando precedentes oficiais..."):
             try:
                 client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -372,21 +415,31 @@ if prompt_final:
                     else PROMPT_JURISPRUDENCIA
                 )
 
-                # Montagem das partes da mensagem atual
                 user_parts = []
+                
+                # Upload seguro dos PDFs para a Files API na 1ª mensagem
                 if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
                     for f in uploaded_files:
-                        user_parts.append(types.Part.from_bytes(data=f.getvalue(), mime_type="application/pdf"))
-                        user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                            tmp.write(f.getvalue())
+                            tmp_path = tmp.name
+                        
+                        try:
+                            uploaded_gemini_file = client.files.upload(file=tmp_path)
+                            user_parts.append(uploaded_gemini_file)
+                            user_parts.append(types.Part.from_text(text=f"[Documento dos Autos: {f.name}]"))
+                        finally:
+                            if os.path.exists(tmp_path):
+                                os.remove(tmp_path)
 
                 user_parts.append(types.Part.from_text(text=prompt_final))
 
-                # Registra no histórico do Gemini
+                # Registra no histórico estruturado
                 chat_atual["gemini_history"].append(
                     types.Content(role="user", parts=user_parts)
                 )
 
-                # Gera com todo o histórico acumulado
+                # Gera conteúdo com memória e Google Search Grounding
                 response = client.models.generate_content(
                     model="gemini-2.5-flash",
                     contents=chat_atual["gemini_history"],
@@ -397,9 +450,8 @@ if prompt_final:
                     )
                 )
 
-                texto_resposta = response.text
+                texto_resposta = extrair_texto_resposta(response)
 
-                # Salva resposta no histórico do Gemini
                 chat_atual["gemini_history"].append(
                     types.Content(role="model", parts=[types.Part.from_text(text=texto_resposta)])
                 )
@@ -409,4 +461,4 @@ if prompt_final:
                 st.rerun()
 
             except Exception as e:
-                st.error(f"Erro no processamento da análise: {str(e)}")
+                st.error(f"Erro no processamento: {str(e)}")

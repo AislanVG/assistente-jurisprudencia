@@ -6,6 +6,7 @@ import re
 import requests
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from supabase import create_client, Client
 from google import genai
 from google.genai import types
 
@@ -23,34 +24,23 @@ st.set_page_config(
 # ----------------------------------------------------
 GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
 CNJ_API_KEY = st.secrets.get("CNJ_API_KEY", "")
+SUPABASE_URL = st.secrets.get("SUPABASE_URL", "")
+SUPABASE_KEY = st.secrets.get("SUPABASE_KEY", "")
 
 if not GEMINI_API_KEY:
     st.error("⚠️ Chave GEMINI_API_KEY não configurada nos Secrets do Streamlit.")
     st.stop()
 
 # ----------------------------------------------------
-# 3. Gerenciamento de Sessões e Feedbacks
+# 3. Inicialização do Cliente Supabase
 # ----------------------------------------------------
-if "chats" not in st.session_state:
-    primeiro_id = str(uuid.uuid4())
-    st.session_state.chats = {
-        primeiro_id: {
-            "title": "",
-            "mode": "📄 Minuta de Parecer (MPMS)",
-            "messages": [],
-            "gemini_history": []
-        }
-    }
-    st.session_state.current_chat_id = primeiro_id
+@st.cache_resource
+def get_supabase_client() -> Client:
+    if SUPABASE_URL and SUPABASE_KEY:
+        return create_client(SUPABASE_URL, SUPABASE_KEY)
+    return None
 
-if "feedbacks_coletados" not in st.session_state:
-    st.session_state.feedbacks_coletados = []
-
-if "current_chat_id" not in st.session_state or st.session_state.current_chat_id not in st.session_state.chats:
-    st.session_state.current_chat_id = list(st.session_state.chats.keys())[0]
-
-chat_atual = st.session_state.chats[st.session_state.current_chat_id]
-chat_vazio = len(chat_atual["messages"]) == 0
+supabase = get_supabase_client()
 
 # ----------------------------------------------------
 # 4. Injeção de CSS Dinâmico
@@ -136,12 +126,112 @@ css_customizado = """
         margin-top: 8px;
         margin-bottom: 20px;
     }
+    
+    .auth-container {
+        max-width: 440px;
+        margin: 8vh auto 0 auto;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    }
 </style>
 """
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 5. Módulo de Integração com API DataJud (CNJ)
+# 5. Fluxo de Autenticação (Login & Cadastro com Supabase)
+# ----------------------------------------------------
+if "user_session" not in st.session_state:
+    st.session_state.user_session = None
+
+def exibir_tela_autenticacao():
+    col_l1, col_l2, col_l3 = st.columns([1, 1.2, 1])
+    with col_l2:
+        st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
+        st.markdown("### ⚖️ JusAssist MPMS")
+        st.caption("Acesso Restrito à Assessoria da 4ª Procuradoria de Justiça")
+        
+        tab_login, tab_cadastro = st.tabs(["Entrar", "Criar Conta"])
+        
+        with tab_login:
+            with st.form("form_login"):
+                email = st.text_input("E-mail institucional / pessoal")
+                senha = st.text_input("Senha", type="password")
+                btn_entrar = st.form_submit_button("Acessar Plataforma", type="primary", use_container_width=True)
+                
+                if btn_entrar:
+                    if not email or not senha:
+                        st.warning("Por favor, preencha o e-mail e a senha.")
+                    elif not supabase:
+                        st.error("Credenciais do Supabase não configuradas nos Secrets.")
+                    else:
+                        try:
+                            res = supabase.auth.sign_in_with_password({"email": email, "password": senha})
+                            if res.user:
+                                st.session_state.user_session = res.user
+                                st.rerun()
+                        except Exception as e:
+                            st.error("E-mail ou senha incorretos. Verifique suas credenciais.")
+
+        with tab_cadastro:
+            with st.form("form_cadastro"):
+                novo_email = st.text_input("Seu E-mail")
+                nova_senha = st.text_input("Crie uma Senha (mínimo 6 caracteres)", type="password")
+                confirma_senha = st.text_input("Confirme a Senha", type="password")
+                btn_cadastrar = st.form_submit_button("Cadastrar", use_container_width=True)
+                
+                if btn_cadastrar:
+                    if not novo_email or not nova_senha:
+                        st.warning("Preencha todos os campos.")
+                    elif nova_senha != confirma_senha:
+                        st.error("As senhas digitadas não coincidem.")
+                    elif len(nova_senha) < 6:
+                        st.warning("A senha deve ter pelo menos 6 caracteres.")
+                    elif not supabase:
+                        st.error("Credenciais do Supabase não configuradas nos Secrets.")
+                    else:
+                        try:
+                            res = supabase.auth.sign_up({"email": novo_email, "password": nova_senha})
+                            if res.user:
+                                st.success("Conta criada com sucesso! Você já pode realizar o login.")
+                        except Exception as e:
+                            st.error(f"Erro ao cadastrar: {str(e)}")
+                            
+        st.markdown("</div>", unsafe_allow_html=True)
+
+# Se o usuário não estiver logado, bloqueia a exibição do aplicativo e mostra a tela de login
+if not st.session_state.user_session:
+    exibir_tela_autenticacao()
+    st.stop()
+
+# ----------------------------------------------------
+# 6. Gerenciamento de Sessões do Assistente
+# ----------------------------------------------------
+if "chats" not in st.session_state:
+    primeiro_id = str(uuid.uuid4())
+    st.session_state.chats = {
+        primeiro_id: {
+            "title": "",
+            "mode": "📄 Minuta de Parecer (MPMS)",
+            "messages": [],
+            "gemini_history": []
+        }
+    }
+    st.session_state.current_chat_id = primeiro_id
+
+if "feedbacks_coletados" not in st.session_state:
+    st.session_state.feedbacks_coletados = []
+
+if "current_chat_id" not in st.session_state or st.session_state.current_chat_id not in st.session_state.chats:
+    st.session_state.current_chat_id = list(st.session_state.chats.keys())[0]
+
+chat_atual = st.session_state.chats[st.session_state.current_chat_id]
+chat_vazio = len(chat_atual["messages"]) == 0
+
+# ----------------------------------------------------
+# 7. Módulo de Integração com API DataJud (CNJ)
 # ----------------------------------------------------
 def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjms"):
     if not CNJ_API_KEY:
@@ -190,7 +280,7 @@ def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjms"):
     return None
 
 # ----------------------------------------------------
-# 6. Prompts Especializados
+# 8. Prompts Especializados
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -244,7 +334,7 @@ Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do
 """
 
 # ----------------------------------------------------
-# 7. Feed de Precedentes (Cache 12h)
+# 9. Feed de Precedentes (Cache 12h)
 # ----------------------------------------------------
 @st.cache_data(ttl=43200)
 def carregar_feed_precedentes():
@@ -258,7 +348,7 @@ def carregar_feed_precedentes():
     ]
 
 # ----------------------------------------------------
-# 8. Modais: Manual de Ajuda & Avaliação Negativa
+# 10. Modais de Ajuda & Feedback
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional (MPMS)", width="large")
 def exibir_manual_ajuda():
@@ -351,6 +441,7 @@ def modal_feedback_negativo(msg_index, msg_content):
     with col_b2:
         if st.button("Enviar agora", type="primary", use_container_width=True):
             st.session_state.feedbacks_coletados.append({
+                "usuario": st.session_state.user_session.email,
                 "data_hora": datetime.now().isoformat(),
                 "tipo": "negativo",
                 "motivo_texto": motivo_texto,
@@ -361,11 +452,19 @@ def modal_feedback_negativo(msg_index, msg_content):
             st.rerun()
 
 # ----------------------------------------------------
-# 9. Barra Lateral
+# 11. Barra Lateral
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown("### ⚖️ **JusAssist MPMS**")
-    st.caption("4ª Procuradoria de Justiça Cível")
+    st.caption(f"Usuário: **{st.session_state.user_session.email}**")
+    
+    if st.button("🚪 Sair da Conta", use_container_width=True):
+        if supabase:
+            supabase.auth.sign_out()
+        st.session_state.user_session = None
+        st.rerun()
+        
+    st.markdown("---")
     
     if st.button("➕ Novo Atendimento", use_container_width=True, type="primary"):
         if len(chat_atual["messages"]) > 0:
@@ -444,7 +543,7 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 10. Horário Local (MS / Brasília)
+# 12. Horário Local (MS / Brasília)
 # ----------------------------------------------------
 try:
     fuso_ms = ZoneInfo("America/Campo_Grande")
@@ -460,7 +559,7 @@ else:
     saudacao = "Qual é o caso da noite?"
 
 # ----------------------------------------------------
-# 11. Área Principal: Estado Inicial vs. Conversação
+# 13. Área Principal: Estado Inicial vs. Conversação
 # ----------------------------------------------------
 if chat_vazio:
     st.markdown(f"<div class='hero-title'>{saudacao}</div>", unsafe_allow_html=True)
@@ -515,6 +614,7 @@ else:
                 with col_act2:
                     if st.button("👍", key=f"like_{i}", help="Aprovar resposta"):
                         st.session_state.feedbacks_coletados.append({
+                            "usuario": st.session_state.user_session.email,
                             "data_hora": datetime.now().isoformat(),
                             "tipo": "positivo",
                             "trecho_resposta": msg["content"][:250]
@@ -527,7 +627,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 12. Processamento de Mensagens com Streaming Seguro
+# 14. Processamento de Mensagens com Streaming Seguro
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua matéria jurídica ou use para pesquisar acórdãos..." if chat_vazio else "Digite sua resposta ou orientação para a próxima fase..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -553,7 +653,6 @@ if prompt_final:
 
             user_parts = []
             
-            # Consulta DataJud por número
             dados_cnj = None
             if not is_parecer_mode and re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
                 match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)
@@ -561,7 +660,6 @@ if prompt_final:
                 if dados_cnj:
                     user_parts.append(types.Part.from_text(text=f"[Consulta Oficial DataJud/CNJ]:\n{dados_cnj}"))
 
-            # Anexa os PDFs em binário somente na 1ª mensagem
             if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
                 for f in uploaded_files:
                     pdf_bytes = f.getvalue()
@@ -588,7 +686,6 @@ if prompt_final:
             if not is_parecer_mode:
                 config_params["tools"] = [types.Tool(google_search=types.GoogleSearch())]
 
-            # Gerador com Streaming focado no modelo oficial estável
             def stream_generator():
                 for tentativa in range(3):
                     try:
@@ -608,7 +705,7 @@ if prompt_final:
                             if tentativa == 2:
                                 raise Exception(
                                     "A cota de requisições da chave do Google foi temporariamente atingida (429). "
-                                    "Para remover esse limite, ative o faturamento (Pay-As-You-Go) no Google AI Studio."
+                                    "Para remover esse limite, ative o faturamento no Google AI Studio."
                                 )
                             continue
                         else:

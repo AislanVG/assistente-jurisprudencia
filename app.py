@@ -1,162 +1,151 @@
 import streamlit as st
-import requests
-import json
+import uuid
 from google import genai
 from google.genai import types
 
 # ----------------------------------------------------
-# 1. Configurações da Página (Estilo Jus IA)
+# 1. Configurações da Página
 # ----------------------------------------------------
 st.set_page_config(
-    page_title="Assistente de Jurisprudência IA",
+    page_title="JusAssist IA",
     page_icon="⚖️",
     layout="wide"
 )
 
 # ----------------------------------------------------
-# 2. Carregamento Automático e Invisível das Chaves
+# 2. Carregamento da Chave
 # ----------------------------------------------------
 GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
-CNJ_API_KEY = st.secrets.get("CNJ_API_KEY")
 
 if not GEMINI_API_KEY:
-    st.error("⚠️ Chave de API não configurada nos Secrets do servidor.")
+    st.error("⚠️ Chave GEMINI_API_KEY não configurada nos Secrets.")
     st.stop()
 
 # ----------------------------------------------------
-# 3. Barra Lateral Limpa (Apenas Filtros Jurídicos)
+# 3. Gerenciamento de Múltiplas Sessões/Conversas
+# ----------------------------------------------------
+# Estrutura: st.session_state.chats = {chat_id: {"title": str, "messages": list}}
+if "chats" not in st.session_state:
+    primeiro_id = str(uuid.uuid4())
+    st.session_state.chats = {
+        primeiro_id: {
+            "title": "Nova conversa",
+            "messages": []
+        }
+    }
+    st.session_state.current_chat_id = primeiro_id
+
+if "current_chat_id" not in st.session_state or st.session_state.current_chat_id not in st.session_state.chats:
+    st.session_state.current_chat_id = list(st.session_state.chats.keys())[0]
+
+# ----------------------------------------------------
+# 4. Barra Lateral (Estilo Jus IA)
 # ----------------------------------------------------
 with st.sidebar:
-    st.title("⚖️ Filtros de Jurisprudência")
+    st.title("⚖️ JusAssist IA")
     
-    fonte_escolhida = st.selectbox(
-        "Base Jurisprudencial:",
-        [
-            "STF e STJ (Tribunais Superiores)",
-            "STF - Supremo Tribunal Federal",
-            "STJ - Superior Tribunal de Justiça",
-            "DataJud / CNJ (TJs e TRFs)"
-        ]
-    )
-
-    tribunal_datajud = "tjsp"
-    if fonte_escolhida == "DataJud / CNJ (TJs e TRFs)":
-        tribunal_datajud = st.selectbox(
-            "Tribunal Estadual / Federal:",
-            ["tjsp", "tjrj", "tjmg", "tjrs", "tjpr", "tjsc", "trf1", "trf2", "trf3", "trf4", "trf5"]
-        )
-
-    st.divider()
-    if st.button("🗑️ Nova Consulta / Limpar Chat"):
-        st.session_state.messages = []
+    # Botão de Nova Conversa
+    if st.button("📝 Nova conversa", use_container_width=True, type="primary"):
+        novo_id = str(uuid.uuid4())
+        st.session_state.chats[novo_id] = {
+            "title": "Nova conversa",
+            "messages": []
+        }
+        st.session_state.current_chat_id = novo_id
         st.rerun()
 
-# ----------------------------------------------------
-# 4. Ferramenta de Consulta DataJud
-# ----------------------------------------------------
-def consultar_processos_datajud(termo_busca: str, sigla_tribunal: str = "tjsp") -> str:
-    """Consulta processos ativos e movimentações no DataJud/CNJ."""
-    if not CNJ_API_KEY:
-        return "Chave do DataJud não configurada no servidor."
+    st.divider()
+    st.caption("ÚLTIMAS CONVERSAS")
 
-    tribunal_limpo = sigla_tribunal.lower().strip()
-    url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal_limpo}/_search"
-    headers = {"Authorization": f"APIKey {CNJ_API_KEY}", "Content-Type": "application/json"}
-
-    payload = {
-        "size": 5,
-        "query": {"match": {"assuntos.nome": termo_busca}}
-    }
-
-    try:
-        response = requests.post(url, json=payload, headers=headers, timeout=15)
-        if response.status_code == 200:
-            hits = response.json().get("hits", {}).get("hits", [])
-            if not hits:
-                return f"Nenhum processo localizado no {sigla_tribunal.upper()} para '{termo_busca}'."
-
-            resultados = []
-            for item in hits:
-                fonte = item.get("_source", {})
-                assuntos = [a.get("nome") for a in fonte.get("assuntos", []) if a.get("nome")]
-                resultados.append({
-                    "numeroProcesso": fonte.get("numeroProcesso"),
-                    "classe": fonte.get("classe", {}).get("nome"),
-                    "tribunal": fonte.get("tribunal"),
-                    "orgaoJulgador": fonte.get("orgaoJulgador", {}).get("nome"),
-                    "dataAjuizamento": fonte.get("dataAjuizamento"),
-                    "assuntos": assuntos[:3]
-                })
-            return json.dumps(resultados, ensure_ascii=False)
-        return f"Erro DataJud ({response.status_code}): {response.text}"
-    except Exception as e:
-        return f"Erro de conexão com DataJud: {str(e)}"
+    # Lista todas as conversas salvas na sessão
+    for chat_id, chat_data in list(st.session_state.chats.items()):
+        titulo_exibicao = chat_data["title"]
+        if len(titulo_exibicao) > 28:
+            titulo_exibicao = titulo_exibicao[:25] + "..."
+            
+        # Destaque visual para a conversa selecionada
+        is_active = (chat_id == st.session_state.current_chat_id)
+        btn_label = f"💬 {titulo_exibicao}" if not is_active else f"👉 {titulo_exibicao}"
+        
+        col1, col2 = st.columns([0.85, 0.15])
+        with col1:
+            if st.button(btn_label, key=f"chat_{chat_id}", use_container_width=True):
+                st.session_state.current_chat_id = chat_id
+                st.rerun()
+        with col2:
+            # Botão para excluir conversa específica (se houver mais de uma)
+            if len(st.session_state.chats) > 1:
+                if st.button("✕", key=f"del_{chat_id}", help="Excluir conversa"):
+                    del st.session_state.chats[chat_id]
+                    if st.session_state.current_chat_id == chat_id:
+                        st.session_state.current_chat_id = list(st.session_state.chats.keys())[0]
+                    st.rerun()
 
 # ----------------------------------------------------
 # 5. Interface Principal de Chat
 # ----------------------------------------------------
+chat_atual = st.session_state.chats[st.session_state.current_chat_id]
+
 st.header("⚖️ Consulta Jurisprudencial Inteligente")
-st.caption(f"Foco ativo: **{fonte_escolhida}**" + (f" ({tribunal_datajud.upper()})" if fonte_escolhida == "DataJud / CNJ (TJs e TRFs)" else ""))
+st.caption(f"Conversa ativa: **{chat_atual['title']}**")
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-for msg in st.session_state.messages:
+# Exibe as mensagens da conversa ativa
+for msg in chat_atual["messages"]:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-if prompt := st.chat_input("Ex.: Pesquise jurisprudência sobre responsabilidade civil do Estado por erro médico..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+# Entrada de nova mensagem
+if prompt := st.chat_input("Digite o caso fático, tese ou jurisprudência que procura..."):
+    # Atualiza o título da conversa com base na primeira pergunta
+    if len(chat_atual["messages"]) == 0:
+        chat_atual["title"] = prompt[:30] + ("..." if len(prompt) > 30 else "")
+
+    chat_atual["messages"].append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        with st.spinner("Analisando precedentes, ementas e teses vinculantes..."):
+        with st.spinner("Pesquisando precedentes nos Tribunais Superiores e Regionais..."):
             try:
                 client = genai.Client(api_key=GEMINI_API_KEY)
 
-                # Instrução estruturada no padrão do Jus IA
                 instrucoes = (
-                    "Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica. "
-                    f"Base prioritária selecionada: '{fonte_escolhida}'.\n\n"
-                    "REGRAS DE FORMATAÇÃO E ESTRUTURA (ESTILO PARECER JURÍDICO):\n"
-                    "Estruture rigorosamente sua resposta nas seguintes seções:\n\n"
+                    "Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.\n\n"
+                    "ESTRATÉGIA DE BUSCA AUTÔNOMA:\n"
+                    "1. Realize busca ampla e profunda utilizando o Google Search.\n"
+                    "2. Se o usuário mencionar um tribunal específico (ex: TJSP, TJRJ, TRF4, STJ, STF), priorize julgados desse órgão.\n"
+                    "3. Se não houver tribunal especificado, busque o entendimento nos Tribunais Superiores (STF/STJ) "
+                    "e complemente com acórdãos relevantes dos Tribunais de Justiça/TRFs.\n\n"
+                    "ESTRUTURA OBRIGATÓRIA DA RESPOSTA:\n"
                     "### 📌 Tese Jurídica Central\n"
-                    "Apresente em 1 ou 2 frases qual é o ponto decisivo exigido pelos tribunais (nexo causal, requisitos objetivos, ônus da prova).\n\n"
+                    "Síntese objetiva da posição predominante e ônus probatório.\n\n"
                     "### ⚖️ Precedentes Favoráveis\n"
-                    "Liste de 2 a 4 decisões favoráveis, no formato exato:\n"
-                    "* **[Tribunal] – [Classe Processual] nº [Número do Processo]**: [Resumo fático em 2 linhas explicando por que houve procedência]. [Link Oficial/Fonte]\n\n"
-                    "### 🛑 Precedentes Desfavoráveis ou Restritivos\n"
-                    "Apresente 1 ou 2 decisões contrárias, demonstrando em quais circunstâncias o pedido costuma ser rejeitado.\n\n"
+                    "Liste de 2 a 4 julgados específicos com:\n"
+                    "* **[Tribunal] – [Classe e Número do Processo]**: Resumo fático conciso demonstrando por que o pedido foi acolhido. [Link/Fonte Oficial]\n\n"
+                    "### 🛑 Precedentes Desfavoráveis ou Distinções (Distinguishing)\n"
+                    "Apresente hipóteses em que a tese é rejeitada.\n\n"
                     "### 📋 Critérios Objetivos Extraídos dos Julgados\n"
-                    "Enumere os requisitos práticos indispensáveis para o acolhimento da tese.\n\n"
-                    "### 🏛️ Precedentes Vinculantes (STF / STJ)\n"
-                    "Indique se há Súmula, Tema de Repercussão Geral (STF) ou Recurso Repetitivo (STJ) aplicável.\n\n"
+                    "Lista com os requisitos práticos exigidos pelos magistrados.\n\n"
+                    "### 🏛️ Precedentes Vinculantes\n"
+                    "Indique Súmulas, Temas Repetitivos (STJ) ou Repercussão Geral (STF), se existentes.\n\n"
                     "### 📝 Sugestão de Ementa para Cópia\n"
-                    "Forneça o trecho mais representativo de uma das ementas dentro de um bloco de citação pronto para uso em petições."
+                    "Disponibilize o trecho mais relevante de um acórdão representativo em bloco formatado pronto para citação."
                 )
-
-                if fonte_escolhida == "DataJud / CNJ (TJs e TRFs)":
-                    ferramentas = [consultar_processos_datajud]
-                    prompt_envio = f"[Tribunal: {tribunal_datajud}] {prompt}"
-                else:
-                    ferramentas = [types.Tool(google_search=types.GoogleSearch())]
-                    prompt_envio = f"[Base Prioritária: {fonte_escolhida}] {prompt}"
 
                 chat = client.chats.create(
                     model="gemini-2.5-flash",
                     config=types.GenerateContentConfig(
                         system_instruction=instrucoes,
-                        tools=ferramentas,
+                        tools=[types.Tool(google_search=types.GoogleSearch())],
                         temperature=0.1
                     )
                 )
 
-                response = chat.send_message(prompt_envio)
+                response = chat.send_message(prompt)
                 texto_resposta = response.text
 
                 st.markdown(texto_resposta)
-                st.session_state.messages.append({"role": "assistant", "content": texto_resposta})
+                chat_atual["messages"].append({"role": "assistant", "content": texto_resposta})
 
             except Exception as e:
-                st.error(f"Erro ao processar consulta: {str(e)}")
+                st.error(f"Erro ao processar a pesquisa: {str(e)}")

@@ -653,12 +653,14 @@ with st.sidebar:
     uploaded_files = []
     if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
         st.markdown('<div class="sidebar-label">Autos do Processo (PDFs)</div>', unsafe_allow_html=True)
+        # Chave dinâmica vinculada à sessão ativa para limpar ao clicar em "Novo Atendimento"
         uploaded_files = st.file_uploader(
             "Upload dos Processos",
             type=["pdf"],
             accept_multiple_files=True,
             help="Selecione Petição Inicial, Sentença, Apelação e Laudos",
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            key=f"uploader_{st.session_state.current_chat_id}"
         )
         if uploaded_files and len(chat_atual["messages"]) == 0:
             if st.button("⚡ Iniciar Análise do Processo", use_container_width=True, type="primary"):

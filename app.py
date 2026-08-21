@@ -322,7 +322,46 @@ if not st.session_state.user_session:
     st.stop()
 
 # ----------------------------------------------------
-# 6. Gerenciamento de Sessões do Assistente
+# 6. Modal de Alteração de Senha do Usuário Logado
+# ----------------------------------------------------
+@st.dialog("🔒 Alterar Minha Senha", width="medium")
+def modal_alterar_senha():
+    st.markdown("### Defina sua nova senha pessoal")
+    st.caption("A nova senha será salva diretamente no seu usuário.")
+    
+    with st.form("form_troca_senha"):
+        nova_senha = st.text_input("Nova Senha (mínimo 6 dígitos)", type="password", placeholder="••••••••")
+        confirma_senha = st.text_input("Confirme a Nova Senha", type="password", placeholder="••••••••")
+        
+        col_t1, col_t2 = st.columns(2)
+        with col_t1:
+            btn_atualizar = st.form_submit_button("Salvar Senha", type="primary", use_container_width=True)
+        with col_t2:
+            btn_cancelar = st.form_submit_button("Cancelar", use_container_width=True)
+            
+        if btn_atualizar:
+            if not nova_senha or not confirma_senha:
+                st.warning("Preencha ambos os campos de senha.")
+            elif nova_senha != confirma_senha:
+                st.error("As senhas digitadas não coincidem.")
+            elif len(nova_senha) < 6:
+                st.warning("A nova senha deve ter no mínimo 6 caracteres.")
+            elif not supabase:
+                st.error("Erro de conexão com o banco de dados.")
+            else:
+                try:
+                    supabase.auth.update_user({"password": nova_senha})
+                    st.success("Senha alterada com sucesso!")
+                    time.sleep(1.2)
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Erro ao alterar a senha: {str(e)}")
+                    
+        if btn_cancelar:
+            st.rerun()
+
+# ----------------------------------------------------
+# 7. Gerenciamento de Sessões do Assistente
 # ----------------------------------------------------
 if "chats" not in st.session_state:
     primeiro_id = str(uuid.uuid4())
@@ -346,7 +385,7 @@ chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 chat_vazio = len(chat_atual["messages"]) == 0
 
 # ----------------------------------------------------
-# 7. Módulo de Integração com API DataJud (CNJ)
+# 8. Módulo de Integração com API DataJud (CNJ)
 # ----------------------------------------------------
 def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjms"):
     if not CNJ_API_KEY:
@@ -395,7 +434,7 @@ def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjms"):
     return None
 
 # ----------------------------------------------------
-# 8. Prompts Especializados
+# 9. Prompts Especializados
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -449,7 +488,7 @@ Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do
 """
 
 # ----------------------------------------------------
-# 9. Feed de Precedentes (Cache 12h)
+# 10. Feed de Precedentes (Cache 12h)
 # ----------------------------------------------------
 @st.cache_data(ttl=43200)
 def carregar_feed_precedentes():
@@ -463,7 +502,7 @@ def carregar_feed_precedentes():
     ]
 
 # ----------------------------------------------------
-# 10. Modais de Ajuda & Feedback
+# 11. Modais de Ajuda & Feedback
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional (MPMS)", width="large")
 def exibir_manual_ajuda():
@@ -567,17 +606,22 @@ def modal_feedback_negativo(msg_index, msg_content):
             st.rerun()
 
 # ----------------------------------------------------
-# 11. Barra Lateral
+# 12. Barra Lateral
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown("### ⚖️ **JusAssist MPMS**")
     st.caption(f"Usuário: **{st.session_state.user_session.email}**")
     
-    if st.button("🚪 Sair da Conta", use_container_width=True):
-        if supabase:
-            supabase.auth.sign_out()
-        st.session_state.user_session = None
-        st.rerun()
+    col_u1, col_u2 = st.columns([1, 1])
+    with col_u1:
+        if st.button("🔑 Trocar Senha", key="btn_troca_senha_side", use_container_width=True):
+            modal_alterar_senha()
+    with col_u2:
+        if st.button("🚪 Sair", key="btn_sair_side", use_container_width=True):
+            if supabase:
+                supabase.auth.sign_out()
+            st.session_state.user_session = None
+            st.rerun()
         
     st.markdown("---")
     
@@ -658,7 +702,7 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 12. Horário Local (MS / Brasília)
+# 13. Horário Local (MS / Brasília)
 # ----------------------------------------------------
 try:
     fuso_ms = ZoneInfo("America/Campo_Grande")
@@ -674,7 +718,7 @@ else:
     saudacao = "Qual é o caso da noite?"
 
 # ----------------------------------------------------
-# 13. Área Principal: Estado Inicial vs. Conversação
+# 14. Área Principal: Estado Inicial vs. Conversação
 # ----------------------------------------------------
 if chat_vazio:
     st.markdown(f"<div class='hero-title'>{saudacao}</div>", unsafe_allow_html=True)
@@ -742,7 +786,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 14. Processamento de Mensagens com Streaming Seguro
+# 15. Processamento de Mensagens com Streaming Seguro
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua matéria jurídica ou use para pesquisar acórdãos..." if chat_vazio else "Digite sua resposta ou orientação para a próxima fase..."
 prompt_digitado = st.chat_input(prompt_placeholder)

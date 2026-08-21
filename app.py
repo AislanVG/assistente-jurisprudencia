@@ -43,7 +43,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico (+1px Geral e Containers Adequados)
+# 4. Injeção de CSS Dinâmico (+1px Geral e Layout Sem Scroll)
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -51,7 +51,6 @@ css_customizado = """
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* Fundo neutro e sem cabeçalho padrão */
     .stApp {
         background-color: #f8fafc !important;
     }
@@ -66,7 +65,6 @@ css_customizado = """
         max-width: 100% !important;
     }
     
-    /* Botões da Barra Lateral */
     div[data-testid="stSidebar"] button[kind="primary"],
     div.stButton > button[kind="primary"] {
         border-radius: 8px !important;
@@ -143,7 +141,7 @@ css_customizado = """
         margin-bottom: 16px;
     }
 
-    /* --- CARD CENTRALIZADO E INTEGRADO --- */
+    /* CARD CENTRALIZADO E INTEGRADO */
     .auth-unified-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -151,7 +149,7 @@ css_customizado = """
         padding: 26px 32px 18px 32px;
         box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
         text-align: center;
-        max-width: 510px;
+        max-width: 520px;
         margin: 0.5vh auto 0 auto;
     }
     
@@ -201,7 +199,7 @@ css_customizado = """
         border-radius: 6px;
     }
     
-    /* Abas de Login com Tipografia Expandida (+1px) */
+    /* Abas de Login */
     div[data-testid="stTabs"] button {
         font-size: 16.5px !important;
         font-weight: 700 !important;
@@ -216,7 +214,7 @@ css_customizado = """
         border-color: #e2e8f0 !important;
     }
     
-    /* Rótulos dos Inputs (+1px) */
+    /* Rótulos dos Inputs */
     div[data-testid="stWidgetLabel"] label p {
         font-size: 15.5px !important;
         font-weight: 600 !important;
@@ -225,7 +223,7 @@ css_customizado = """
         text-align: left !important;
     }
     
-    /* Caixas de Texto Expandidas (+1px) */
+    /* Caixas de Texto */
     div[data-testid="stTextInput"] input {
         font-size: 16px !important;
         padding: 10px 14px !important;
@@ -242,7 +240,7 @@ css_customizado = """
         box-shadow: none !important;
     }
 
-    /* Botão de Ação Institucional */
+    /* Botão de Entrar */
     div[data-testid="stForm"] button[kind="primary"],
     div[data-testid="stForm"] button {
         background-color: #1e3a8a !important;
@@ -260,7 +258,7 @@ css_customizado = """
         border-color: #2563eb !important;
     }
     
-    /* Rodapé de Segurança Integrado (+1px) */
+    /* Rodapé de Segurança */
     .auth-security-footer {
         text-align: center !important;
         font-size: 12.5px !important;
@@ -280,13 +278,13 @@ css_customizado = """
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 5. Fluxo de Autenticação (Login, Cadastro & Esqueci a Senha)
+# 5. Fluxo de Autenticação Completo
 # ----------------------------------------------------
 if "user_session" not in st.session_state:
     st.session_state.user_session = None
 
 def exibir_tela_autenticacao():
-    col_l1, col_l2, col_l3 = st.columns([1, 1.38, 1])
+    col_l1, col_l2, col_l3 = st.columns([1, 1.4, 1])
     with col_l2:
         st.markdown(
             """
@@ -304,8 +302,11 @@ def exibir_tela_autenticacao():
             unsafe_allow_html=True
         )
         
-        tab_login, tab_cadastro, tab_recuperar = st.tabs(["🔑 Entrar", "✨ Criar Acesso", "🔄 Esqueci a Senha"])
+        tab_login, tab_cadastro, tab_recuperar, tab_nova_senha = st.tabs([
+            "🔑 Entrar", "✨ Criar Acesso", "📧 Solicitar Link", "🔒 Nova Senha"
+        ])
         
+        # Aba 1: Login
         with tab_login:
             with st.form("form_login"):
                 email = st.text_input("E-mail institucional / cadastrado", placeholder="exemplo@mpms.mp.br")
@@ -326,6 +327,7 @@ def exibir_tela_autenticacao():
                         except Exception:
                             st.error("E-mail ou senha incorretos. Verifique suas credenciais.")
 
+        # Aba 2: Criar Acesso
         with tab_cadastro:
             with st.form("form_cadastro"):
                 novo_email = st.text_input("Seu E-mail", placeholder="seu.email@mpms.mp.br")
@@ -350,11 +352,12 @@ def exibir_tela_autenticacao():
                         except Exception as e:
                             st.error(f"Erro ao cadastrar: {str(e)}")
 
+        # Aba 3: Solicitar Link de Recuperação por E-mail
         with tab_recuperar:
             with st.form("form_recuperar"):
-                st.caption("Informe seu e-mail para enviarmos o link seguro de redefinição de senha.")
+                st.caption("Digite seu e-mail para enviarmos o link seguro de recuperação.")
                 email_recuperacao = st.text_input("E-mail cadastrado", placeholder="seu.email@mpms.mp.br")
-                btn_recuperar = st.form_submit_button("Enviar Link de Redefinição", use_container_width=True)
+                btn_recuperar = st.form_submit_button("Enviar Link por E-mail", use_container_width=True)
                 
                 if btn_recuperar:
                     if not email_recuperacao:
@@ -364,9 +367,33 @@ def exibir_tela_autenticacao():
                     else:
                         try:
                             supabase.auth.reset_password_email(email_recuperacao)
-                            st.success("Link de redefinição enviado para seu e-mail! Verifique sua caixa de entrada.")
+                            st.success("Link enviado! Clique no link do e-mail e depois use a aba '🔒 Nova Senha'.")
                         except Exception as e:
                             st.error(f"Erro ao solicitar recuperação: {str(e)}")
+
+        # Aba 4: Redefinir Senha (Nova Senha e Repetir Nova Senha)
+        with tab_nova_senha:
+            with st.form("form_nova_senha"):
+                st.caption("Digite e confirme a sua nova senha para atualizar seu cadastro.")
+                senha_redefinida = st.text_input("Nova Senha (mínimo 6 dígitos)", type="password", placeholder="••••••••")
+                senha_redefinida_confirma = st.text_input("Repetir Nova Senha", type="password", placeholder="••••••••")
+                btn_salvar_senha = st.form_submit_button("Salvar Nova Senha", type="primary", use_container_width=True)
+                
+                if btn_salvar_senha:
+                    if not senha_redefinida or not senha_redefinida_confirma:
+                        st.warning("Preencha ambos os campos de senha.")
+                    elif senha_redefinida != senha_redefinida_confirma:
+                        st.error("As senhas digitadas não são iguais.")
+                    elif len(senha_redefinida) < 6:
+                        st.warning("A nova senha deve ter no mínimo 6 caracteres.")
+                    elif not supabase:
+                        st.error("Credenciais do Supabase não configuradas nos Secrets.")
+                    else:
+                        try:
+                            supabase.auth.update_user({"password": senha_redefinida})
+                            st.success("Senha redefinida com sucesso! Você já pode fazer login na aba '🔑 Entrar'.")
+                        except Exception as e:
+                            st.error(f"Não foi possível redefinir. Certifique-se de ter clicado no link do e-mail: {str(e)}")
 
         st.markdown(
             """

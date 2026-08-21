@@ -43,7 +43,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico (+1px Geral e Layout Sem Scroll)
+# 4. Injeção de CSS Dinâmico (Design Corporativo Sóbrio)
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -60,7 +60,7 @@ css_customizado = """
     }
     
     .block-container {
-        padding-top: 1.2rem !important;
+        padding-top: 1.5rem !important;
         padding-bottom: 0.5rem !important;
         max-width: 100% !important;
     }
@@ -141,16 +141,16 @@ css_customizado = """
         margin-bottom: 16px;
     }
 
-    /* CARD CENTRALIZADO E INTEGRADO */
+    /* CARD DE LOGIN EXCLUSIVO E UNIFICADO */
     .auth-unified-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 20px;
-        padding: 26px 32px 18px 32px;
+        padding: 32px 36px 24px 36px;
         box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
         text-align: center;
-        max-width: 520px;
-        margin: 0.5vh auto 0 auto;
+        max-width: 490px;
+        margin: 2vh auto 0 auto;
     }
     
     .auth-badge {
@@ -163,7 +163,7 @@ css_customizado = """
         text-transform: uppercase;
         padding: 5px 14px;
         border-radius: 20px;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         border: 1px solid #dbeafe;
     }
     
@@ -178,7 +178,7 @@ css_customizado = """
     .auth-subtitle {
         font-size: 15px;
         color: #475569;
-        margin-bottom: 14px;
+        margin-bottom: 16px;
         line-height: 1.45;
     }
     
@@ -186,7 +186,7 @@ css_customizado = """
         display: flex;
         justify-content: center;
         gap: 10px;
-        margin-bottom: 14px;
+        margin-bottom: 22px;
     }
     
     .pill {
@@ -199,27 +199,12 @@ css_customizado = """
         border-radius: 6px;
     }
     
-    /* Abas de Login */
-    div[data-testid="stTabs"] button {
-        font-size: 16.5px !important;
-        font-weight: 700 !important;
-        padding: 8px 14px !important;
-        color: #64748b !important;
-    }
-    div[data-testid="stTabs"] button[aria-selected="true"] {
-        color: #1e3a8a !important;
-        border-bottom-color: #1e3a8a !important;
-    }
-    div[data-testid="stTabs"] hr {
-        border-color: #e2e8f0 !important;
-    }
-    
     /* Rótulos dos Inputs */
     div[data-testid="stWidgetLabel"] label p {
         font-size: 15.5px !important;
         font-weight: 600 !important;
         color: #1e293b !important;
-        margin-bottom: 2px !important;
+        margin-bottom: 4px !important;
         text-align: left !important;
     }
     
@@ -250,7 +235,7 @@ css_customizado = """
         font-weight: 700 !important;
         height: 48px !important;
         border-radius: 8px !important;
-        margin-top: 10px !important;
+        margin-top: 14px !important;
         transition: all 0.2s ease !important;
     }
     div[data-testid="stForm"] button:hover {
@@ -258,33 +243,33 @@ css_customizado = """
         border-color: #2563eb !important;
     }
     
-    /* Rodapé de Segurança */
+    /* Rodapé de Segurança Integrado */
     .auth-security-footer {
         text-align: center !important;
         font-size: 12.5px !important;
         font-weight: 500 !important;
         color: #64748b !important;
-        margin-top: 14px !important;
+        margin-top: 20px !important;
         margin-bottom: 0px !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
         gap: 6px !important;
         border-top: 1px solid #f1f5f9;
-        padding-top: 10px;
+        padding-top: 14px;
     }
 </style>
 """
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 5. Fluxo de Autenticação Completo
+# 5. Fluxo de Autenticação Seguro (Somente Login)
 # ----------------------------------------------------
 if "user_session" not in st.session_state:
     st.session_state.user_session = None
 
 def exibir_tela_autenticacao():
-    col_l1, col_l2, col_l3 = st.columns([1, 1.4, 1])
+    col_l1, col_l2, col_l3 = st.columns([1, 1.35, 1])
     with col_l2:
         st.markdown(
             """
@@ -302,103 +287,29 @@ def exibir_tela_autenticacao():
             unsafe_allow_html=True
         )
         
-        tab_login, tab_cadastro, tab_recuperar, tab_nova_senha = st.tabs([
-            "🔑 Entrar", "✨ Criar Acesso", "📧 Solicitar Link", "🔒 Nova Senha"
-        ])
-        
-        # Aba 1: Login
-        with tab_login:
-            with st.form("form_login"):
-                email = st.text_input("E-mail institucional / cadastrado", placeholder="exemplo@mpms.mp.br")
-                senha = st.text_input("Senha de Acesso", type="password", placeholder="••••••••")
-                btn_entrar = st.form_submit_button("Entrar no JusAssist", type="primary", use_container_width=True)
-                
-                if btn_entrar:
-                    if not email or not senha:
-                        st.warning("Por favor, preencha o e-mail e a senha.")
-                    elif not supabase:
-                        st.error("Credenciais do Supabase não configuradas nos Secrets.")
-                    else:
-                        try:
-                            res = supabase.auth.sign_in_with_password({"email": email, "password": senha})
-                            if res.user:
-                                st.session_state.user_session = res.user
-                                st.rerun()
-                        except Exception:
-                            st.error("E-mail ou senha incorretos. Verifique suas credenciais.")
-
-        # Aba 2: Criar Acesso
-        with tab_cadastro:
-            with st.form("form_cadastro"):
-                novo_email = st.text_input("Seu E-mail", placeholder="seu.email@mpms.mp.br")
-                nova_senha = st.text_input("Crie uma Senha (mínimo 6 dígitos)", type="password", placeholder="••••••••")
-                confirma_senha = st.text_input("Confirme a Senha", type="password", placeholder="••••••••")
-                btn_cadastrar = st.form_submit_button("Criar Acesso", use_container_width=True)
-                
-                if btn_cadastrar:
-                    if not novo_email or not nova_senha:
-                        st.warning("Preencha todos os campos.")
-                    elif nova_senha != confirma_senha:
-                        st.error("As senhas não coincidem.")
-                    elif len(nova_senha) < 6:
-                        st.warning("A senha deve ter no mínimo 6 caracteres.")
-                    elif not supabase:
-                        st.error("Credenciais do Supabase não configuradas nos Secrets.")
-                    else:
-                        try:
-                            res = supabase.auth.sign_up({"email": novo_email, "password": nova_senha})
-                            if res.user:
-                                st.success("Conta criada com sucesso! Você já pode realizar o login.")
-                        except Exception as e:
-                            st.error(f"Erro ao cadastrar: {str(e)}")
-
-        # Aba 3: Solicitar Link de Recuperação por E-mail
-        with tab_recuperar:
-            with st.form("form_recuperar"):
-                st.caption("Digite seu e-mail para enviarmos o link seguro de recuperação.")
-                email_recuperacao = st.text_input("E-mail cadastrado", placeholder="seu.email@mpms.mp.br")
-                btn_recuperar = st.form_submit_button("Enviar Link por E-mail", use_container_width=True)
-                
-                if btn_recuperar:
-                    if not email_recuperacao:
-                        st.warning("Por favor, digite seu e-mail cadastrado.")
-                    elif not supabase:
-                        st.error("Credenciais do Supabase não configuradas nos Secrets.")
-                    else:
-                        try:
-                            supabase.auth.reset_password_email(email_recuperacao)
-                            st.success("Link enviado! Clique no link do e-mail e depois use a aba '🔒 Nova Senha'.")
-                        except Exception as e:
-                            st.error(f"Erro ao solicitar recuperação: {str(e)}")
-
-        # Aba 4: Redefinir Senha (Nova Senha e Repetir Nova Senha)
-        with tab_nova_senha:
-            with st.form("form_nova_senha"):
-                st.caption("Digite e confirme a sua nova senha para atualizar seu cadastro.")
-                senha_redefinida = st.text_input("Nova Senha (mínimo 6 dígitos)", type="password", placeholder="••••••••")
-                senha_redefinida_confirma = st.text_input("Repetir Nova Senha", type="password", placeholder="••••••••")
-                btn_salvar_senha = st.form_submit_button("Salvar Nova Senha", type="primary", use_container_width=True)
-                
-                if btn_salvar_senha:
-                    if not senha_redefinida or not senha_redefinida_confirma:
-                        st.warning("Preencha ambos os campos de senha.")
-                    elif senha_redefinida != senha_redefinida_confirma:
-                        st.error("As senhas digitadas não são iguais.")
-                    elif len(senha_redefinida) < 6:
-                        st.warning("A nova senha deve ter no mínimo 6 caracteres.")
-                    elif not supabase:
-                        st.error("Credenciais do Supabase não configuradas nos Secrets.")
-                    else:
-                        try:
-                            supabase.auth.update_user({"password": senha_redefinida})
-                            st.success("Senha redefinida com sucesso! Você já pode fazer login na aba '🔑 Entrar'.")
-                        except Exception as e:
-                            st.error(f"Não foi possível redefinir. Certifique-se de ter clicado no link do e-mail: {str(e)}")
+        with st.form("form_login"):
+            email = st.text_input("E-mail cadastrado", placeholder="usuario@mpms.mp.br")
+            senha = st.text_input("Senha de Acesso", type="password", placeholder="••••••••")
+            btn_entrar = st.form_submit_button("Acessar Plataforma", type="primary", use_container_width=True)
+            
+            if btn_entrar:
+                if not email or not senha:
+                    st.warning("Por favor, preencha o e-mail e a senha.")
+                elif not supabase:
+                    st.error("Credenciais do Supabase não configuradas nos Secrets.")
+                else:
+                    try:
+                        res = supabase.auth.sign_in_with_password({"email": email, "password": senha})
+                        if res.user:
+                            st.session_state.user_session = res.user
+                            st.rerun()
+                    except Exception:
+                        st.error("Acesso não autorizado. Verifique seu e-mail e senha.")
 
         st.markdown(
             """
                 <div class="auth-security-footer">
-                    🔒 <strong>Ambiente Seguro & Criptografado</strong> • Gabinete Dra. Luciana Moreira Schenk
+                    🔒 <strong>Acesso Restrito & Criptografado</strong> • Gabinete Dra. Luciana Moreira Schenk
                 </div>
             </div>
             """,

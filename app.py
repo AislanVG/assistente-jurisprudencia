@@ -434,7 +434,7 @@ def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjms"):
     return None
 
 # ----------------------------------------------------
-# 9. Prompts Especializados
+# 9. Prompts Especializados (Superprompt Calibrado pelo Gabinete)
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -462,29 +462,54 @@ Disponibilize o trecho mais relevante de um acórdão representativo em bloco fo
 """
 
 SUPERPROMPT_PARECER = """
-Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, auxiliando diretamente a Procuradora de Justiça, Dra. Luciana Moreira Schenk. Seu objetivo é elaborar minutas de PARECER DO MINISTÉRIO PÚBLICO EM SEGUNDO GRAU completas, densas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral.
+Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, auxiliando diretamente a Procuradora de Justiça, Dra. Luciana Moreira Schenk. Seu objetivo é elaborar minutas de PARECER DO MINISTÉRIO PÚBLICO EM SEGUNDO GRAU completas, densas, fluidas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral.
 
-### 🛡️ BLINDAGEM E REGRAS ESTRITAS:
-1. ADERÊNCIA ESTRITA AOS AUTOS: Baseie sua análise EXCLUSIVAMENTE nos fatos e documentos do caso concreto anexado pelo usuário. É PROIBIDO inventar ou misturar matérias fáticas estranhas ao processo.
-2. PRECEDENTES REAIS: Indique precedentes consolidados, números de REsps, Temas Vinculantes e acórdãos REAIS do STF, STJ e TJMS aplicáveis à matéria dos autos. Proibido inventar números ou ementas.
-3. TRAVA DE HIERARQUIA: Precedentes das Turmas do STJ e teses vinculantes do STF prevalecem sobre atos administrativos ou pareceres técnicos.
-4. RELATÓRIO SUCINTO INSTITUCIONAL: Máximo 500 palavras, fluido em parágrafos encadeados por verbos de ligação ("Alega o apelante que..."), SEM TÓPICOS/BULLETS, finalizando com a fórmula padrão de admissibilidade.
-5. ESTILO: Expressões latinas em itálico (*in re ipsa*, *tempus regit actum*). Jurisprudências citadas em bloco recuado (`>`), em itálico.
+### 🛡️ BLINDAGEM E REGRAS ESTRITAS DE REDAÇÃO MINISTERIAL:
+
+1. RELATÓRIO DO RECURSO (E NÃO DO PROCESSO):
+   - O relatório NÃO deve resumir a petição inicial ou a história do processo todo.
+   - O relatório deve conter EXCLUSIVAMENTE o resumo exaustivo e fiel das alegações do RECORRENTE (apelante/agravante), seus fundamentos jurídicos e o pedido recursal final. Se houver decisão monocrática nos autos de 2º grau, mencione-a sucintamente ao final.
+   - Redação corrida em parágrafos encadeados ("Sustenta o apelante que...", "Aduz ainda..."), SEM TÓPICOS/BULLETS, encerrando com a fórmula: "É o relatório.".
+
+2. DA CONTROVÉRSIA RECURSAL (DELIMITAÇÃO PRECISA):
+   - Logo após o relatório, crie o tópico autônomo "DA CONTROVÉRSIA RECURSAL".
+   - Limite estrito de 1 a 2 parágrafos.
+   - Não resuma o processo aqui. Apenas delimite com precisão cirúrgica o cerne do litígio recursal (Ex.: "A controvérsia recursal cinge-se a verificar se...").
+
+3. ANÁLISE DO MÉRITO SEM FRAGMENTAÇÃO EXCESSIVA:
+   - É PROIBIDO fatiar o mérito em vários subtópicos isolados e rasos.
+   - Estruture uma narrativa jurídica contínua, densa e com encadeamento lógico natural entre os temas debatidos.
+   - Somente crie subtópicos destacados para "PRELIMINARES" (se houver) e "MÉRITO".
+
+4. FECHAMENTO CONCLUSIVO OBRIGATÓRIO DE CADA TESE:
+   - Ao enfrentar cada matéria ou pedido do recurso dentro do mérito, finalize com um FECHAMENTO LÓGICO E OPINATIVO EXPRESSO (Ex.: "Destarte, diante da ausência de comprovação do fato constitutivo, a pretensão recursal não comporta provimento quanto a este capítulo."). NUNCA deixe o argumento solto para iniciar o tema seguinte.
+
+5. PRECEDENTES REAIS E HIERARQUIA:
+   - Indique precedentes consolidados, números de REsps e Temas Vinculantes reais do STF, STJ e TJMS. Precedentes vinculantes do STF/STJ prevalecem sobre notas técnicas ou órgãos consultivos.
+   - Expressões latinas em itálico (*in re ipsa*, *quantum*). Citações jurisprudenciais em bloco recuado (`>`), em itálico.
 
 ### 🔄 FLUXO PROGRESSIVO OBRIGATÓRIO EM 3 ETAPAS:
 
-- ETAPA 1 (Diagnóstico & Precedentes Aplicáveis):
-  Apresente o Raio-X dos autos (Fatos reais do processo, Preliminares mapeadas, Dispositivos legais envolvidos).
-  Apresente a linha de precedentes do STJ/STF/TJMS consolidada para a matéria.
-  Ao final, faça a PERGUNTA OBRIGATÓRIA: "Deseja aplicar os precedentes acima sugeridos ou indicar outro julgado específico?" e PARE AQUI.
+- ETAPA 1 (Diagnóstico, Mapeamento do Recurso & Precedentes):
+  Apresente o Raio-X das razões recursais e dos autos.
+  Indique a linha de precedentes consolidada do STJ/STF/TJMS aplicável à controvérsia.
+  Faça a pergunta de validação: "Deseja aplicar os precedentes acima sugeridos ou indicar outro julgado específico?" e PARE.
 
-- ETAPA 2 (Ementa Técnica e Relatório Institucional):
-  Quando o analista aprovar ou orientar a tese, elabore a Ementa Técnica Formal (com as palavras-chave da matéria dos autos e opinião final) e o Relatório Sucinto Fluido (máximo 500 palavras, corrido).
-  Ao final, diga: "Aguardando validação da Ementa e Relatório para gerar a Minuta Integral (Etapa 3)." e PARE AQUI.
+- ETAPA 2 (Ementa Técnica e Relatório Exclusivo do Recurso):
+  Quando validada a tese, apresente a Ementa Formal e o Relatório focado estritamente nas razões recursais (sem resumir a ação toda).
+  Diga: "Aguardando validação da Ementa e Relatório para gerar a Minuta Integral (Etapa 3)." e PARE.
 
 - ETAPA 3 (Minuta Integral de Alta Densidade - Peça Completa):
-  Quando o analista responder "validado", "aprovado" ou "prossiga", REDIJA IMEDIATAMENTE A PEÇA COMPLETA DE SEGUNDO GRAU, sem cortes e sem placeholders:
-  Cabeçalho Oficial (Autos, Classe, Órgão Julgador, Relator, Partes), Ementa Formal, "COLENDA CÂMARA CÍVEL,", Relatório, I – Das Preliminares (se houver), II – Do Mérito (Fundamentação exaustiva e densa de 2.500 a 4.000 palavras, enfrentando todas as teses dos autos com doutrina e precedentes), III – Conclusão (Opinamento formal), Datação (Campo Grande/MS) e Assinatura institucional de Luciana Moreira Schenk. NÃO REINICIE O FLUXO.
+  Quando o analista responder "validado" ou "aprovado", REDIJA IMEDIATAMENTE A PEÇA COMPLETA DE SEGUNDO GRAU sem placeholders:
+  1. Cabeçalho Oficial (Autos, Classe, Origem, Órgão Julgador, Relator, Apelante, Apelado).
+  2. Ementa Formal.
+  3. "COLENDA CÂMARA CÍVEL,"
+  4. RELATÓRIO (Resumo focado nas razões e pedidos do recurso, finalizando com "É o relatório.").
+  5. DA CONTROVÉRSIA RECURSAL (1 a 2 parágrafos delimitando o mérito).
+  6. I – DAS PRELIMINARES (se houver).
+  7. II – DO MÉRITO (Texto fluido, contínuo e exaustivo de 2.500 a 4.000 palavras, enfrentando ponto a ponto as teses recursais com fechamento conclusivo em cada uma delas).
+  8. III – CONCLUSÃO (Opinamento ministerial expresso: provimento, desprovimento ou parcial provimento).
+  9. Local, Data e Assinatura institucional de Luciana Moreira Schenk. NÃO REINICIE O FLUXO.
 """
 
 # ----------------------------------------------------
@@ -519,21 +544,21 @@ def exibir_manual_ajuda():
     with tab1:
         st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer de 2º Grau)")
         st.markdown(
-            "O assistente é rigorosamente calibrado para atuar como Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, "
+            "O assistente é calibrado para atuar como Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, "
             "elaborando peças densas e completas com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)** no corpo da minuta."
         )
         st.markdown(
             """
 1. **Passo 1: Upload dos Autos (Múltiplos PDFs)**
-   * Na barra lateral, selecione **📄 Parecer** e anexe as peças necessárias (Inicial, Sentença, Apelação, Laudos).
+   * Na barra lateral, selecione **📄 Parecer** e anexe as peças necessárias (Razões de Apelação, Sentença, Contrarrazões).
 2. **Passo 2: Início da Análise**
    * Clique em `⚡ Analisar autos e gerar parecer completo` ou use o botão na barra lateral.
-3. **Passo 3: Diagnóstico Fático & Precedentes (Fase 2)**
-   * A IA apresentará o raio-x e indicará os precedentes aplicáveis do STJ/STF/TJMS.
-4. **Passo 4: Validação da Ementa e Relatório (Fase 3)**
-   * Responda `Aprovado` para gerar a Ementa Técnica e o Relatório Fluido (até 500 palavras, sem marcadores).
-5. **Passo 5: Minuta Final de Alta Densidade (Fase 4)**
-   * Responda `Validado, prossiga` para a IA entregar a minuta completa pronta para exportação.
+3. **Passo 3: Diagnóstico Fático & Precedentes (Fase 1)**
+   * A IA apresentará o raio-x do recurso e indicará os precedentes aplicáveis do STJ/STF/TJMS.
+4. **Passo 4: Validação da Ementa e Relatório do Recurso (Fase 2)**
+   * Responda `Aprovado` para gerar a Ementa Técnica e o Relatório do Recurso (focado nas razões recursais, sem resumir a ação toda).
+5. **Passo 5: Minuta Final de Alta Densidade (Fase 3)**
+   * Responda `Validado, prossiga` para a IA entregar a minuta completa com a delimitação da controvérsia e mérito contínuo.
             """
         )
         st.info("💡 **Dica de Exportação:** Copie o texto da resposta final e cole no Microsoft Word mantendo a formatação de origem (Ctrl + V).")
@@ -550,18 +575,18 @@ def exibir_manual_ajuda():
         st.markdown(
             """
 * **Prevalência STJ/STF:** Precedentes de Turmas do STJ e STF sobrepõem-se a notas do e-NATJus ou conselhos.
-* **Aderência aos Autos:** Foco restrito aos documentos do processo anexado.
-* **Trava Anti-Alucinação:** Pesquisa ativa em bases oficiais, sem inventar julgados.
-* **Relatório Padrão Ouro:** Narrativa fluida e encadeada de até 500 palavras, estritamente sem tópicos.
+* **Relatório Recursal Estrito:** Narrativa das alegações do recorrente (não do processo todo).
+* **Controvérsia Delimitada:** Tópico de 1 a 2 parágrafos fixando os pontos a julgar.
+* **Mérito Contínuo e Fechado:** Sem fragmentação excessiva, com conclusão ao final de cada argumento.
             """
         )
 
     with tab4:
         st.markdown("### 🛑 Comandos de Ajuste de Rota (Se não aprovar)")
-        st.markdown("**1. Correção de Tese na Fase 2 (Diagnóstico):**")
-        st.code("Não está aprovado. Na proposta de mérito, considere que a 3ª Turma do STJ já pacificou o dever de custeio pelo REsp 2.221.399/SP. Reformule a Fase 2 opinando pelo desprovimento do recurso.", language="text")
+        st.markdown("**1. Correção de Tese no Diagnóstico:**")
+        st.code("Não está aprovado. Na proposta de mérito, considere que a 3ª Turma do STJ já pacificou o dever de custeio pelo REsp 2.221.399/SP. Reformule o diagnóstico opinando pelo desprovimento do recurso.", language="text")
         st.markdown("**2. Avanço Direto:**")
-        st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a emissão da Fase 3 e da Minuta Completa.", language="text")
+        st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a emissão da Ementa, Relatório e Minuta Completa.", language="text")
 
 @st.dialog("O que motivou a sua avaliação negativa?", width="medium")
 def modal_feedback_negativo(msg_index, msg_content):
@@ -653,7 +678,6 @@ with st.sidebar:
     uploaded_files = []
     if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
         st.markdown('<div class="sidebar-label">Autos do Processo (PDFs)</div>', unsafe_allow_html=True)
-        # Chave dinâmica vinculada à sessão ativa para limpar ao clicar em "Novo Atendimento"
         uploaded_files = st.file_uploader(
             "Upload dos Processos",
             type=["pdf"],

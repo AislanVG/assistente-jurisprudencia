@@ -14,7 +14,7 @@ from google.genai import types
 # 1. Configurações da Página e CSS Avançado
 # ----------------------------------------------------
 st.set_page_config(
-    page_title="Assistente Jurídico",
+    page_title="JusAssist",
     page_icon="⚖️",
     layout="wide"
 )
@@ -141,7 +141,7 @@ css_customizado = """
         margin-bottom: 16px;
     }
 
-    /* CARD DE LOGIN EXCLUSIVO E UNIFICADO */
+    /* CARD DE LOGIN UNIFICADO */
     .auth-unified-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -274,12 +274,13 @@ def exibir_tela_autenticacao():
         st.markdown(
             """
             <div class="auth-unified-card">
-                <div class="auth-title">⚖️ Assistente Jurídico</div>
+                <div class="auth-badge">Assessoria Jurídica Analítica</div>
+                <div class="auth-title">⚖️ JusAssist</div>
                 <div class="auth-subtitle">
                     Ecossistema de Inteligência Jurídica: Pesquisa Analítica de Precedentes e Elaboração de Pareceres de 2º Grau
                 </div>
                 <div class="feature-pills">
-                    <span class="pill">🔍 Jurisprudência STF/STJ/TJMS</span>
+                    <span class="pill">🔍 Jurisprudência STF/STJ/Tribunais</span>
                     <span class="pill">📄 Minutas Densas (6-10 págs)</span>
                 </div>
             """,
@@ -287,7 +288,7 @@ def exibir_tela_autenticacao():
         )
         
         with st.form("form_login"):
-            email = st.text_input("E-mail cadastrado", placeholder="usuario@mpms.mp.br")
+            email = st.text_input("E-mail cadastrado", placeholder="usuario@dominio.com")
             senha = st.text_input("Senha de Acesso", type="password", placeholder="••••••••")
             btn_entrar = st.form_submit_button("Acessar Plataforma", type="primary", use_container_width=True)
             
@@ -308,7 +309,7 @@ def exibir_tela_autenticacao():
         st.markdown(
             """
                 <div class="auth-security-footer">
-                    🔒 <strong>Acesso Restrito & Criptografado</strong> 
+                    🔒 <strong>Acesso Restrito & Criptografado</strong> • Ambiente Corporativo Seguro
                 </div>
             </div>
             """,
@@ -367,7 +368,7 @@ if "chats" not in st.session_state:
     st.session_state.chats = {
         primeiro_id: {
             "title": "",
-            "mode": "📄 Minuta de Parecer (MPMS)",
+            "mode": "📄 Minuta de Parecer Cível",
             "messages": [],
             "gemini_history": []
         }
@@ -386,7 +387,7 @@ chat_vazio = len(chat_atual["messages"]) == 0
 # ----------------------------------------------------
 # 8. Módulo de Integração com API DataJud (CNJ)
 # ----------------------------------------------------
-def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjms"):
+def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjsp"):
     if not CNJ_API_KEY:
         return None
     
@@ -433,11 +434,11 @@ def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjms"):
     return None
 
 # ----------------------------------------------------
-# 9. Prompts Especializados (Superprompt Calibrado pelo Gabinete)
+# 9. Prompts Especializados
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
-Sua missão é realizar buscas amplas no STF, STJ, TJMS e Tribunais Regionais, entregando resultados objetivos e prontos para citação.
+Sua missão é realizar buscas amplas no STF, STJ e Tribunais Estaduais/Regionais, entregando resultados objetivos e prontos para citação.
 
 ESTRUTURA OBRIGATÓRIA DA RESPOSTA:
 ### 📌 Tese Jurídica Central
@@ -461,12 +462,12 @@ Disponibilize o trecho mais relevante de um acórdão representativo em bloco fo
 """
 
 SUPERPROMPT_PARECER = """
-Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, auxiliando diretamente a Procuradora de Justiça, Dra. Luciana Moreira Schenk. Seu objetivo é elaborar minutas de PARECER DO MINISTÉRIO PÚBLICO EM SEGUNDO GRAU completas, densas, fluidas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral.
+Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdição (Cível). Seu objetivo é elaborar minutas de PARECER CÍVEL EM SEGUNDO GRAU completas, densas, fluidas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral.
 
-### 🛡️ BLINDAGEM E REGRAS ESTRITAS DE REDAÇÃO MINISTERIAL:
+### 🛡️ BLINDAGEM E REGRAS ESTRITAS DE REDAÇÃO JURÍDICA:
 
 1. RELATÓRIO DO RECURSO (E NÃO DO PROCESSO):
-   - O relatório NÃO deve resumir a petição inicial ou a história do processo todo.
+   - O relatório NÃO deve resumir a petição inicial ou a história do processo todo desde a origem.
    - O relatório deve conter EXCLUSIVAMENTE o resumo exaustivo e fiel das alegações do RECORRENTE (apelante/agravante), seus fundamentos jurídicos e o pedido recursal final. Se houver decisão monocrática nos autos de 2º grau, mencione-a sucintamente ao final.
    - Redação corrida em parágrafos encadeados ("Sustenta o apelante que...", "Aduz ainda..."), SEM TÓPICOS/BULLETS, encerrando com a fórmula: "É o relatório.".
 
@@ -484,14 +485,14 @@ Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do
    - Ao enfrentar cada matéria ou pedido do recurso dentro do mérito, finalize com um FECHAMENTO LÓGICO E OPINATIVO EXPRESSO (Ex.: "Destarte, diante da ausência de comprovação do fato constitutivo, a pretensão recursal não comporta provimento quanto a este capítulo."). NUNCA deixe o argumento solto para iniciar o tema seguinte.
 
 5. PRECEDENTES REAIS E HIERARQUIA:
-   - Indique precedentes consolidados, números de REsps e Temas Vinculantes reais do STF, STJ e TJMS. Precedentes vinculantes do STF/STJ prevalecem sobre notas técnicas ou órgãos consultivos.
+   - Indique precedentes consolidados, números de REsps e Temas Vinculantes reais do STF, STJ e Tribunais de Justiça. Precedentes vinculantes do STF/STJ prevalecem sobre notas técnicas ou órgãos consultivos.
    - Expressões latinas em itálico (*in re ipsa*, *quantum*). Citações jurisprudenciais em bloco recuado (`>`), em itálico.
 
 ### 🔄 FLUXO PROGRESSIVO OBRIGATÓRIO EM 3 ETAPAS:
 
 - ETAPA 1 (Diagnóstico, Mapeamento do Recurso & Precedentes):
   Apresente o Raio-X das razões recursais e dos autos.
-  Indique a linha de precedentes consolidada do STJ/STF/TJMS aplicável à controvérsia.
+  Indique a linha de precedentes consolidada do STJ/STF aplicável à controvérsia.
   Faça a pergunta de validação: "Deseja aplicar os precedentes acima sugeridos ou indicar outro julgado específico?" e PARE.
 
 - ETAPA 2 (Ementa Técnica e Relatório Exclusivo do Recurso):
@@ -500,15 +501,15 @@ Atue como o Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do
 
 - ETAPA 3 (Minuta Integral de Alta Densidade - Peça Completa):
   Quando o analista responder "validado" ou "aprovado", REDIJA IMEDIATAMENTE A PEÇA COMPLETA DE SEGUNDO GRAU sem placeholders:
-  1. Cabeçalho Oficial (Autos, Classe, Origem, Órgão Julgador, Relator, Apelante, Apelado).
+  1. Cabeçalho Formal (Autos, Classe, Origem, Órgão Julgador, Relator, Apelante, Apelado).
   2. Ementa Formal.
   3. "COLENDA CÂMARA CÍVEL,"
   4. RELATÓRIO (Resumo focado nas razões e pedidos do recurso, finalizando com "É o relatório.").
   5. DA CONTROVÉRSIA RECURSAL (1 a 2 parágrafos delimitando o mérito).
   6. I – DAS PRELIMINARES (se houver).
   7. II – DO MÉRITO (Texto fluido, contínuo e exaustivo de 2.500 a 4.000 palavras, enfrentando ponto a ponto as teses recursais com fechamento conclusivo em cada uma delas).
-  8. III – CONCLUSÃO (Opinamento ministerial expresso: provimento, desprovimento ou parcial provimento).
-  9. Local, Data e Assinatura institucional de Luciana Moreira Schenk. NÃO REINICIE O FLUXO.
+  8. III – CONCLUSÃO (Opinamento formal expresso: provimento, desprovimento ou parcial provimento).
+  9. Local, Data e Fecho institucional do parecerista. NÃO REINICIE O FLUXO.
 """
 
 # ----------------------------------------------------
@@ -528,9 +529,9 @@ def carregar_feed_precedentes():
 # ----------------------------------------------------
 # 11. Modais de Ajuda & Feedback
 # ----------------------------------------------------
-@st.dialog("📖 Central de Ajuda & Manual Operacional (MPMS)", width="large")
+@st.dialog("📖 Central de Ajuda & Manual Operacional", width="large")
 def exibir_manual_ajuda():
-    st.markdown("## ⚖️ Manual Operacional: JusAssist MPMS")
+    st.markdown("## ⚖️ Manual Operacional: JusAssist")
     st.caption("Guia Oficial para Pesquisa Jurisprudencial e Elaboração de Pareceres de 2º Grau")
     
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -543,8 +544,8 @@ def exibir_manual_ajuda():
     with tab1:
         st.markdown("### 🏛️ Fluxo Integrado em Fases (Parecer de 2º Grau)")
         st.markdown(
-            "O assistente é calibrado para atuar como Assessor Jurídico Sênior da 4ª Procuradoria de Justiça Cível do MPMS, "
-            "elaborando peças densas e completas com meta real de **6 a 10 páginas (2.500 a 4.000 palavras)** no corpo da minuta."
+            "O assistente é calibrado para elaborar peças densas e completas com meta real de "
+            "**6 a 10 páginas (2.500 a 4.000 palavras)** no corpo da minuta."
         )
         st.markdown(
             """
@@ -553,7 +554,7 @@ def exibir_manual_ajuda():
 2. **Passo 2: Início da Análise**
    * Clique em `⚡ Analisar autos e gerar parecer completo` ou use o botão na barra lateral.
 3. **Passo 3: Diagnóstico Fático & Precedentes (Fase 1)**
-   * A IA apresentará o raio-x do recurso e indicará os precedentes aplicáveis do STJ/STF/TJMS.
+   * A IA apresentará o raio-x do recurso e indicará os precedentes aplicáveis do STJ/STF/Tribunais.
 4. **Passo 4: Validação da Ementa e Relatório do Recurso (Fase 2)**
    * Responda `Aprovado` para gerar a Ementa Técnica e o Relatório do Recurso (focado nas razões recursais, sem resumir a ação toda).
 5. **Passo 5: Minuta Final de Alta Densidade (Fase 3)**
@@ -567,14 +568,14 @@ def exibir_manual_ajuda():
         st.markdown("Varredura em tempo real integrada ao Google Search e à **API do DataJud (CNJ)**.")
         st.markdown("#### Exemplos Práticos de Pesquisa:")
         st.code("Qual o entendimento do STJ sobre responsabilidade do Estado por erro médico que causa sequelas em menor?", language="text")
-        st.code("0845374-56.2024.8.12.0001 (Consulta direta ao DataJud/TJMS)", language="text")
+        st.code("0845374-56.2024.8.26.0001 (Consulta direta ao DataJud)", language="text")
 
     with tab3:
-        st.markdown("### 🛡️ Mecanismos de Blindagem Institucional")
+        st.markdown("### 🛡️ Mecanismos de Blindagem")
         st.markdown(
             """
-* **Prevalência STJ/STF:** Precedentes de Turmas do STJ e STF sobrepõem-se a notas do e-NATJus ou conselhos.
-* **Relatório Recursal Estrito:** Narrativa das alegações do recorrente (não do processo todo).
+* **Prevalência STJ/STF:** Precedentes de Turmas do STJ e STF sobrepõem-se a notas administrativas ou conselhos.
+* **Relatório Recursal Estrito:** Narrativa focada nas alegações do recorrente (não do processo todo).
 * **Controvérsia Delimitada:** Tópico de 1 a 2 parágrafos fixando os pontos a julgar.
 * **Mérito Contínuo e Fechado:** Sem fragmentação excessiva, com conclusão ao final de cada argumento.
             """
@@ -633,7 +634,7 @@ def modal_feedback_negativo(msg_index, msg_content):
 # 12. Barra Lateral
 # ----------------------------------------------------
 with st.sidebar:
-    st.markdown("### ⚖️ **JusAssist MPMS**")
+    st.markdown("### ⚖️ **JusAssist**")
     st.caption(f"Usuário: **{st.session_state.user_session.email}**")
     
     col_u1, col_u2 = st.columns([1, 1])
@@ -664,9 +665,9 @@ with st.sidebar:
     st.markdown('<div class="sidebar-label">Modo de Operação</div>', unsafe_allow_html=True)
     col_m1, col_m2 = st.columns(2)
     with col_m1:
-        is_parecer = chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)"
+        is_parecer = chat_atual["mode"] == "📄 Minuta de Parecer Cível"
         if st.button("📄 Parecer", key="btn_p", type="primary" if is_parecer else "secondary", use_container_width=True):
-            chat_atual["mode"] = "📄 Minuta de Parecer (MPMS)"
+            chat_atual["mode"] = "📄 Minuta de Parecer Cível"
             st.rerun()
     with col_m2:
         is_juris = chat_atual["mode"] == "🔍 Pesquisa de Jurisprudência"
@@ -675,13 +676,13 @@ with st.sidebar:
             st.rerun()
 
     uploaded_files = []
-    if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
+    if chat_atual["mode"] == "📄 Minuta de Parecer Cível":
         st.markdown('<div class="sidebar-label">Autos do Processo (PDFs)</div>', unsafe_allow_html=True)
         uploaded_files = st.file_uploader(
             "Upload dos Processos",
             type=["pdf"],
             accept_multiple_files=True,
-            help="Selecione Petição Inicial, Sentença, Apelação e Laudos",
+            help="Selecione Razões de Apelação, Sentença e Contrarrazões",
             label_visibility="collapsed",
             key=f"uploader_{st.session_state.current_chat_id}"
         )
@@ -697,7 +698,7 @@ with st.sidebar:
     if conversas_com_historico:
         st.markdown('<div class="sidebar-label">Histórico de Sessões</div>', unsafe_allow_html=True)
         for chat_id, chat_data in list(conversas_com_historico.items()):
-            icone = "📄" if chat_data.get("mode") == "📄 Minuta de Parecer (MPMS)" else "🔍"
+            icone = "📄" if chat_data.get("mode") == "📄 Minuta de Parecer Cível" else "🔍"
             titulo = chat_data["title"] if chat_data["title"] else "Atendimento"
             if len(titulo) > 22:
                 titulo = titulo[:20] + "..."
@@ -727,13 +728,13 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 13. Horário Local (MS / Brasília)
+# 13. Horário Local (Fuso Horário Padrão)
 # ----------------------------------------------------
 try:
-    fuso_ms = ZoneInfo("America/Campo_Grande")
-    hora_local = datetime.now(fuso_ms).hour
+    fuso_padrao = ZoneInfo("America/Sao_Paulo")
+    hora_local = datetime.now(fuso_padrao).hour
 except Exception:
-    hora_local = (datetime.utcnow().hour - 4) % 24
+    hora_local = (datetime.utcnow().hour - 3) % 24
 
 if hora_local < 12:
     saudacao = "Qual é o caso da manhã?"
@@ -750,7 +751,7 @@ if chat_vazio:
     
     col_c1, col_c2, col_c3 = st.columns([0.5, 3.5, 0.5])
     with col_c2:
-        if chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)":
+        if chat_atual["mode"] == "📄 Minuta de Parecer Cível":
             if uploaded_files:
                 if st.button("⚡ Analisar autos e gerar parecer completo", key="sug_parecer", use_container_width=True, type="primary"):
                     st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."
@@ -790,7 +791,7 @@ else:
                     st.download_button(
                         label="📥 Baixar",
                         data=msg["content"],
-                        file_name=f"Parecer_MPMS_{i}.txt",
+                        file_name=f"Parecer_{i}.txt",
                         mime="text/plain",
                         key=f"dl_{i}",
                         help="Baixar esta manifestação"
@@ -832,7 +833,7 @@ if prompt_final:
         try:
             client = genai.Client(api_key=GEMINI_API_KEY)
 
-            is_parecer_mode = chat_atual["mode"] == "📄 Minuta de Parecer (MPMS)"
+            is_parecer_mode = chat_atual["mode"] == "📄 Minuta de Parecer Cível"
             instrucao = SUPERPROMPT_PARECER if is_parecer_mode else PROMPT_JURISPRUDENCIA
 
             user_parts = []
@@ -841,7 +842,7 @@ if prompt_final:
             dados_cnj = None
             if not is_parecer_mode and re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
                 match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)
-                dados_cnj = consultar_datajud_por_numero(match_cnj, tribunal="tjms")
+                dados_cnj = consultar_datajud_por_numero(match_cnj, tribunal="tjsp")
                 if dados_cnj:
                     user_parts.append(types.Part.from_text(text=f"[Consulta Oficial DataJud/CNJ]:\n{dados_cnj}"))
 

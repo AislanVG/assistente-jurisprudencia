@@ -14,7 +14,7 @@ from google.genai import types
 # 1. Configurações da Página e CSS Avançado
 # ----------------------------------------------------
 st.set_page_config(
-    page_title="JusAssist",
+    page_title="JurisPrime AI",
     page_icon="⚖️",
     layout="wide"
 )
@@ -65,6 +65,37 @@ css_customizado = """
         max-width: 100% !important;
     }
     
+    /* Header da Barra Lateral Centralizado */
+    .sidebar-brand-container {
+        text-align: center;
+        padding-top: 6px;
+        padding-bottom: 12px;
+    }
+    .sidebar-brand-icon {
+        font-size: 36px;
+        display: inline-block;
+        margin-bottom: 4px;
+    }
+    .sidebar-brand-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.5px;
+    }
+    .sidebar-user-badge {
+        font-size: 13px;
+        color: #475569;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        padding: 4px 10px;
+        border-radius: 6px;
+        display: inline-block;
+        margin-top: 6px;
+        margin-bottom: 14px;
+        word-break: break-all;
+    }
+
+    /* Botões da Barra Lateral */
     div[data-testid="stSidebar"] button[kind="primary"],
     div.stButton > button[kind="primary"] {
         border-radius: 8px !important;
@@ -278,10 +309,10 @@ def exibir_tela_autenticacao():
         st.markdown(
             """
             <div class="auth-unified-card">
-                <div class="auth-badge">Assessoria Jurídica Analítica</div>
-                <div class="auth-title">⚖️ JusAssist</div>
+                <div class="auth-badge">Ecossistema de Inteligência Jurídica</div>
+                <div class="auth-title">⚖️ JurisPrime AI</div>
                 <div class="auth-subtitle">
-                    Ecossistema de Inteligência Jurídica: Pesquisa Analítica de Precedentes e Elaboração de Pareceres de 2º Grau
+                    Pesquisa Analítica de Precedentes e Elaboração de Pareceres de 2º Grau
                 </div>
                 <div class="feature-pills">
                     <span class="pill">🔍 Jurisprudência STF/STJ/Tribunais</span>
@@ -438,19 +469,24 @@ def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjsp"):
     return None
 
 # ----------------------------------------------------
-# 9. Prompts Especializados
+# 9. Prompts Especializados (Com Trava Anti-Alucinação Reforçada)
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
-Sua missão é realizar buscas amplas no STF, STJ e Tribunais Estaduais/Regionais, entregando resultados objetivos e prontos para citação.
+Sua missão é realizar buscas exatas e verificáveis no STF, STJ e Tribunais Estaduais/Regionais.
+
+### 🚫 TRAVA DE TOLERÂNCIA ZERO À ALUCINAÇÃO JURISPRUDENCIAL:
+1. É TERMINANTEMENTE PROIBIDO inventar, supor ou deduzir números de processos, números de REsp, relatores, datas de julgamento ou ementas.
+2. Utilize a ferramenta de busca Google Search integrada para verificar a existência real e o teor exato de cada precedente citado.
+3. Se não encontrar o número exato de um acórdão específico sobre a matéria, cite expressamente a Súmula, o Tema Vinculante/Repetitivo aplicável ou enuncie a tese consolidada do tribunal sem inventar numerações fictícias.
 
 ESTRUTURA OBRIGATÓRIA DA RESPOSTA:
 ### 📌 Tese Jurídica Central
 Síntese objetiva da posição predominante e ônus probatório.
 
-### ⚖️ Precedentes Favoráveis
+### ⚖️ Precedentes Favoráveis (Verificados e Reais)
 Liste de 2 a 4 julgados específicos com:
-* **[Tribunal] – [Classe e Número do Processo]**: Resumo fático conciso demonstrando por que o pedido foi acolhido. [Link/Fonte Oficial]
+* **[Tribunal] – [Classe e Número do Processo Real]**: Resumo fático conciso demonstrando por que o pedido foi acolhido. [Link/Fonte Oficial]
 
 ### 🛑 Precedentes Desfavoráveis ou Distinções (Distinguishing)
 Apresente hipóteses em que a tese é rejeitada.
@@ -458,45 +494,49 @@ Apresente hipóteses em que a tese é rejeitada.
 ### 📋 Critérios Objetivos Extraídos dos Julgados
 Lista com os requisitos práticos exigidos pelos magistrados.
 
-### 🏛️ Precedentes Vinculantes
-Indique Súmulas, Temas Repetitivos (STJ) ou Repercussão Geral (STF), se existentes.
+### 🏛️ Precedentes Vinculantes (Súmulas e Temas)
+Indique Súmulas, Temas Repetitivos (STJ) ou Repercussão Geral (STF) com sua numeração oficial.
 
 ### 📝 Sugestão de Ementa para Cópia
-Disponibilize o trecho mais relevante de um acórdão representativo em bloco formatado pronto para citação.
+Disponibilize o trecho oficial de um acórdão representativo em bloco formatado pronto para citação.
 """
 
 SUPERPROMPT_PARECER = """
 Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdição (Cível). Seu objetivo é elaborar minutas de PARECER CÍVEL EM SEGUNDO GRAU completas, densas, fluidas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral.
 
-### 🛡️ BLINDAGEM E REGRAS ESTRITAS DE REDAÇÃO JURÍDICA:
+### 🛡️ BLINDAGEM ANTI-ALUCINAÇÃO E REGRAS ESTRITAS DE REDAÇÃO JURÍDICA:
 
-1. RELATÓRIO DO RECURSO (E NÃO DO PROCESSO):
+1. PROIBIÇÃO ABSOLUTA DE JURISPRUDÊNCIA INVENTADA:
+   - É PROIBIDO CRIAR OU DEDUZIR NÚMEROS DE PROCESSOS, REsps OU EMENTAS FICTÍCIAS.
+   - Utilize a ferramenta Google Search integrada para pesquisar em tempo real e confirmar a existência e numeração dos julgados do STF, STJ e Tribunais.
+   - Em caso de dúvida sobre o número do processo, cite o número oficial da Súmula ou do Tema Repetitivo/Vinculante (Ex.: "conforme Tema 1.082 do STJ"), sem criar números de acórdãos avulsos inventados.
+
+2. RELATÓRIO DO RECURSO (E NÃO DO PROCESSO):
    - O relatório NÃO deve resumir a petição inicial ou a história do processo todo desde a origem.
    - O relatório deve conter EXCLUSIVAMENTE o resumo exaustivo e fiel das alegações do RECORRENTE (apelante/agravante), seus fundamentos jurídicos e o pedido recursal final. Se houver decisão monocrática nos autos de 2º grau, mencione-a sucintamente ao final.
    - Redação corrida em parágrafos encadeados ("Sustenta o apelante que...", "Aduz ainda..."), SEM TÓPICOS/BULLETS, encerrando com a fórmula: "É o relatório.".
 
-2. DA CONTROVÉRSIA RECURSAL (DELIMITAÇÃO PRECISA):
+3. DA CONTROVÉRSIA RECURSAL (DELIMITAÇÃO PRECISA):
    - Logo após o relatório, crie o tópico autônomo "DA CONTROVÉRSIA RECURSAL".
    - Limite estrito de 1 a 2 parágrafos.
    - Não resuma o processo aqui. Apenas delimite com precisão cirúrgica o cerne do litígio recursal (Ex.: "A controvérsia recursal cinge-se a verificar se...").
 
-3. ANÁLISE DO MÉRITO SEM FRAGMENTAÇÃO EXCESSIVA:
+4. ANÁLISE DO MÉRITO SEM FRAGMENTAÇÃO EXCESSIVA:
    - É PROIBIDO fatiar o mérito em vários subtópicos isolados e rasos.
    - Estruture uma narrativa jurídica contínua, densa e com encadeamento lógico natural entre os temas debatidos.
    - Somente crie subtópicos destacados para "PRELIMINARES" (se houver) e "MÉRITO".
 
-4. FECHAMENTO CONCLUSIVO OBRIGATÓRIO DE CADA TESE:
+5. FECHAMENTO CONCLUSIVO OBRIGATÓRIO DE CADA TESE:
    - Ao enfrentar cada matéria ou pedido do recurso dentro do mérito, finalize com um FECHAMENTO LÓGICO E OPINATIVO EXPRESSO (Ex.: "Destarte, diante da ausência de comprovação do fato constitutivo, a pretensão recursal não comporta provimento quanto a este capítulo."). NUNCA deixe o argumento solto para iniciar o tema seguinte.
 
-5. PRECEDENTES REAIS E HIERARQUIA:
-   - Indique precedentes consolidados, números de REsps e Temas Vinculantes reais do STF, STJ e Tribunais de Justiça. Precedentes vinculantes do STF/STJ prevalecem sobre notas técnicas ou órgãos consultivos.
+6. FORMATAÇÃO E HIERARQUIA:
    - Expressões latinas em itálico (*in re ipsa*, *quantum*). Citações jurisprudenciais em bloco recuado (`>`), em itálico.
 
 ### 🔄 FLUXO PROGRESSIVO OBRIGATÓRIO EM 3 ETAPAS:
 
-- ETAPA 1 (Diagnóstico, Mapeamento do Recurso & Precedentes):
+- ETAPA 1 (Diagnóstico, Mapeamento do Recurso & Precedentes Verificados):
   Apresente o Raio-X das razões recursais e dos autos.
-  Indique a linha de precedentes consolidada do STJ/STF aplicável à controvérsia.
+  Indique a linha de precedentes REAIS e confirmados do STJ/STF aplicáveis à controvérsia.
   Faça a pergunta de validação: "Deseja aplicar os precedentes acima sugeridos ou indicar outro julgado específico?" e PARE.
 
 - ETAPA 2 (Ementa Técnica e Relatório Exclusivo do Recurso):
@@ -511,7 +551,7 @@ Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdiç�
   4. RELATÓRIO (Resumo focado nas razões e pedidos do recurso, finalizando com "É o relatório.").
   5. DA CONTROVÉRSIA RECURSAL (1 a 2 parágrafos delimitando o mérito).
   6. I – DAS PRELIMINARES (se houver).
-  7. II – DO MÉRITO (Texto fluido, contínuo e exaustivo de 2.500 a 4.000 palavras, enfrentando ponto a ponto as teses recursais com fechamento conclusivo em cada uma delas).
+  7. II – DO MÉRITO (Texto fluido, contínuo e exaustivo de 2.500 a 4.000 palavras, com precedentes reais e fechamento conclusivo em cada capítulo).
   8. III – CONCLUSÃO (Opinamento formal expresso: provimento, desprovimento ou parcial provimento).
   9. Local, Data e Fecho institucional do parecerista. NÃO REINICIE O FLUXO.
 """
@@ -535,7 +575,7 @@ def carregar_feed_precedentes():
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional", width="large")
 def exibir_manual_ajuda():
-    st.markdown("## ⚖️ Manual Operacional: JusAssist")
+    st.markdown("## ⚖️ Manual Operacional: JurisPrime AI")
     st.caption("Guia Oficial para Pesquisa Jurisprudencial e Elaboração de Pareceres de 2º Grau")
     
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -558,7 +598,7 @@ def exibir_manual_ajuda():
 2. **Passo 2: Início da Análise**
    * Clique em `⚡ Analisar autos e gerar parecer completo` ou use o botão na barra lateral.
 3. **Passo 3: Diagnóstico Fático & Precedentes (Fase 1)**
-   * A IA apresentará o raio-x do recurso e indicará os precedentes aplicáveis do STJ/STF/Tribunais.
+   * A IA apresentará o raio-x do recurso e indicará os precedentes reais e verificados do STJ/STF/Tribunais.
 4. **Passo 4: Validação da Ementa e Relatório do Recurso (Fase 2)**
    * Responda `Aprovado` para gerar a Ementa Técnica e o Relatório do Recurso (focado nas razões recursais, sem resumir a ação toda).
 5. **Passo 5: Minuta Final de Alta Densidade (Fase 3)**
@@ -575,9 +615,10 @@ def exibir_manual_ajuda():
         st.code("0845374-56.2024.8.26.0001 (Consulta direta ao DataJud)", language="text")
 
     with tab3:
-        st.markdown("### 🛡️ Mecanismos de Blindagem")
+        st.markdown("### 🛡️ Mecanismos de Blindagem Anti-Alucinação")
         st.markdown(
             """
+* **Busca Ativa Obrigatória:** Consulta em tempo real via Google Search em todas as minutas para verificação de precedentes.
 * **Prevalência STJ/STF:** Precedentes de Turmas do STJ e STF sobrepõem-se a notas administrativas ou conselhos.
 * **Relatório Recursal Estrito:** Narrativa focada nas alegações do recorrente (não do processo todo).
 * **Controvérsia Delimitada:** Tópico de 1 a 2 parágrafos fixando os pontos a julgar.
@@ -635,14 +676,21 @@ def modal_feedback_negativo(msg_index, msg_content):
             st.rerun()
 
 # ----------------------------------------------------
-# 12. Barra Lateral (Layout Rebalanceado para Linha Única)
+# 12. Barra Lateral (Layout Centralizado e Otimizado)
 # ----------------------------------------------------
 with st.sidebar:
-    st.markdown("### ⚖️ **JusAssist**")
-    st.caption(f"Usuário: **{st.session_state.user_session.email}**")
+    st.markdown(
+        f"""
+        <div class="sidebar-brand-container">
+            <div class="sidebar-brand-icon">⚖️</div>
+            <div class="sidebar-brand-title">JurisPrime AI</div>
+            <div class="sidebar-user-badge">👤 {st.session_state.user_session.email}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
-    # Proporção balanceada para manter 'Trocar Senha' e 'Sair' em linha única
-    col_u1, col_u2 = st.columns([1.4, 0.8])
+    col_u1, col_u2 = st.columns([1.35, 0.85])
     with col_u1:
         if st.button("🔑 Trocar Senha", key="btn_troca_senha_side", use_container_width=True):
             modal_alterar_senha()
@@ -693,7 +741,7 @@ with st.sidebar:
         )
         if uploaded_files and len(chat_atual["messages"]) == 0:
             if st.button("⚡ Iniciar Análise do Processo", use_container_width=True, type="primary"):
-                st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."
+                st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes verificados."
                 st.rerun()
 
     conversas_com_historico = {
@@ -759,7 +807,7 @@ if chat_vazio:
         if chat_atual["mode"] == "📄 Minuta de Parecer Cível":
             if uploaded_files:
                 if st.button("⚡ Analisar autos e gerar parecer completo", key="sug_parecer", use_container_width=True, type="primary"):
-                    st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes."
+                    st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes verificados."
                     st.rerun()
                 if st.button("💬 Mapear apenas preliminares e teses recursais dos autos", key="sug_teses", use_container_width=True):
                     st.session_state["trigger_prompt"] = "Faça um mapeamento analítico das preliminares e das principais teses recursais cabíveis para o caso."
@@ -776,7 +824,7 @@ if chat_vazio:
                 with col_alvo:
                     rotulo_btn = f"📌 **[{prec['tribunal']}]** {prec['tema']}\n\n_{prec['desc']}_"
                     if st.button(rotulo_btn, key=f"prec_{idx}", use_container_width=True):
-                        st.session_state["trigger_prompt"] = f"Apresente uma análise jurisprudencial analítica e aprofundada sobre o seguinte precedente do {prec['tribunal']}: {prec['tema']}. Foco na tese jurídica, critérios práticos e ementa representativa."
+                        st.session_state["trigger_prompt"] = f"Apresente uma análise jurisprudencial analítica e verificada sobre o seguinte precedente do {prec['tribunal']}: {prec['tema']}. Foco na tese jurídica real, critérios práticos e ementa oficial."
                         st.rerun()
 
 else:
@@ -817,7 +865,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 15. Processamento de Mensagens com Streaming Seguro
+# 15. Processamento de Mensagens com Verificação Ativa em Tempo Real
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua matéria jurídica ou use para pesquisar acórdãos..." if chat_vazio else "Digite sua resposta ou orientação para a próxima fase..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -845,7 +893,7 @@ if prompt_final:
             
             # Consulta DataJud por número de processo
             dados_cnj = None
-            if not is_parecer_mode and re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
+            if re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
                 match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)
                 dados_cnj = consultar_datajud_por_numero(match_cnj, tribunal="tjsp")
                 if dados_cnj:
@@ -869,15 +917,13 @@ if prompt_final:
                 types.Content(role="user", parts=user_parts)
             )
 
-            # Otimização de latência ultra-baixa
+            # Otimização e Ativação do Google Search em AMBOS os modos para validação factual
             config_params = {
                 "system_instruction": instrucao,
-                "temperature": 0.1,
-                "thinking_config": types.ThinkingConfig(thinking_budget=0)
+                "temperature": 0.0,  # Zero determinismo para anular desvios e alucinações
+                "thinking_config": types.ThinkingConfig(thinking_budget=0),
+                "tools": [types.Tool(google_search=types.GoogleSearch())]  # Ativado obrigatoriamente
             }
-
-            if not is_parecer_mode:
-                config_params["tools"] = [types.Tool(google_search=types.GoogleSearch())]
 
             def stream_generator():
                 for tentativa in range(3):

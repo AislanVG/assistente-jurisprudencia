@@ -14,7 +14,7 @@ from google.genai import types
 # 1. Configurações da Página e CSS Avançado
 # ----------------------------------------------------
 st.set_page_config(
-    page_title="JusAssist MPMS",
+    page_title="Assistente Jurídico",
     page_icon="⚖️",
     layout="wide"
 )

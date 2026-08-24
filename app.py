@@ -68,12 +68,13 @@ css_customizado = """
     div[data-testid="stSidebar"] button[kind="primary"],
     div.stButton > button[kind="primary"] {
         border-radius: 8px !important;
-        font-size: 16px !important;
+        font-size: 15px !important;
         font-weight: 600 !important;
-        padding: 10px 16px !important;
+        padding: 8px 10px !important;
         background-color: #1e3a8a !important;
         border: 1px solid #1e3a8a !important;
         color: #ffffff !important;
+        white-space: nowrap !important;
     }
     div[data-testid="stSidebar"] button[kind="primary"]:hover,
     div.stButton > button[kind="primary"]:hover {
@@ -84,11 +85,12 @@ css_customizado = """
     div[data-testid="stSidebar"] button[kind="secondary"],
     div.stButton > button[kind="secondary"] {
         border-radius: 8px !important;
-        font-size: 15px !important;
+        font-size: 14px !important;
         font-weight: 500 !important;
-        padding: 8px 14px !important;
+        padding: 8px 8px !important;
         border: 1px solid #cbd5e1 !important;
         color: #1e293b !important;
+        white-space: nowrap !important;
     }
     div[data-testid="stSidebar"] button[kind="secondary"]:hover,
     div.stButton > button[kind="secondary"]:hover {
@@ -633,13 +635,14 @@ def modal_feedback_negativo(msg_index, msg_content):
             st.rerun()
 
 # ----------------------------------------------------
-# 12. Barra Lateral
+# 12. Barra Lateral (Layout Rebalanceado para Linha Única)
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown("### ⚖️ **JusAssist**")
     st.caption(f"Usuário: **{st.session_state.user_session.email}**")
     
-    col_u1, col_u2 = st.columns([1, 1])
+    # Proporção balanceada para manter 'Trocar Senha' e 'Sair' em linha única
+    col_u1, col_u2 = st.columns([1.4, 0.8])
     with col_u1:
         if st.button("🔑 Trocar Senha", key="btn_troca_senha_side", use_container_width=True):
             modal_alterar_senha()

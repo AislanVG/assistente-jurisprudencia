@@ -274,8 +274,7 @@ def exibir_tela_autenticacao():
         st.markdown(
             """
             <div class="auth-unified-card">
-                <div class="auth-badge">4ª Procuradoria de Justiça Cível • MPMS</div>
-                <div class="auth-title">⚖️ JusAssist MPMS</div>
+                <div class="auth-title">⚖️ Assistente Jurídico</div>
                 <div class="auth-subtitle">
                     Ecossistema de Inteligência Jurídica: Pesquisa Analítica de Precedentes e Elaboração de Pareceres de 2º Grau
                 </div>
@@ -309,7 +308,7 @@ def exibir_tela_autenticacao():
         st.markdown(
             """
                 <div class="auth-security-footer">
-                    🔒 <strong>Acesso Restrito & Criptografado</strong> • Gabinete Dra. Luciana Moreira Schenk
+                    🔒 <strong>Acesso Restrito & Criptografado</strong> 
                 </div>
             </div>
             """,

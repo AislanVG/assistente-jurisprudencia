@@ -149,7 +149,7 @@ css_customizado = """
         padding: 32px 36px 24px 36px;
         box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
         text-align: center;
-        max-width: 490px;
+        max-width: 530px;
         margin: 2vh auto 0 auto;
     }
     
@@ -185,6 +185,7 @@ css_customizado = """
     .feature-pills {
         display: flex;
         justify-content: center;
+        flex-wrap: nowrap;
         gap: 10px;
         margin-bottom: 22px;
     }
@@ -195,8 +196,9 @@ css_customizado = """
         color: #334155;
         font-size: 13px;
         font-weight: 600;
-        padding: 5px 12px;
+        padding: 6px 12px;
         border-radius: 6px;
+        white-space: nowrap !important;
     }
     
     /* Rótulos dos Inputs */
@@ -269,7 +271,7 @@ if "user_session" not in st.session_state:
     st.session_state.user_session = None
 
 def exibir_tela_autenticacao():
-    col_l1, col_l2, col_l3 = st.columns([1, 1.35, 1])
+    col_l1, col_l2, col_l3 = st.columns([1, 1.45, 1])
     with col_l2:
         st.markdown(
             """
@@ -281,7 +283,7 @@ def exibir_tela_autenticacao():
                 </div>
                 <div class="feature-pills">
                     <span class="pill">🔍 Jurisprudência STF/STJ/Tribunais</span>
-                    <span class="pill">📄 Minutas Densas (6-10 págs)</span>
+                    <span class="pill">📄 Minutas Densas&nbsp;(6-10&nbsp;págs)</span>
                 </div>
             """,
             unsafe_allow_html=True

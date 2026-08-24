@@ -43,7 +43,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico (Design Corporativo Sóbrio)
+# 4. Injeção de CSS Dinâmico (Design Corporativo Sóbrio & Fix de Botões)
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -113,8 +113,7 @@ css_customizado = """
         border-color: #2563eb !important;
     }
 
-    div[data-testid="stSidebar"] button[kind="secondary"],
-    div.stButton > button[kind="secondary"] {
+    div[data-testid="stSidebar"] button[kind="secondary"] {
         border-radius: 8px !important;
         font-size: 14px !important;
         font-weight: 500 !important;
@@ -123,10 +122,36 @@ css_customizado = """
         color: #1e293b !important;
         white-space: nowrap !important;
     }
-    div[data-testid="stSidebar"] button[kind="secondary"]:hover,
-    div.stButton > button[kind="secondary"]:hover {
+    div[data-testid="stSidebar"] button[kind="secondary"]:hover {
         border-color: #94a3b8 !important;
         background-color: #ffffff !important;
+    }
+
+    /* CORREÇÃO DAS CAIXAS DE PRECEDENTES */
+    .precedente-btn-container button {
+        width: 100% !important;
+        min-height: 85px !important;
+        height: auto !important;
+        white-space: normal !important;
+        text-align: left !important;
+        padding: 14px 16px !important;
+        border-radius: 12px !important;
+        border: 1px solid #cbd5e1 !important;
+        background-color: #ffffff !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        line-height: 1.45 !important;
+    }
+    .precedente-btn-container button:hover {
+        border-color: #2563eb !important;
+        background-color: #eff6ff !important;
+    }
+    .precedente-btn-container button p {
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
     }
 
     .sidebar-label {
@@ -155,13 +180,13 @@ css_customizado = """
     }
 
     .feed-header {
-        font-size: 15px;
+        font-size: 14.5px;
         font-weight: 700;
         color: #475569;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.6px;
         margin-top: 18px;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
         text-align: center;
     }
 
@@ -469,7 +494,7 @@ def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjsp"):
     return None
 
 # ----------------------------------------------------
-# 9. Prompts Especializados (Com Trava Anti-Alucinação Reforçada)
+# 9. Prompts Especializados (Com Soberania do Assessor e Distinção de Instâncias)
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -504,7 +529,14 @@ Disponibilize o trecho oficial de um acórdão representativo em bloco formatado
 SUPERPROMPT_PARECER = """
 Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdição (Cível). Seu objetivo é elaborar minutas de PARECER CÍVEL EM SEGUNDO GRAU completas, densas, fluidas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral.
 
-### 🛡️ BLINDAGEM ANTI-ALUCINAÇÃO E REGRAS ESTRITAS DE REDAÇÃO JURÍDICA:
+### 🎯 REGRA DE OURO: SOBERANIA DAS DIRETRIZES DO ASSESSOR (OBEDIÊNCIA ESTRITA)
+1. DISTINÇÃO FUNDAMENTAL ENTRE 1º GRAU E 2º GRAU:
+   - **Decisão do Juiz (1º Grau):** É a decisão ou sentença originária recorrida (objeto do recurso).
+   - **Decisão do Desembargador Relator (2º Grau):** É a decisão monocrática liminar, tutela antecipada recursal ou efeito suspensivo deferido/indeferido monocraticamente no Tribunal de Justiça.
+   - **COMANDO "ACOMPANHAR O DESEMBARGADOR / RELATOR":** Se o assessor determinar *"acompanhe o entendimento do relator/desembargador"*, NUNCA opine pela manutenção da decisão do Juiz de 1º grau. Você DEVE opinar no EXATO SENTIDO da decisão liminar/monocrática do Desembargador (ou seja, opinando pelo PROVIMENTO ou PARCIAL PROVIMENTO do recurso, confirmando a tutela antecipada recursal concedida pelo Relator para reformar total ou parcialmente a decisão de piso).
+2. SOBERANIA TOTAL: A tese, orientação e sentido do voto/opinião definidos pelo assessor no chat são ABSOLUTOS e VINCULANTES. É proibido subverter ou divergir do comando exarado.
+
+### 🛡️ BLINDAGEM ANTI-ALUCINAÇÃO E REGRAS ESTRITAS DE REDAÇÃO:
 
 1. PROIBIÇÃO ABSOLUTA DE JURISPRUDÊNCIA INVENTADA:
    - É PROIBIDO CRIAR OU DEDUZIR NÚMEROS DE PROCESSOS, REsps OU EMENTAS FICTÍCIAS.
@@ -513,13 +545,13 @@ Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdiç�
 
 2. RELATÓRIO DO RECURSO (E NÃO DO PROCESSO):
    - O relatório NÃO deve resumir a petição inicial ou a história do processo todo desde a origem.
-   - O relatório deve conter EXCLUSIVAMENTE o resumo exaustivo e fiel das alegações do RECORRENTE (apelante/agravante), seus fundamentos jurídicos e o pedido recursal final. Se houver decisão monocrática nos autos de 2º grau, mencione-a sucintamente ao final.
-   - Redação corrida em parágrafos encadeados ("Sustenta o apelante que...", "Aduz ainda..."), SEM TÓPICOS/BULLETS, encerrando com a fórmula: "É o relatório.".
+   - O relatório deve conter EXCLUSIVAMENTE o resumo exaustivo e fiel das alegações do RECORRENTE (apelante/agravante), seus fundamentos jurídicos e o pedido recursal final. Se houver decisão monocrática do Desembargador Relator nos autos de 2º grau (ex: concessão de tutela antecipada recursal), relate-a expressamente ao final.
+   - Redação corrida em parágrafos encadeados ("Sustenta o agravante que...", "Aduz ainda..."), SEM TÓPICOS/BULLETS, encerrando com a fórmula: "É o relatório.".
 
 3. DA CONTROVÉRSIA RECURSAL (DELIMITAÇÃO PRECISA):
    - Logo após o relatório, crie o tópico autônomo "DA CONTROVÉRSIA RECURSAL".
    - Limite estrito de 1 a 2 parágrafos.
-   - Não resuma o processo aqui. Apenas delimite com precisão cirúrgica o cerne do litígio recursal (Ex.: "A controvérsia recursal cinge-se a verificar se...").
+   - Delimite com precisão o cerne do litígio a ser apreciado pela Câmara (Ex.: "A controvérsia recursal cinge-se a verificar a presença dos requisitos para concessão da tutela de urgência...").
 
 4. ANÁLISE DO MÉRITO SEM FRAGMENTAÇÃO EXCESSIVA:
    - É PROIBIDO fatiar o mérito em vários subtópicos isolados e rasos.
@@ -527,7 +559,7 @@ Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdiç�
    - Somente crie subtópicos destacados para "PRELIMINARES" (se houver) e "MÉRITO".
 
 5. FECHAMENTO CONCLUSIVO OBRIGATÓRIO DE CADA TESE:
-   - Ao enfrentar cada matéria ou pedido do recurso dentro do mérito, finalize com um FECHAMENTO LÓGICO E OPINATIVO EXPRESSO (Ex.: "Destarte, diante da ausência de comprovação do fato constitutivo, a pretensão recursal não comporta provimento quanto a este capítulo."). NUNCA deixe o argumento solto para iniciar o tema seguinte.
+   - Ao enfrentar cada matéria ou pedido do recurso dentro do mérito, finalize com um FECHAMENTO LÓGICO E OPINATIVO EXPRESSO alinhado à diretriz do assessor (Ex.: "Destarte, correta a decisão do i. Relator ao antecipar os efeitos da tutela recursal, impondo-se o parcial provimento do agravo de instrumento."). NUNCA deixe o argumento solto para iniciar o tema seguinte.
 
 6. FORMATAÇÃO E HIERARQUIA:
    - Expressões latinas em itálico (*in re ipsa*, *quantum*). Citações jurisprudenciais em bloco recuado (`>`), em itálico.
@@ -535,39 +567,69 @@ Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdiç�
 ### 🔄 FLUXO PROGRESSIVO OBRIGATÓRIO EM 3 ETAPAS:
 
 - ETAPA 1 (Diagnóstico, Mapeamento do Recurso & Precedentes Verificados):
-  Apresente o Raio-X das razões recursais e dos autos.
+  Apresente o Raio-X das razões recursais, da decisão recorrida de 1º grau e da decisão liminar do Relator (se houver).
   Indique a linha de precedentes REAIS e confirmados do STJ/STF aplicáveis à controvérsia.
-  Faça a pergunta de validação: "Deseja aplicar os precedentes acima sugeridos ou indicar outro julgado específico?" e PARE.
+  Faça a pergunta de validação: "Deseja adotar a linha de parecer acima sugerida ou aplicar diretriz específica (ex: acompanhar o Desembargador Relator)?" e PARE.
 
 - ETAPA 2 (Ementa Técnica e Relatório Exclusivo do Recurso):
-  Quando validada a tese, apresente a Ementa Formal e o Relatório focado estritamente nas razões recursais (sem resumir a ação toda).
+  Com base na orientação soberana validada pelo assessor, apresente a Ementa Formal e o Relatório focado estritamente nas razões recursais e na decisão do Relator.
   Diga: "Aguardando validação da Ementa e Relatório para gerar a Minuta Integral (Etapa 3)." e PARE.
 
 - ETAPA 3 (Minuta Integral de Alta Densidade - Peça Completa):
   Quando o analista responder "validado" ou "aprovado", REDIJA IMEDIATAMENTE A PEÇA COMPLETA DE SEGUNDO GRAU sem placeholders:
-  1. Cabeçalho Formal (Autos, Classe, Origem, Órgão Julgador, Relator, Apelante, Apelado).
-  2. Ementa Formal.
+  1. Cabeçalho Formal (Autos, Classe, Origem, Órgão Julgador, Relator, Agravante/Apelante, Agravado/Apelado).
+  2. Ementa Formal (alinhada à orientação dada).
   3. "COLENDA CÂMARA CÍVEL,"
-  4. RELATÓRIO (Resumo focado nas razões e pedidos do recurso, finalizando com "É o relatório.").
+  4. RELATÓRIO (Resumo focado nas razões recursais e menção à liminar do Relator, finalizando com "É o relatório.").
   5. DA CONTROVÉRSIA RECURSAL (1 a 2 parágrafos delimitando o mérito).
   6. I – DAS PRELIMINARES (se houver).
-  7. II – DO MÉRITO (Texto fluido, contínuo e exaustivo de 2.500 a 4.000 palavras, com precedentes reais e fechamento conclusivo em cada capítulo).
-  8. III – CONCLUSÃO (Opinamento formal expresso: provimento, desprovimento ou parcial provimento).
+  7. II – DO MÉRITO (Texto fluido, contínuo e exaustivo de 2.500 a 4.000 palavras, fundamentando a confirmação do entendimento do Relator e o provimento/parcial provimento correspondente).
+  8. III – CONCLUSÃO (Opinamento formal expresso: pelo provimento, desprovimento ou parcial provimento conforme estipulado).
   9. Local, Data e Fecho institucional do parecerista. NÃO REINICIE O FLUXO.
 """
 
 # ----------------------------------------------------
-# 10. Feed de Precedentes (Cache 12h)
+# 10. Feed de Precedentes Dinâmico em Tempo Real (Cache 12h)
 # ----------------------------------------------------
 @st.cache_data(ttl=43200)
-def carregar_feed_precedentes():
+def carregar_feed_precedentes_dinamico():
+    prompt_busca = """
+    Pesquise no Google Search os 6 julgados, temas repetitivos ou teses vinculantes mais relevantes e recentes do STF e STJ em Direito Privado, Cível, Consumidor ou Saúde Pública publicados nas últimas semanas/meses.
+    Retorne ESTRITAMENTE um array JSON contendo 6 objetos com os campos exatos:
+    [
+      {
+        "tribunal": "STJ ou STF",
+        "tema": "Identificação exata do Tema, Súmula ou REsp",
+        "desc": "Resumo objetivo da tese jurídica em até 120 caracteres"
+      }
+    ]
+    Responda apenas com o JSON puro, sem crases de markdown ou texto adicional.
+    """
+    try:
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        resp = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt_busca,
+            config=types.GenerateContentConfig(
+                tools=[types.Tool(google_search=types.GoogleSearch())],
+                temperature=0.0
+            )
+        )
+        texto_limpo = re.sub(r"```json|```", "", resp.text).strip()
+        dados = json.loads(texto_limpo)
+        if isinstance(dados, list) and len(dados) >= 4:
+            return dados[:6]
+    except Exception:
+        pass
+
+    # Contingência de alta autoridade factual
     return [
-        {"tribunal": "STJ", "tema": "Tema Repetitivo 1.082/STJ (Saúde Suplementar)", "desc": "Custeio de tratamento multidisciplinar (método ABA) para beneficiário com TEA e nulidade de cláusula limitativa."},
-        {"tribunal": "STJ", "tema": "REsp 2.221.399/SP (3ª Turma - Direito Privado)", "desc": "Dever das operadoras de plano de saúde em fornecer cobertura de terapias especiais prescritas por médico assistente."},
-        {"tribunal": "STJ", "tema": "Tema Repetitivo 290/STJ (Fraude à Execução)", "desc": "Marco temporal e requisitos da LC 118/2005 para caracterização de fraude à execução fiscal e terceiro de boa-fé."},
-        {"tribunal": "STF", "tema": "Tema 793/STF (Repercussão Geral)", "desc": "Responsabilidade solidária dos entes federados no fornecimento de medicamentos e tratamentos pelo SUS."},
-        {"tribunal": "STF", "tema": "Tema 1.234/STF (Medicamentos sem Registro)", "desc": "Critérios vinculantes de competência e legitimidade para fornecimento judicial de fármacos de alto custo."},
-        {"tribunal": "STF", "tema": "Súmula Vinculante 510/STF (Delegação Registral)", "desc": "Cabimento de Mandado de Segurança contra atos praticados por delegatários de serviços notariais e de registro."}
+        {"tribunal": "STJ", "tema": "Tema 1.082/STJ (Saúde)", "desc": "Cobertura obrigatória de terapias multidisciplinares (ABA) para autismo."},
+        {"tribunal": "STJ", "tema": "REsp 2.221.399/SP (3ª Turma)", "desc": "Dever de fornecimento de procedimentos especiais prescritos por médico assistente."},
+        {"tribunal": "STJ", "tema": "Tema 290/STJ (Execução)", "desc": "Marco temporal e requisitos da LC 118/2005 para fraude à execução fiscal."},
+        {"tribunal": "STF", "tema": "Tema 793/STF (SUS)", "desc": "Responsabilidade solidária dos entes públicos no fornecimento de tratamentos médicos."},
+        {"tribunal": "STF", "tema": "Tema 1.234/STF (Fármacos)", "desc": "Critérios vinculantes de competência para fornecimento judicial de medicamentos."},
+        {"tribunal": "STF", "tema": "Súmula Vinculante 510", "desc": "Mandado de Segurança contra atos praticados por serviços notariais e de registro."}
     ]
 
 # ----------------------------------------------------
@@ -594,13 +656,13 @@ def exibir_manual_ajuda():
         st.markdown(
             """
 1. **Passo 1: Upload dos Autos (Múltiplos PDFs)**
-   * Na barra lateral, selecione **📄 Parecer** e anexe as peças necessárias (Razões de Apelação, Sentença, Contrarrazões).
+   * Na barra lateral, selecione **📄 Parecer** e anexe as peças necessárias (Razões de Apelação/Agravo, Decisão/Sentença, Liminar do Relator).
 2. **Passo 2: Início da Análise**
    * Clique em `⚡ Analisar autos e gerar parecer completo` ou use o botão na barra lateral.
 3. **Passo 3: Diagnóstico Fático & Precedentes (Fase 1)**
    * A IA apresentará o raio-x do recurso e indicará os precedentes reais e verificados do STJ/STF/Tribunais.
 4. **Passo 4: Validação da Ementa e Relatório do Recurso (Fase 2)**
-   * Responda `Aprovado` para gerar a Ementa Técnica e o Relatório do Recurso (focado nas razões recursais, sem resumir a ação toda).
+   * Responda `Aprovado` (ou dê a ordem de mérito, ex.: *Acompanhe a decisão liminar do Desembargador Relator*).
 5. **Passo 5: Minuta Final de Alta Densidade (Fase 3)**
    * Responda `Validado, prossiga` para a IA entregar a minuta completa com a delimitação da controvérsia e mérito contínuo.
             """
@@ -615,21 +677,21 @@ def exibir_manual_ajuda():
         st.code("0845374-56.2024.8.26.0001 (Consulta direta ao DataJud)", language="text")
 
     with tab3:
-        st.markdown("### 🛡️ Mecanismos de Blindagem Anti-Alucinação")
+        st.markdown("### 🛡️ Mecanismos de Blindagem Anti-Alucinação & Soberania")
         st.markdown(
             """
-* **Busca Ativa Obrigatória:** Consulta em tempo real via Google Search em todas as minutas para verificação de precedentes.
+* **Soberania do Assessor:** Se o comando for acompanhar o Desembargador Relator, o parecer opinará pela reforma da decisão de 1º grau para consolidar a liminar recursal.
+* **Busca Ativa Obrigatória:** Consulta em tempo real via Google Search em todas as minutas para verificação de precedentes reais.
 * **Prevalência STJ/STF:** Precedentes de Turmas do STJ e STF sobrepõem-se a notas administrativas ou conselhos.
-* **Relatório Recursal Estrito:** Narrativa focada nas alegações do recorrente (não do processo todo).
+* **Relatório Recursal Estrito:** Narrativa focada nas alegações do recorrente e na liminar do Relator (não do processo todo).
 * **Controvérsia Delimitada:** Tópico de 1 a 2 parágrafos fixando os pontos a julgar.
-* **Mérito Contínuo e Fechado:** Sem fragmentação excessiva, com conclusão ao final de cada argumento.
             """
         )
 
     with tab4:
         st.markdown("### 🛑 Comandos de Ajuste de Rota (Se não aprovar)")
-        st.markdown("**1. Correção de Tese no Diagnóstico:**")
-        st.code("Não está aprovado. Na proposta de mérito, considere que a 3ª Turma do STJ já pacificou o dever de custeio pelo REsp 2.221.399/SP. Reformule o diagnóstico opinando pelo desprovimento do recurso.", language="text")
+        st.markdown("**1. Correção de Tese / Acompanhar Relator:**")
+        st.code("Acompanhe o entendimento do Desembargador Relator que concedeu a tutela antecipada recursal. Opine pelo parcial provimento do agravo de instrumento reformando a decisão de primeiro grau.", language="text")
         st.markdown("**2. Avanço Direto:**")
         st.code("Aprovado o diagnóstico e os precedentes sugeridos. Prossiga para a emissão da Ementa, Relatório e Minuta Completa.", language="text")
 
@@ -735,7 +797,7 @@ with st.sidebar:
             "Upload dos Processos",
             type=["pdf"],
             accept_multiple_files=True,
-            help="Selecione Razões de Apelação, Sentença e Contrarrazões",
+            help="Selecione Razões de Apelação/Agravo, Decisão e Liminar do Relator",
             label_visibility="collapsed",
             key=f"uploader_{st.session_state.current_chat_id}"
         )
@@ -797,7 +859,7 @@ else:
     saudacao = "Qual é o caso da noite?"
 
 # ----------------------------------------------------
-# 14. Área Principal: Estado Inicial vs. Conversação
+# 14. Área Principal: Feed Dinâmico e Caixas Otimizadas
 # ----------------------------------------------------
 if chat_vazio:
     st.markdown(f"<div class='hero-title'>{saudacao}</div>", unsafe_allow_html=True)
@@ -816,16 +878,18 @@ if chat_vazio:
                 st.info("📂 Anexe os arquivos PDF na barra lateral para iniciar a análise dos autos.")
         
         else:
-            st.markdown("<div class='feed-header'>🏛️ Precedentes Recentes dos Tribunais Superiores (Direito Privado / Cível)</div>", unsafe_allow_html=True)
-            feed_precedentes = carregar_feed_precedentes()
+            st.markdown("<div class='feed-header'>🏛️ Precedentes Recentes dos Tribunais Superiores (STJ / STF)</div>", unsafe_allow_html=True)
+            feed_precedentes = carregar_feed_precedentes_dinamico()
             col_f1, col_f2 = st.columns(2)
             for idx, prec in enumerate(feed_precedentes):
                 col_alvo = col_f1 if idx % 2 == 0 else col_f2
                 with col_alvo:
-                    rotulo_btn = f"📌 **[{prec['tribunal']}]** {prec['tema']}\n\n_{prec['desc']}_"
-                    if st.button(rotulo_btn, key=f"prec_{idx}", use_container_width=True):
-                        st.session_state["trigger_prompt"] = f"Apresente uma análise jurisprudencial analítica e verificada sobre o seguinte precedente do {prec['tribunal']}: {prec['tema']}. Foco na tese jurídica real, critérios práticos e ementa oficial."
+                    st.markdown("<div class='precedente-btn-container'>", unsafe_allow_html=True)
+                    rotulo_btn = f"📌 **[{prec.get('tribunal', 'STJ')}]** {prec.get('tema', '')}\n\n_{prec.get('desc', '')}_"
+                    if st.button(rotulo_btn, key=f"prec_din_{idx}", use_container_width=True):
+                        st.session_state["trigger_prompt"] = f"Apresente uma análise jurisprudencial analítica e verificada sobre o seguinte precedente do {prec.get('tribunal')}: {prec.get('tema')}. Foco na tese jurídica real, critérios práticos e ementa oficial."
                         st.rerun()
+                    st.markdown("</div>", unsafe_allow_html=True)
 
 else:
     st.subheader(chat_atual["mode"])
@@ -920,9 +984,9 @@ if prompt_final:
             # Otimização e Ativação do Google Search em AMBOS os modos para validação factual
             config_params = {
                 "system_instruction": instrucao,
-                "temperature": 0.0,  # Zero determinismo para anular desvios e alucinações
+                "temperature": 0.0,
                 "thinking_config": types.ThinkingConfig(thinking_budget=0),
-                "tools": [types.Tool(google_search=types.GoogleSearch())]  # Ativado obrigatoriamente
+                "tools": [types.Tool(google_search=types.GoogleSearch())]
             }
 
             def stream_generator():

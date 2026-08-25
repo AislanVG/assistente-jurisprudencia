@@ -4,13 +4,11 @@ import time
 import json
 import re
 import requests
-from io import BytesIO
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from supabase import create_client, Client
 from google import genai
 from google.genai import types
-from pypdf import PdfReader
 
 # ----------------------------------------------------
 # 1. Configurações da Página e CSS Avançado
@@ -382,22 +380,7 @@ def modal_alterar_senha():
             st.rerun()
 
 # ----------------------------------------------------
-# 7. Função Rápida de Extração Textual de PDFs
-# ----------------------------------------------------
-def extrair_texto_pdfs(arquivos_pdf) -> str:
-    texto_total = []
-    for f in arquivos_pdf:
-        try:
-            reader = PdfReader(BytesIO(f.getvalue()))
-            paginas = [p.extract_text() or "" for p in reader.pages]
-            texto_doc = "\n".join(paginas)
-            texto_total.append(f"=== [ARQUIVO DOS AUTOS: {f.name}] ===\n{texto_doc}")
-        except Exception:
-            texto_total.append(f"=== [ARQUIVO DOS AUTOS: {f.name}] ===\n(Falha na leitura automática)")
-    return "\n\n".join(texto_total)
-
-# ----------------------------------------------------
-# 8. Gerenciamento de Sessões do Assistente
+# 7. Gerenciamento de Sessões do Assistente
 # ----------------------------------------------------
 if "chats" not in st.session_state:
     primeiro_id = str(uuid.uuid4())
@@ -406,8 +389,7 @@ if "chats" not in st.session_state:
             "title": "",
             "mode": "📄 Minuta de Parecer Cível",
             "messages": [],
-            "gemini_history": [],
-            "texto_autos_cache": ""
+            "gemini_history": []
         }
     }
     st.session_state.current_chat_id = primeiro_id
@@ -419,7 +401,7 @@ chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 chat_vazio = len(chat_atual["messages"]) == 0
 
 # ----------------------------------------------------
-# 9. Prompts Especializados
+# 8. Prompts Especializados
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -563,8 +545,7 @@ with st.sidebar:
             "title": "",
             "mode": chat_atual["mode"],
             "messages": [],
-            "gemini_history": [],
-            "texto_autos_cache": ""
+            "gemini_history": []
         }
         st.session_state.current_chat_id = novo_id
         st.rerun()
@@ -632,6 +613,13 @@ with st.sidebar:
             with c2:
                 if st.button("✕", key=f"del_{chat_id}", help="Excluir"):
                     del st.session_state.chats[chat_id]
+                    if st.session_state.current_chat_id == chat_id:
+                        restantes = list(st.session_state.chats.keys())
+                        st.session_state.current_chat_id = restantes[0] if restantes else str(uuid.uuid4())
+                        if not restantes:
+                            st.session_state.chats[st.session_state.current_chat_id] = {
+                                "title": "", "mode": chat_atual["mode"], "messages": [], "gemini_history": []
+                            }
                     st.rerun()
 
     st.markdown('<div class="help-section"></div>', unsafe_allow_html=True)
@@ -672,7 +660,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 13. Processamento Atômico sem Congelamento de Tela
+# 13. Processamento Agêntico Otimizado (Sem Travamentos)
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua mensagem, orientação de ajuste ou comando..." if not chat_vazio else "Digite sua matéria jurídica ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -685,21 +673,14 @@ if prompt_final:
         else:
             chat_atual["title"] = prompt_final[:30] + ("..." if len(prompt_final) > 30 else "")
 
-    # Registra mensagem do usuário na tela
     chat_atual["messages"].append({"role": "user", "content": prompt_final})
     with st.chat_message("user"):
         st.markdown(prompt_final)
 
-    # Inicia a resposta do assistente
     with st.chat_message("assistant"):
         with st.status("🧠 Analisando autos e raciocinando...", expanded=True) as status_box:
-            st.write("📂 **Lendo e extraindo acervo probatório dos autos...**")
-            
-            # Extração de texto rápida dos PDFs se ainda não cacheado
-            if not chat_atual["texto_autos_cache"] and uploaded_files:
-                chat_atual["texto_autos_cache"] = extrair_texto_pdfs(uploaded_files)
-            
-            st.write("🔍 **Pesquisando precedentes vinculantes no STF e STJ...**")
+            st.write("📂 **Lendo acervo probatório dos autos...**")
+            st.write("🔍 **Consultando jurisprudência e teses vinculantes...**")
             st.write("✍️ **Estruturando fundamentação jurídica de Segundo Grau...**")
 
             try:
@@ -712,28 +693,35 @@ if prompt_final:
                 else:
                     instrucao = PROMPT_JURISPRUDENCIA
 
-                # Monta a carga da mensagem de forma limpa e textual
-                user_msg_content = ""
-                if len(chat_atual["gemini_history"]) == 0 and chat_atual["texto_autos_cache"]:
-                    user_msg_content = f"{chat_atual['texto_autos_cache']}\n\n[COMANDO DO ANALISTA]:\n{prompt_final}"
-                else:
-                    user_msg_content = prompt_final
+                user_parts = []
+                
+                # Ingestão binária dos arquivos PDF apenas na primeira interação
+                if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
+                    for f in uploaded_files:
+                        pdf_bytes = f.getvalue()
+                        user_parts.append(
+                            types.Part.from_bytes(
+                                data=pdf_bytes,
+                                mime_type="application/pdf"
+                            )
+                        )
+                        user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))
+
+                user_parts.append(types.Part.from_text(text=prompt_final))
 
                 chat_atual["gemini_history"].append(
-                    types.Content(role="user", parts=[types.Part.from_text(text=user_msg_content)])
+                    types.Content(role="user", parts=user_parts)
                 )
 
                 config_params = {
                     "system_instruction": instrucao,
-                    "temperature": 0.1,
+                    "temperature": 0.0,
                     "max_output_tokens": 8192,
-                    "thinking_config": types.ThinkingConfig(thinking_budget=1024),
                     "tools": [types.Tool(google_search=types.GoogleSearch())]
                 }
 
                 status_box.update(label="✅ Análise concluída. Redigindo manifestação...", state="complete", expanded=False)
 
-                # Container dedicado para escrita contínua (evita tela em branco)
                 response_container = st.empty()
                 texto_acumulado = ""
 
@@ -748,10 +736,8 @@ if prompt_final:
                         texto_acumulado += chunk.text
                         response_container.markdown(texto_acumulado + "▌")
 
-                # Fixa o texto final limpo sem o cursor
                 response_container.markdown(texto_acumulado)
 
-                # Salva o texto gerado na sessão
                 chat_atual["gemini_history"].append(
                     types.Content(role="model", parts=[types.Part.from_text(text=texto_acumulado)])
                 )

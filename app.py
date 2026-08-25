@@ -43,7 +43,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico (Design Corporativo Sóbrio)
+# 4. Injeção de CSS Dinâmico (Design Forense Aprimorado)
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -128,11 +128,30 @@ css_customizado = """
         background-color: #f1f5f9 !important;
     }
 
-    div[data-testid="stStatusWidget"] {
+    .precedente-btn-container button {
+        width: 100% !important;
+        min-height: 85px !important;
+        height: auto !important;
+        white-space: normal !important;
+        text-align: left !important;
+        padding: 14px 16px !important;
+        border-radius: 12px !important;
+        border: 1px solid #cbd5e1 !important;
         background-color: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 10px !important;
-        margin-bottom: 14px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        line-height: 1.45 !important;
+    }
+    .precedente-btn-container button:hover {
+        border-color: #2563eb !important;
+        background-color: #eff6ff !important;
+    }
+    .precedente-btn-container button p {
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
     }
 
     .sidebar-label {
@@ -160,6 +179,17 @@ css_customizado = """
         margin-bottom: 18px;
     }
 
+    .feed-header {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-top: 18px;
+        margin-bottom: 16px;
+        text-align: center;
+    }
+
     .main-chat-container {
         padding-bottom: 100px;
     }
@@ -169,6 +199,42 @@ css_customizado = """
         margin-bottom: 16px;
     }
 
+    /* FORMATO FORENSE PARA AS MENSAGENS DO ASSISTENTE (ESTILO WORD / PEÇA INSTITUCIONAL) */
+    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 24px 28px !important;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+    }
+
+    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) div[data-testid="stMarkdownContainer"] {
+        font-family: "Georgia", "Times New Roman", Times, serif !important;
+        font-size: 15.5px !important;
+        line-height: 1.65 !important;
+        color: #0f172a !important;
+    }
+
+    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) p {
+        text-align: justify !important;
+        text-justify: inter-word !important;
+        margin-bottom: 14px !important;
+    }
+
+    /* Recuo de Bloco para Ementas e Citações de Jurisprudência */
+    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) blockquote {
+        margin-left: 25% !important;
+        margin-right: 0 !important;
+        padding-left: 14px !important;
+        border-left: 2px solid #94a3b8 !important;
+        font-size: 13.5px !important;
+        line-height: 1.45 !important;
+        text-align: justify !important;
+        color: #334155 !important;
+        background: transparent !important;
+    }
+
+    /* CARD DE LOGIN UNIFICADO */
     .auth-unified-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -458,7 +524,7 @@ def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjsp"):
     return None
 
 # ----------------------------------------------------
-# 9. Prompts Especializados
+# 9. Prompts Especializados com Diagramação Forense Estilo Word
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -507,21 +573,36 @@ Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdiç�
    - **COMANDO DO USUÁRIO:** Se o usuário responder "pelo desprovimento", "pelo provimento", "acompanhe o relator", ADOTE IMEDIATAMENTE essa orientação de mérito e avance sem pedir novas confirmações da mesma pergunta[cite: 1].
 2. SOBERANIA TOTAL: A tese e orientação definidas pelo usuário no chat são ABSOLUTAS e VINCULANTES.
 
-### 🛡️ ESTRUTURAÇÃO E REGRAS ESTRITAS DE REDAÇÃO FORENSE:
-1. CABEÇALHO E EMENTA TÉCNICA:
-   - Cabeçalho formal com: N.º MP, Autos n.º, Classe do Processo, Órgão Julgador, Relator(a), Apelante(s), Apelado(s)[cite: 2, 3].
-   - Ementa Técnica Formal: Palavras-chave em CAIXA ALTA separadas por pontos, citando precedentes vinculantes (STF/STJ) e finalizando com o desfecho formal em negrito: "PARECER PELO CONHECIMENTO E PROVIMENTO / DESPROVIMENTO / PARCIAL PROVIMENTO DO RECURSO."[cite: 2, 3]
-2. RELATÓRIO DO RECURSO:
-   - Inicie com: "Trata-se de Apelação Cível / Agravo de Instrumento interposto por..."[cite: 2, 3].
-   - Resuma as alegações do RECORRENTE em parágrafos corridos interligados por verbos técnicos ("Sustenta o apelante que...", "Alega que...", "Nesse sentido, afirma que...", "Argumenta que...", "Ao final, requer...")[cite: 2, 3].
-   - Fecho obrigatório do relatório:
-     "É o relatório.
-     O presente recurso é tempestivo e preenche os demais requisitos de admissibilidade, razão pela qual merece ser conhecido."[cite: 2, 3]
-3. CAPÍTULOS OBRIGATÓRIOS DO PARECER:
-   - "I – Da controvérsia recursal" (1 a 2 parágrafos delimitando o litígio: "A controvérsia recursal cinge-se a verificar/definir se...")[cite: 2, 3].
-   - "II – Da impugnação à justiça gratuita" (se houver)[cite: 3].
-   - "II/III – Do mérito" (Fundamentação jurídica densa, exaustiva e contínua de 2.500 a 4.000 palavras, articulando fatos, laudos, leis federais e precedentes vinculantes do STF e STJ)[cite: 1, 2, 3].
-   - "III/IV – Conclusão": "Ante o exposto, esta Procuradoria de Justiça manifesta-se pelo conhecimento e provimento / desprovimento / parcial provimento do recurso."[cite: 2, 3]
+### 📜 ESTRUTURAÇÃO VISUAL E DIAGRAMAÇÃO FORENSE (ESTILO WORD INSTITUCIONAL):
+1. CABEÇALHO DO PROCESSO (EM LINHAS SEPARADAS):
+   **N.º MP:** [Número MP ou A ser preenchido]  
+   **Autos n.º:** [Número do processo TJ]  
+   **Classe:** [Apelação Cível / Agravo de Instrumento]  
+   **Órgão Julgador:** [Câmara Cível competente]  
+   **Relator(a):** [Nome do Desembargador / Juiz Convocado]  
+   **Apelante(s):** [Nome do Recorrente]  
+   **Apelado(s):** [Nome do Recorrido]  
+
+2. EMENTA TÉCNICA FORMAL (RECUADA À DIREITA / BLOCKQUOTE):
+   Formate a ementa inteira em bloco de citação (`>`), em caixa alta com separação por pontos:
+   > APELAÇÃO CÍVEL. AÇÃO DE OBRIGAÇÃO DE FAZER... [Palavras-chave]. TESE JURÍDICA E PRECEDENTES DO STJ/STF. **PARECER PELO CONHECIMENTO E PROVIMENTO / DESPROVIMENTO / PARCIAL PROVIMENTO DO RECURSO.**
+
+3. VOCATIVO:
+   No centro do documento, em linha destacada:
+   **COLENDA CÂMARA CÍVEL,**
+
+4. RELATÓRIO DO RECURSO (TEXTO CORRIDO):
+   Inicie com parágrafo formal: "Trata-se de Apelação Cível interposta por... em face da r. sentença que..."[cite: 2, 3].
+   Resuma as razões recursais de forma encadeada[cite: 2, 3].
+   Fecho obrigatório do relatório:
+   "É o relatório.  
+   O presente recurso é tempestivo e preenche os demais requisitos de admissibilidade, razão pela qual merece ser conhecido."[cite: 2, 3]
+
+5. CAPÍTULOS DO PARECER:
+   **I – Da controvérsia recursal** (1 a 2 parágrafos delimitando o litígio: "A controvérsia recursal cinge-se a verificar/definir se...")[cite: 2, 3].
+   **II – Da impugnação à justiça gratuita** (quando houver)[cite: 3].
+   **II/III – Do mérito** (Fundamentação jurídica densa, exaustiva e contínua de 2.500 a 4.000 palavras, articulando fatos, laudos e precedentes vinculantes)[cite: 1, 2, 3].
+   **III/IV – Conclusão**: "Ante o exposto, esta Procuradoria de Justiça manifesta-se pelo conhecimento e provimento / desprovimento / parcial provimento do recurso."[cite: 2, 3]
 
 ### 🔄 FLUXO PROGRESSIVO EM 3 ETAPAS:
 - **ETAPA 1:** Apresente o Raio-X dos autos e a Pergunta de Validação da tese. PARE e aguarde a resposta do assessor.
@@ -547,7 +628,50 @@ Atue como o Assessor Jurídico Sênior Auditor e Mentor Especializado em Segundo
 """
 
 # ----------------------------------------------------
-# 10. Modais de Ajuda
+# 10. Feed Dinâmico de Precedentes (Cache 12h)
+# ----------------------------------------------------
+@st.cache_data(ttl=43200)
+def carregar_feed_precedentes_dinamico():
+    prompt_busca = """
+    Pesquise no Google Search os 6 julgados, temas repetitivos ou teses vinculantes mais relevantes e recentes do STF e STJ em Direito Privado, Cível, Consumidor ou Saúde Pública publicados nas últimas semanas/meses.
+    Retorne ESTRITAMENTE um array JSON contendo 6 objetos com os campos exatos:
+    [
+      {
+        "tribunal": "STJ ou STF",
+        "tema": "Identificação exata do Tema, Súmula ou REsp",
+        "desc": "Resumo objetivo da tese jurídica em até 120 caracteres"
+      }
+    ]
+    Responda apenas com o JSON puro, sem crases de markdown ou texto adicional.
+    """
+    try:
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        resp = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt_busca,
+            config=types.GenerateContentConfig(
+                tools=[types.Tool(google_search=types.GoogleSearch())],
+                temperature=0.0
+            )
+        )
+        texto_limpo = re.sub(r"```json|```", "", resp.text).strip()
+        dados = json.loads(texto_limpo)
+        if isinstance(dados, list) and len(dados) >= 4:
+            return dados[:6]
+    except Exception:
+        pass
+
+    return [
+        {"tribunal": "STJ", "tema": "Tema 1.082/STJ (Saúde)", "desc": "Cobertura obrigatória de terapias multidisciplinares (ABA) para autismo."},
+        {"tribunal": "STJ", "tema": "REsp 2.221.399/SP (3ª Turma)", "desc": "Dever de fornecimento de procedimentos especiais prescritos por médico assistente."},
+        {"tribunal": "STJ", "tema": "Tema 290/STJ (Execução)", "desc": "Marco temporal e requisitos da LC 118/2005 para fraude à execução fiscal."},
+        {"tribunal": "STF", "tema": "Tema 793/STF (SUS)", "desc": "Responsabilidade solidária dos entes públicos no fornecimento de tratamentos médicos."},
+        {"tribunal": "STF", "tema": "Tema 1.234/STF (Fármacos)", "desc": "Critérios vinculantes de competência para fornecimento judicial de medicamentos."},
+        {"tribunal": "STF", "tema": "Súmula Vinculante 510", "desc": "Mandado de Segurança contra atos praticados por serviços notariais e de registro."}
+    ]
+
+# ----------------------------------------------------
+# 11. Modais de Ajuda & Feedback
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional", width="large")
 def exibir_manual_ajuda():
@@ -569,7 +693,7 @@ def exibir_manual_ajuda():
         st.markdown("Varredura em tempo real integrada ao Google Search e à API do DataJud (CNJ).")
 
 # ----------------------------------------------------
-# 11. Barra Lateral (Menu Vertical Limpo e Otimizado)
+# 12. Barra Lateral (Menu Vertical Limpo e Otimizado)
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown(
@@ -684,18 +808,58 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 12. Área Principal: Telas Iniciais vs. Chat
+# 13. Horário Local
+# ----------------------------------------------------
+try:
+    fuso_padrao = ZoneInfo("America/Sao_Paulo")
+    hora_local = datetime.now(fuso_padrao).hour
+except Exception:
+    hora_local = (datetime.utcnow().hour - 3) % 24
+
+if hora_local < 12:
+    saudacao = "Qual é o caso da manhã?"
+elif hora_local < 18:
+    saudacao = "Qual é o caso da tarde?"
+else:
+    saudacao = "Qual é o caso da noite?"
+
+# ----------------------------------------------------
+# 14. Área Principal: Telas Iniciais vs. Chat
 # ----------------------------------------------------
 if chat_vazio:
-    st.markdown("<div class='hero-title'>Qual é o caso de hoje?</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='hero-title'>{saudacao}</div>", unsafe_allow_html=True)
+    
     col_c1, col_c2, col_c3 = st.columns([0.5, 3.5, 0.5])
     with col_c2:
-        if uploaded_files:
-            if st.button("⚡ Analisar autos e gerar parecer completo", use_container_width=True, type="primary"):
-                st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes verificados."
-                st.rerun()
+        if chat_atual["mode"] == "📄 Minuta de Parecer Cível":
+            if uploaded_files:
+                if st.button("⚡ Analisar autos e gerar parecer completo", key="sug_parecer", use_container_width=True, type="primary"):
+                    st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes verificados."
+                    st.rerun()
+            else:
+                st.info("📂 Anexe os arquivos PDF na barra lateral para iniciar a análise dos autos.")
+
+        elif chat_atual["mode"] == "🛡️ Auditoria & Mentoria":
+            if uploaded_files:
+                if st.button("🛡️ Executar Auditoria Completa e Mentoria (Fase 2)", key="sug_audit", use_container_width=True, type="primary"):
+                    st.session_state["trigger_prompt"] = "Execute a FASE 2 da Auditoria Agêntica: realize o cruzamento minucioso das peças processuais com a minuta do estagiário/assessor anexadas nos arquivos."
+                    st.rerun()
+            else:
+                st.info("📂 Anexe os **PDFs dos Autos e da Minuta** na barra lateral para iniciar a auditoria.")
+        
         else:
-            st.info("📂 Anexe os arquivos PDF na barra lateral para iniciar a análise dos autos.")
+            st.markdown("<div class='feed-header'>🏛️ Precedentes Recentes dos Tribunais Superiores (STJ / STF)</div>", unsafe_allow_html=True)
+            feed_precedentes = carregar_feed_precedentes_dinamico()
+            col_f1, col_f2 = st.columns(2)
+            for idx, prec in enumerate(feed_precedentes):
+                col_alvo = col_f1 if idx % 2 == 0 else col_f2
+                with col_alvo:
+                    st.markdown("<div class='precedente-btn-container'>", unsafe_allow_html=True)
+                    rotulo_btn = f"📌 **[{prec.get('tribunal', 'STJ')}]** {prec.get('tema', '')}\n\n_{prec.get('desc', '')}_"
+                    if st.button(rotulo_btn, key=f"prec_din_{idx}", use_container_width=True):
+                        st.session_state["trigger_prompt"] = f"Apresente uma análise jurisprudencial analítica e verificada sobre o seguinte precedente do {prec.get('tribunal')}: {prec.get('tema')}. Foco na tese jurídica real, critérios práticos e ementa oficial."
+                        st.rerun()
+                    st.markdown("</div>", unsafe_allow_html=True)
 
 else:
     st.subheader(chat_atual["mode"])
@@ -706,18 +870,24 @@ else:
     for i, msg in enumerate(chat_atual["messages"]):
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
+            
             if msg["role"] == "assistant":
-                st.download_button(
-                    label="📥 Baixar",
-                    data=msg["content"],
-                    file_name=f"Manifestacao_{i}.txt",
-                    mime="text/plain",
-                    key=f"dl_{i}"
-                )
+                st.markdown("<div class='action-bar'>", unsafe_allow_html=True)
+                col_act1, col_act2 = st.columns([0.15, 0.85])
+                with col_act1:
+                    st.download_button(
+                        label="📥 Baixar",
+                        data=msg["content"],
+                        file_name=f"JurisPrime_{i}.txt",
+                        mime="text/plain",
+                        key=f"dl_{i}",
+                        help="Baixar este documento"
+                    )
+                st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 13. Processamento com Status e Escrita Externa Imediata
+# 15. Processamento Seguro e Confiável
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua mensagem, orientação de ajuste ou comando..." if not chat_vazio else "Digite sua matéria jurídica ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -735,14 +905,6 @@ if prompt_final:
         st.markdown(prompt_final)
 
     with st.chat_message("assistant"):
-        # 1. Box de Status com Raciocínio (Executa e fecha antes da escrita)
-        with st.status("🧠 Analisando autos e raciocinando...", expanded=True) as status_box:
-            st.write("📂 **Lendo acervo probatório dos autos...**")
-            st.write("🔍 **Consultando jurisprudência e teses vinculantes no STF e STJ...**")
-            st.write("✍️ **Estruturando fundamentação jurídica de Segundo Grau...**")
-            status_box.update(label="✅ Análise concluída", state="complete", expanded=False)
-
-        # 2. Renderização da Resposta FORA do status, diretamente no corpo da mensagem
         try:
             client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -755,7 +917,14 @@ if prompt_final:
 
             user_parts = []
             
-            # Ingestão binária dos PDFs apenas na 1ª mensagem da sessão
+            # Consulta DataJud por número de processo
+            if re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
+                match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)
+                dados_cnj = consultar_datajud_por_numero(match_cnj, tribunal="tjsp")
+                if dados_cnj:
+                    user_parts.append(types.Part.from_text(text=f"[Consulta Oficial DataJud/CNJ]:\n{dados_cnj}"))
+
+            # Ingestão binária dos arquivos PDF apenas na 1ª mensagem da sessão
             if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
                 for f in uploaded_files:
                     pdf_bytes = f.getvalue()

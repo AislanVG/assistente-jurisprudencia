@@ -4,8 +4,6 @@ import time
 import json
 import re
 import requests
-import tempfile
-import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from supabase import create_client, Client
@@ -164,6 +162,11 @@ css_customizado = """
 
     .main-chat-container {
         padding-bottom: 100px;
+    }
+
+    .action-bar {
+        margin-top: 8px;
+        margin-bottom: 16px;
     }
 
     .auth-unified-card {
@@ -391,11 +394,13 @@ if "chats" not in st.session_state:
             "title": "",
             "mode": "📄 Minuta de Parecer Cível",
             "messages": [],
-            "gemini_history": [],
-            "uploaded_files_data": []
+            "gemini_history": []
         }
     }
     st.session_state.current_chat_id = primeiro_id
+
+if "feedbacks_coletados" not in st.session_state:
+    st.session_state.feedbacks_coletados = []
 
 if "current_chat_id" not in st.session_state or st.session_state.current_chat_id not in st.session_state.chats:
     st.session_state.current_chat_id = list(st.session_state.chats.keys())[0]
@@ -404,7 +409,56 @@ chat_atual = st.session_state.chats[st.session_state.current_chat_id]
 chat_vazio = len(chat_atual["messages"]) == 0
 
 # ----------------------------------------------------
-# 8. Prompts Especializados
+# 8. Módulo de Integração com API DataJud (CNJ)
+# ----------------------------------------------------
+def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjsp"):
+    if not CNJ_API_KEY:
+        return None
+    
+    num_limpo = re.sub(r"\D", "", numero_processo)
+    if len(num_limpo) != 20:
+        return None
+
+    url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal}/_search"
+    headers = {
+        "Authorization": f"APIKey {CNJ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "query": {
+            "match": {
+                "numeroProcesso": num_limpo
+            }
+        }
+    }
+    
+    try:
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        if response.status_code == 200:
+            dados = response.json()
+            hits = dados.get("hits", {}).get("hits", [])
+            if hits:
+                proc = hits[0].get("_source", {})
+                classe = proc.get("classe", {}).get("nome", "Não informada")
+                orgao = proc.get("orgaoJulgador", {}).get("nome", "Não informado")
+                assuntos = [a.get("nome", "") for a in proc.get("assuntos", [])]
+                movs = proc.get("movimentos", [])
+                ultimas_movs = [f"{m.get('dataHora', '')[:10]}: {m.get('nome', '')}" for m in movs[-3:]] if movs else []
+                
+                return (
+                    f"**[Dados Oficiais do DataJud/CNJ - {tribunal.upper()}]**\n"
+                    f"* **Processo:** {numero_processo}\n"
+                    f"* **Classe:** {classe}\n"
+                    f"* **Órgão Julgador:** {orgao}\n"
+                    f"* **Assuntos:** {', '.join(assuntos)}\n"
+                    f"* **Últimas Movimentações:**\n  - " + "\n  - ".join(ultimas_movs)
+                )
+    except Exception:
+        return None
+    return None
+
+# ----------------------------------------------------
+# 9. Prompts Especializados
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -437,42 +491,42 @@ Disponibilize o trecho oficial de um acórdão representativo em bloco formatado
 """
 
 SUPERPROMPT_PARECER = """
-Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdição (Cível). Seu objetivo é elaborar minutas de PARECER CÍVEL EM SEGUNDO GRAU completas, densas, fluidas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral, seguindo o padrão vernáculo e estilístico das manifestações de segundo grau[cite: 1, 2, 3, 4].
+Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdição (Cível). Seu objetivo é elaborar minutas de PARECER CÍVEL EM SEGUNDO GRAU completas, densas, fluidas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral, seguindo o padrão vernáculo e estilístico das manifestações de segundo grau[cite: 1, 2, 3].
 
 ### 🏛️ PADRÃO VERNÁCULO FORENSE, URBANIDADE E DECORO PROCESSUAL:
-1. É PROIBIDO O USO DE LINGUAGEM COLOQUIAL, RASTEIRA OU PERSONALISTA CONTRA O MAGISTRADO DE PRIMEIRO GRAU.
+1. É TERMINANTEMENTE PROIBIDO O USO DE LINGUAGEM COLOQUIAL, RASTEIRA OU PERSONALISTA CONTRA O MAGISTRADO DE PRIMEIRO GRAU.
    - NUNCA escreva frases como: "o juiz cometeu um erro", "o magistrado se equivocou", "a decisão está errada", "o juiz não analisou os documentos".
-   - A crítica deve ser IMPESSOAL, direcionada à DECISÃO/SENTENÇA[cite: 2, 3, 4]:
-     * Utilize fórmulas consagradas: "A r. sentença recorrida comporta reforma..."[cite: 2, 3, 4], "Com a devida vênia ao entendimento esposado pelo d. Juízo singular..."[cite: 2, 3, 4], "O decisum de piso merece reparo..."[cite: 2, 3, 4], "O Apelante parte da premissa correta, mas extrai consequência jurídica incorreta ao sustentar que..."[cite: 2].
-2. TRATAMENTO FORENSE: Trate o órgão de origem como "d. Juízo a quo", "d. Juízo singular", "r. sentença combatida/recorrida", e a instância recursal como "Colenda Câmara Cível"[cite: 2, 3, 4], "E. Tribunal de Justiça"[cite: 2, 3, 4], "ínclito Relator".
+   - A crítica deve ser IMPESSOAL, direcionada à DECISÃO/SENTENÇA[cite: 2, 3]:
+     * Utilize fórmulas consagradas: "A r. sentença recorrida comporta reforma..."[cite: 2, 3], "Com a devida vênia ao entendimento esposado pelo d. Juízo singular..."[cite: 2, 3], "O decisum de piso merece reparo..."[cite: 2, 3], "O Apelante/Município parte da premissa correta, mas extrai consequência jurídica incorreta ao sustentar que..."[cite: 2].
+2. TRATAMENTO FORENSE: Trate o órgão de origem como "d. Juízo a quo", "d. Juízo singular", "r. sentença combatida/recorrida", e a instância recursal como "Colenda Câmara Cível"[cite: 2, 3], "E. Tribunal de Justiça"[cite: 2, 3], "ínclito Relator".
 
 ### 🎯 REGRA DE OURO: SOBERANIA DAS DIRETRIZES DO ASSESSOR (OBEDIÊNCIA ESTRITA)
 1. DISTINÇÃO ENTRE 1º GRAU E 2º GRAU:
-   - **Decisão do Juiz (1º Grau):** É a decisão ou sentença originária recorrida (objeto do recurso)[cite: 2, 3, 4].
+   - **Decisão do Juiz (1º Grau):** É a decisão ou sentença originária recorrida (objeto do recurso)[cite: 2, 3].
    - **Decisão do Desembargador Relator (2º Grau):** É a decisão monocrática liminar, tutela antecipada recursal ou efeito suspensivo deferido/indeferido no Tribunal de Justiça[cite: 3].
-   - **COMANDO DO USUÁRIO:** Se o usuário responder "pelo desprovimento", "pelo provimento", "acompanhe o relator", ADOTE IMEDIATAMENTE essa orientação de mérito e NÃO peça mais confirmações[cite: 1].
+   - **COMANDO DO USUÁRIO:** Se o usuário responder "pelo desprovimento", "pelo provimento", "acompanhe o relator", ADOTE IMEDIATAMENTE essa orientação de mérito e avance sem pedir novas confirmações da mesma pergunta[cite: 1].
 2. SOBERANIA TOTAL: A tese e orientação definidas pelo usuário no chat são ABSOLUTAS e VINCULANTES.
 
 ### 🛡️ ESTRUTURAÇÃO E REGRAS ESTRITAS DE REDAÇÃO FORENSE:
 1. CABEÇALHO E EMENTA TÉCNICA:
-   - Cabeçalho formal com: N.º MP, Autos n.º, Classe do Processo, Órgão Julgador, Relator(a), Apelante(s), Apelado(s)[cite: 2, 3, 4].
-   - Ementa Técnica Formal: Palavras-chave em CAIXA ALTA separadas por pontos, citando precedentes vinculantes (STF/STJ) e finalizando com o desfecho formal em negrito: "PARECER PELO CONHECIMENTO E PROVIMENTO / DESPROVIMENTO / PARCIAL PROVIMENTO DO RECURSO."[cite: 2, 3, 4]
+   - Cabeçalho formal com: N.º MP, Autos n.º, Classe do Processo, Órgão Julgador, Relator(a), Apelante(s), Apelado(s)[cite: 2, 3].
+   - Ementa Técnica Formal: Palavras-chave em CAIXA ALTA separadas por pontos, citando precedentes vinculantes (STF/STJ) e finalizando com o desfecho formal em negrito: "PARECER PELO CONHECIMENTO E PROVIMENTO / DESPROVIMENTO / PARCIAL PROVIMENTO DO RECURSO."[cite: 2, 3]
 2. RELATÓRIO DO RECURSO:
-   - Inicie com: "Trata-se de Apelação Cível / Agravo de Instrumento interposto por..."[cite: 2, 3, 4].
-   - Resuma as alegações do RECORRENTE em parágrafos corridos interligados por verbos técnicos ("Sustenta o apelante que...", "Alega que...", "Nesse sentido, afirma que...", "Argumenta que...", "Ao final, requer...")[cite: 2, 3, 4].
+   - Inicie com: "Trata-se de Apelação Cível / Agravo de Instrumento interposto por..."[cite: 2, 3].
+   - Resuma as alegações do RECORRENTE em parágrafos corridos interligados por verbos técnicos ("Sustenta o apelante que...", "Alega que...", "Nesse sentido, afirma que...", "Argumenta que...", "Ao final, requer...")[cite: 2, 3].
    - Fecho obrigatório do relatório:
      "É o relatório.
-     O presente recurso é tempestivo e preenche os demais requisitos de admissibilidade, razão pela qual merece ser conhecido."[cite: 2, 3, 4]
+     O presente recurso é tempestivo e preenche os demais requisitos de admissibilidade, razão pela qual merece ser conhecido."[cite: 2, 3]
 3. CAPÍTULOS OBRIGATÓRIOS DO PARECER:
-   - "I – Da controvérsia recursal" (1 a 2 parágrafos delimitando o litígio: "A controvérsia recursal cinge-se a verificar/definir se...")[cite: 2, 3, 4].
+   - "I – Da controvérsia recursal" (1 a 2 parágrafos delimitando o litígio: "A controvérsia recursal cinge-se a verificar/definir se...")[cite: 2, 3].
    - "II – Da impugnação à justiça gratuita" (se houver)[cite: 3].
-   - "II/III – Do mérito" (Fundamentação jurídica densa, exaustiva e contínua de 2.500 a 4.000 palavras, articulando fatos, leis federais e precedentes vinculantes do STF e STJ)[cite: 1, 2, 3, 4].
-   - "III/IV – Conclusão": "Ante o exposto, esta Procuradoria de Justiça manifesta-se pelo conhecimento e provimento / desprovimento / parcial provimento do recurso."[cite: 2, 3, 4]
+   - "II/III – Do mérito" (Fundamentação jurídica densa, exaustiva e contínua de 2.500 a 4.000 palavras, articulando fatos, laudos, leis federais e precedentes vinculantes do STF e STJ)[cite: 1, 2, 3].
+   - "III/IV – Conclusão": "Ante o exposto, esta Procuradoria de Justiça manifesta-se pelo conhecimento e provimento / desprovimento / parcial provimento do recurso."[cite: 2, 3]
 
 ### 🔄 FLUXO PROGRESSIVO EM 3 ETAPAS:
-- **ETAPA 1:** Apresente o Raio-X dos autos e a Pergunta de Validação da tese. PARE e aguarde.
-- **ETAPA 2:** Quando o usuário responder com o sentido do parecer (ex: "pelo desprovimento", "sim", "confirmado"), GERE IMEDIATAMENTE a Ementa Técnica e o Relatório do Recurso completo[cite: 1]. PARE e aguarde o comando final de redação[cite: 1].
-- **ETAPA 3:** Quando o usuário autorizar ("prosseguir", "validado", "minuta final"), GERE A PEÇA COMPLETA DE SEGUNDO GRAU integralmente (2.500 a 4.000 palavras)[cite: 1].
+- **ETAPA 1:** Apresente o Raio-X dos autos e a Pergunta de Validação da tese. PARE e aguarde a resposta do assessor.
+- **ETAPA 2:** Quando o usuário responder com o sentido do parecer (ex: "pelo desprovimento", "sim", "confirmado", "prosseguir"), GERE IMEDIATAMENTE a Ementa Técnica Formal e o Relatório do Recurso completo[cite: 1]. PARE e aguarde o comando para gerar a Minuta Integral (Etapa 3)[cite: 1].
+- **ETAPA 3:** Quando o usuário autorizar ("prosseguir", "validado", "minuta final"), GERE A PEÇA COMPLETA DE SEGUNDO GRAU integralmente (2.500 a 4.000 palavras) sem qualquer placeholder[cite: 1].
 """
 
 SUPERPROMPT_AUDITORIA = """
@@ -480,20 +534,20 @@ Atue como o Assessor Jurídico Sênior Auditor e Mentor Especializado em Segundo
 
 ### 🏛️ PADRÃO VERNÁCULO FORENSE E DECORO PROCESSUAL
 - Aponte como vício grave de redação qualquer linguagem coloquial, agressiva ou personalista que ataque a figura do magistrado (ex: "o juiz errou", "o juiz cometeu um erro").
-- Recomende sempre construções jurídicas impessoais e eruditas (ex: "com a devida vênia ao entendimento firmado na origem, a r. decisão comporta reforma")[cite: 2, 3, 4].
+- Recomende sempre construções jurídicas impessoais e eruditas (ex: "com a devida vênia ao entendimento firmado na origem, a r. decisão comporta reforma")[cite: 2, 3].
 
 ### 🛡️ TRAVA DE HIGIENE DE CONTEXTO E PREVENÇÃO DE CONTAMINAÇÃO PROCESSUAL
 - Esta sessão destina-se EXCLUSIVAMENTE à análise, auditoria e redação do PROCESSO ATUAL[cite: 1].
 - Se em qualquer momento o usuário tentar iniciar a análise de um NOVO PROCESSO dentro desta mesma conversa, PARE IMEDIATAMENTE e emita o aviso de abertura de Novo Atendimento[cite: 1].
 
 ### 🔄 FLUXO DE TRABALHO AGÊNTICO EM 3 FASES:
-#### FASE 1: Identificação dos Autos e da Minuta Anexada[cite: 1].
+#### FASE 1: Identificação dos Autos e da Minuta Anexada nos arquivos[cite: 1].
 #### FASE 2: Relatório de Auditoria, Nota (0 a 10), Tabela Gramatical de Português e Detecção de Alucinações de IA[cite: 1].
 #### FASE 3: Minuta Integral Reestruturada (6 a 10 páginas / 2.500 a 4.000 palavras)[cite: 1].
 """
 
 # ----------------------------------------------------
-# 9. Modais de Ajuda
+# 10. Modais de Ajuda
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional", width="large")
 def exibir_manual_ajuda():
@@ -512,10 +566,10 @@ def exibir_manual_ajuda():
 
     with tab3:
         st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
-        st.markdown("Varredura em tempo real integrada ao Google Search.")
+        st.markdown("Varredura em tempo real integrada ao Google Search e à API do DataJud (CNJ).")
 
 # ----------------------------------------------------
-# 10. Barra Lateral (Layout Vertical Limpo)
+# 11. Barra Lateral (Menu Vertical Limpo e Otimizado)
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown(
@@ -548,8 +602,7 @@ with st.sidebar:
             "title": "",
             "mode": chat_atual["mode"],
             "messages": [],
-            "gemini_history": [],
-            "uploaded_files_data": []
+            "gemini_history": []
         }
         st.session_state.current_chat_id = novo_id
         st.rerun()
@@ -631,7 +684,7 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 11. Área Principal: Telas Iniciais vs. Chat
+# 12. Área Principal: Telas Iniciais vs. Chat
 # ----------------------------------------------------
 if chat_vazio:
     st.markdown("<div class='hero-title'>Qual é o caso de hoje?</div>", unsafe_allow_html=True)
@@ -664,7 +717,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 12. Processamento Seguro com Verificação Ativa de Status
+# 13. Processamento com Status e Escrita Externa Imediata
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua mensagem, orientação de ajuste ou comando..." if not chat_vazio else "Digite sua matéria jurídica ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -682,105 +735,80 @@ if prompt_final:
         st.markdown(prompt_final)
 
     with st.chat_message("assistant"):
+        # 1. Box de Status com Raciocínio (Executa e fecha antes da escrita)
         with st.status("🧠 Analisando autos e raciocinando...", expanded=True) as status_box:
-            try:
-                client = genai.Client(api_key=GEMINI_API_KEY)
+            st.write("📂 **Lendo acervo probatório dos autos...**")
+            st.write("🔍 **Consultando jurisprudência e teses vinculantes no STF e STJ...**")
+            st.write("✍️ **Estruturando fundamentação jurídica de Segundo Grau...**")
+            status_box.update(label="✅ Análise concluída", state="complete", expanded=False)
 
-                # 1. Upload Seguro para Google Files API com Verificação de Ativação
-                if not chat_atual.get("uploaded_files_data") and uploaded_files:
-                    st.write("📂 **Enviando documentos para a nuvem do Google...**")
-                    files_meta = []
-                    for f in uploaded_files:
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                            tmp.write(f.getvalue())
-                            tmp_path = tmp.name
-                        
-                        file_upload = client.files.upload(
-                            file=tmp_path,
-                            config=types.UploadFileConfig(display_name=f.name, mime_type="application/pdf")
+        # 2. Renderização da Resposta FORA do status, diretamente no corpo da mensagem
+        try:
+            client = genai.Client(api_key=GEMINI_API_KEY)
+
+            if chat_atual["mode"] == "🛡️ Auditoria & Mentoria":
+                instrucao = SUPERPROMPT_AUDITORIA
+            elif chat_atual["mode"] == "📄 Minuta de Parecer Cível":
+                instrucao = SUPERPROMPT_PARECER
+            else:
+                instrucao = PROMPT_JURISPRUDENCIA
+
+            user_parts = []
+            
+            # Ingestão binária dos PDFs apenas na 1ª mensagem da sessão
+            if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
+                for f in uploaded_files:
+                    pdf_bytes = f.getvalue()
+                    user_parts.append(
+                        types.Part.from_bytes(
+                            data=pdf_bytes,
+                            mime_type="application/pdf"
                         )
-                        os.unlink(tmp_path)
+                    )
+                    user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))
 
-                        # Loop de verificação de processamento do arquivo no Google
-                        while file_upload.state.name == "PROCESSING":
-                            time.sleep(0.8)
-                            file_upload = client.files.get(name=file_upload.name)
+            user_parts.append(types.Part.from_text(text=prompt_final))
 
-                        if file_upload.state.name == "FAILED":
-                            raise ValueError(f"Falha no processamento do arquivo {f.name} pelo Google.")
+            chat_atual["gemini_history"].append(
+                types.Content(role="user", parts=user_parts)
+            )
 
-                        files_meta.append({"name": file_upload.name, "uri": file_upload.uri, "mime_type": "application/pdf"})
-                    
-                    chat_atual["uploaded_files_data"] = files_meta
+            config_params = {
+                "system_instruction": instrucao,
+                "temperature": 0.0,
+                "max_output_tokens": 8192,
+                "tools": [types.Tool(google_search=types.GoogleSearch())]
+            }
 
-                st.write("🔍 **Consultando precedentes vinculantes no STF e STJ...**")
-                st.write("✍️ **Estruturando fundamentação jurídica de Segundo Grau...**")
-
-                if chat_atual["mode"] == "🛡️ Auditoria & Mentoria":
-                    instrucao = SUPERPROMPT_AUDITORIA
-                elif chat_atual["mode"] == "📄 Minuta de Parecer Cível":
-                    instrucao = SUPERPROMPT_PARECER
-                else:
-                    instrucao = PROMPT_JURISPRUDENCIA
-
-                # 2. Inserção das partes dos arquivos anexados na primeira mensagem
-                user_parts = []
-                if len(chat_atual["gemini_history"]) == 0 and chat_atual.get("uploaded_files_data"):
-                    for file_info in chat_atual["uploaded_files_data"]:
-                        user_parts.append(
-                            types.Part.from_uri(
-                                file_uri=file_info["uri"],
-                                mime_type=file_info["mime_type"]
-                            )
+            def stream_generator():
+                for tentativa in range(3):
+                    try:
+                        response_stream = client.models.generate_content_stream(
+                            model="gemini-2.5-flash",
+                            contents=chat_atual["gemini_history"],
+                            config=types.GenerateContentConfig(**config_params)
                         )
-                
-                user_parts.append(types.Part.from_text(text=prompt_final))
+                        for chunk in response_stream:
+                            if chunk.text:
+                                yield chunk.text
+                        return
+                    except Exception as err:
+                        err_msg = str(err).lower()
+                        if "429" in err_msg or "resource_exhausted" in err_msg or "503" in err_msg:
+                            time.sleep(2 * (tentativa + 1))
+                            if tentativa == 2:
+                                raise Exception("Cota temporariamente excedida. Tente novamente em alguns segundos.")
+                            continue
+                        else:
+                            raise err
 
-                chat_atual["gemini_history"].append(
-                    types.Content(role="user", parts=user_parts)
-                )
+            texto_resposta = st.write_stream(stream_generator())
 
-                # Configuração estável sem o conflito de thinking_budget em streaming de busca
-                config_params = {
-                    "system_instruction": instrucao,
-                    "temperature": 0.0,
-                    "max_output_tokens": 8192,
-                    "tools": [types.Tool(google_search=types.GoogleSearch())]
-                }
+            chat_atual["gemini_history"].append(
+                types.Content(role="model", parts=[types.Part.from_text(text=texto_resposta)])
+            )
+            chat_atual["messages"].append({"role": "assistant", "content": texto_resposta})
+            st.rerun()
 
-                status_box.update(label="✅ Análise concluída. Redigindo manifestação...", state="complete", expanded=False)
-
-                # 3. Stream com fallback de chamada garantida
-                response_container = st.empty()
-                texto_acumulado = ""
-
-                try:
-                    response_stream = client.models.generate_content_stream(
-                        model="gemini-2.5-flash",
-                        contents=chat_atual["gemini_history"],
-                        config=types.GenerateContentConfig(**config_params)
-                    )
-
-                    for chunk in response_stream:
-                        if chunk.text:
-                            texto_acumulado += chunk.text
-                            response_container.markdown(texto_acumulado + "▌")
-                except Exception:
-                    # Fallback síncrono caso o socket de streaming oscile
-                    resp_direct = client.models.generate_content(
-                        model="gemini-2.5-flash",
-                        contents=chat_atual["gemini_history"],
-                        config=types.GenerateContentConfig(**config_params)
-                    )
-                    texto_acumulado = resp_direct.text or ""
-
-                response_container.markdown(texto_acumulado)
-
-                chat_atual["gemini_history"].append(
-                    types.Content(role="model", parts=[types.Part.from_text(text=texto_acumulado)])
-                )
-                chat_atual["messages"].append({"role": "assistant", "content": texto_acumulado})
-
-            except Exception as e:
-                status_box.update(label="❌ Erro no processamento", state="error", expanded=True)
-                st.error(f"Erro no processamento da análise: {str(e)}")
+        except Exception as e:
+            st.error(f"Erro no processamento da análise: {str(e)}")

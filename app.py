@@ -392,7 +392,7 @@ if "chats" not in st.session_state:
             "mode": "📄 Minuta de Parecer Cível",
             "messages": [],
             "gemini_history": [],
-            "google_file_uris": []
+            "uploaded_files_data": []
         }
     }
     st.session_state.current_chat_id = primeiro_id
@@ -549,7 +549,7 @@ with st.sidebar:
             "mode": chat_atual["mode"],
             "messages": [],
             "gemini_history": [],
-            "google_file_uris": []
+            "uploaded_files_data": []
         }
         st.session_state.current_chat_id = novo_id
         st.rerun()
@@ -617,6 +617,13 @@ with st.sidebar:
             with c2:
                 if st.button("✕", key=f"del_{chat_id}", help="Excluir"):
                     del st.session_state.chats[chat_id]
+                    if st.session_state.current_chat_id == chat_id:
+                        restantes = list(st.session_state.chats.keys())
+                        st.session_state.current_chat_id = restantes[0] if restantes else str(uuid.uuid4())
+                        if not restantes:
+                            st.session_state.chats[st.session_state.current_chat_id] = {
+                                "title": "", "mode": chat_atual["mode"], "messages": [], "gemini_history": []
+                            }
                     st.rerun()
 
     st.markdown('<div class="help-section"></div>', unsafe_allow_html=True)
@@ -657,7 +664,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 12. Processamento Seguro via Google Files API (Sem Travamento)
+# 12. Processamento Seguro via Google Files API (Corrigido)
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua mensagem, orientação de ajuste ou comando..." if not chat_vazio else "Digite sua matéria jurídica ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -679,23 +686,23 @@ if prompt_final:
             try:
                 client = genai.Client(api_key=GEMINI_API_KEY)
 
-                # 1. Upload Seguro para Google Files API (Apenas na 1ª Mensagem)
-                if not chat_atual.get("google_file_uris") and uploaded_files:
+                # 1. Upload Seguro para Google Files API (Salva metadados uri e mime_type)
+                if not chat_atual.get("uploaded_files_data") and uploaded_files:
                     st.write("📂 **Enviando documentos com segurança para a nuvem do Google...**")
-                    uploaded_uris = []
+                    files_meta = []
                     for f in uploaded_files:
                         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
                             tmp.write(f.getvalue())
                             tmp_path = tmp.name
                         
-                        uploaded_file_ref = client.files.upload(
+                        file_upload = client.files.upload(
                             file=tmp_path,
                             config=types.UploadFileConfig(display_name=f.name, mime_type="application/pdf")
                         )
-                        uploaded_uris.append(uploaded_file_ref)
+                        files_meta.append({"uri": file_upload.uri, "mime_type": "application/pdf"})
                         os.unlink(tmp_path)
                     
-                    chat_atual["google_file_uris"] = uploaded_uris
+                    chat_atual["uploaded_files_data"] = files_meta
 
                 st.write("🔍 **Consultando precedentes vinculantes no STF e STJ...**")
                 st.write("✍️ **Estruturando fundamentação jurídica de Segundo Grau...**")
@@ -707,11 +714,16 @@ if prompt_final:
                 else:
                     instrucao = PROMPT_JURISPRUDENCIA
 
-                # Montagem das partes de entrada de forma leve (Passa as referências de arquivos)
+                # 2. Conversão Correta usando types.Part.from_uri
                 user_parts = []
-                if len(chat_atual["gemini_history"]) == 0 and chat_atual.get("google_file_uris"):
-                    for file_ref in chat_atual["google_file_uris"]:
-                        user_parts.append(file_ref)
+                if len(chat_atual["gemini_history"]) == 0 and chat_atual.get("uploaded_files_data"):
+                    for file_info in chat_atual["uploaded_files_data"]:
+                        user_parts.append(
+                            types.Part.from_uri(
+                                file_uri=file_info["uri"],
+                                mime_type=file_info["mime_type"]
+                            )
+                        )
                 
                 user_parts.append(types.Part.from_text(text=prompt_final))
 

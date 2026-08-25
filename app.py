@@ -99,13 +99,14 @@ css_customizado = """
     div[data-testid="stSidebar"] button[kind="primary"],
     div.stButton > button[kind="primary"] {
         border-radius: 8px !important;
-        font-size: 14px !important;
+        font-size: 15px !important;
         font-weight: 600 !important;
-        padding: 8px 6px !important;
+        padding: 10px 14px !important;
         background-color: #1e3a8a !important;
         border: 1px solid #1e3a8a !important;
         color: #ffffff !important;
         white-space: nowrap !important;
+        text-align: left !important;
     }
     div[data-testid="stSidebar"] button[kind="primary"]:hover,
     div.stButton > button[kind="primary"]:hover {
@@ -115,16 +116,18 @@ css_customizado = """
 
     div[data-testid="stSidebar"] button[kind="secondary"] {
         border-radius: 8px !important;
-        font-size: 13px !important;
+        font-size: 14.5px !important;
         font-weight: 500 !important;
-        padding: 8px 6px !important;
+        padding: 10px 14px !important;
         border: 1px solid #cbd5e1 !important;
         color: #1e293b !important;
+        background-color: #ffffff !important;
         white-space: nowrap !important;
+        text-align: left !important;
     }
     div[data-testid="stSidebar"] button[kind="secondary"]:hover {
         border-color: #94a3b8 !important;
-        background-color: #ffffff !important;
+        background-color: #f1f5f9 !important;
     }
 
     /* Caixas de Precedentes */
@@ -161,7 +164,7 @@ css_customizado = """
         text-transform: uppercase;
         letter-spacing: 0.6px;
         margin-top: 18px;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
     }
 
     .help-section {
@@ -644,7 +647,6 @@ def carregar_feed_precedentes_dinamico():
     except Exception:
         pass
 
-    # Contingência oficial
     return [
         {"tribunal": "STJ", "tema": "Tema 1.082/STJ (Saúde)", "desc": "Cobertura obrigatória de terapias multidisciplinares (ABA) para autismo."},
         {"tribunal": "STJ", "tema": "REsp 2.221.399/SP (3ª Turma)", "desc": "Dever de fornecimento de procedimentos especiais prescritos por médico assistente."},
@@ -749,7 +751,7 @@ def modal_feedback_negativo(msg_index, msg_content):
             st.rerun()
 
 # ----------------------------------------------------
-# 12. Barra Lateral (3 Modos de Operação)
+# 12. Barra Lateral (Layout Vertical Unificado dos Modos)
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown(
@@ -788,23 +790,23 @@ with st.sidebar:
             st.session_state.current_chat_id = novo_id
             st.rerun()
 
+    # BARRAS EMPILHADAS VERTICALMENTE (LARGURA TOTAL E ZERO QUEBRA DE TEXTO)
     st.markdown('<div class="sidebar-label">Modo de Operação</div>', unsafe_allow_html=True)
-    col_m1, col_m2, col_m3 = st.columns(3)
-    with col_m1:
-        is_parecer = chat_atual["mode"] == "📄 Minuta de Parecer Cível"
-        if st.button("📄 Parecer", key="btn_p", type="primary" if is_parecer else "secondary", use_container_width=True):
-            chat_atual["mode"] = "📄 Minuta de Parecer Cível"
-            st.rerun()
-    with col_m2:
-        is_audit = chat_atual["mode"] == "🛡️ Auditoria & Mentoria"
-        if st.button("🛡️ Auditar", key="btn_a", type="primary" if is_audit else "secondary", use_container_width=True):
-            chat_atual["mode"] = "🛡️ Auditoria & Mentoria"
-            st.rerun()
-    with col_m3:
-        is_juris = chat_atual["mode"] == "🔍 Pesquisa de Jurisprudência"
-        if st.button("🔍 Pesquisa", key="btn_j", type="primary" if is_juris else "secondary", use_container_width=True):
-            chat_atual["mode"] = "🔍 Pesquisa de Jurisprudência"
-            st.rerun()
+    
+    is_parecer = chat_atual["mode"] == "📄 Minuta de Parecer Cível"
+    if st.button("📄 Parecer Cível (2º Grau)", key="btn_mode_parecer", type="primary" if is_parecer else "secondary", use_container_width=True):
+        chat_atual["mode"] = "📄 Minuta de Parecer Cível"
+        st.rerun()
+
+    is_audit = chat_atual["mode"] == "🛡️ Auditoria & Mentoria"
+    if st.button("🛡️ Auditoria & Mentoria", key="btn_mode_audit", type="primary" if is_audit else "secondary", use_container_width=True):
+        chat_atual["mode"] = "🛡️ Auditoria & Mentoria"
+        st.rerun()
+
+    is_juris = chat_atual["mode"] == "🔍 Pesquisa de Jurisprudência"
+    if st.button("🔍 Pesquisa Jurisprudencial", key="btn_mode_pesquisa", type="primary" if is_juris else "secondary", use_container_width=True):
+        chat_atual["mode"] = "🔍 Pesquisa de Jurisprudência"
+        st.rerun()
 
     uploaded_files = []
     minuta_audit_texto = ""

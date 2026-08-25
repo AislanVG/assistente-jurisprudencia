@@ -348,10 +348,36 @@ css_customizado = """
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 5. Fluxo de Autenticação Seguro
+# 5. Fluxo de Autenticação Seguro (Atualizado com Captura OAuth)
 # ----------------------------------------------------
+import streamlit.components.v1 as components
+
 if "user_session" not in st.session_state:
     st.session_state.user_session = None
+
+# [NOVIDADE]: Intercepta o crachá de acesso (token) vindo do Google/Landing Page
+if not st.session_state.user_session:
+    # 1. O Streamlit não lê o "#" da URL. Este JS invisível joga o token para um lugar que o Python consegue ler ("?")
+    components.html("""
+        <script>
+        if (window.parent.location.hash.includes('access_token=')) {
+            var hash = window.parent.location.hash.substring(1);
+            window.parent.location.href = window.parent.location.pathname + '?' + hash;
+        }
+        </script>
+    """, height=0)
+    
+    # 2. O Python agora enxerga o crachá e loga o usuário no Supabase automaticamente
+    params = st.query_params
+    if "access_token" in params and "refresh_token" in params:
+        try:
+            res = supabase.auth.set_session(params["access_token"], params["refresh_token"])
+            if res.user:
+                st.session_state.user_session = res.user
+                st.query_params.clear() # Limpa a URL para deixar o painel limpo
+                st.rerun()
+        except Exception:
+            pass
 
 def exibir_tela_autenticacao():
     col_l1, col_l2, col_l3 = st.columns([1, 1.45, 1])
@@ -552,26 +578,26 @@ Disponibilize o trecho oficial de um acórdão representativo em bloco formatado
 """
 
 SUPERPROMPT_PARECER = """
-Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdição (Cível). Seu objetivo é elaborar minutas de PARECER CÍVEL EM SEGUNDO GRAU completas, densas, fluidas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral, seguindo o padrão vernáculo e estilístico das manifestações de segundo grau[cite: 1, 2, 3].
+Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdição (Cível). Seu objetivo é elaborar minutas de PARECER CÍVEL EM SEGUNDO GRAU completas, densas, fluidas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral, seguindo o padrão vernáculo e estilístico das manifestações de segundo grau.
 
 ### 🏛️ PADRÃO VERNÁCULO FORENSE, URBANIDADE E DECORO PROCESSUAL:
 1. É TERMINANTEMENTE PROIBIDO O USO DE LINGUAGEM COLOQUIAL, RASTEIRA OU PERSONALISTA CONTRA O MAGISTRADO DE PRIMEIRO GRAU.
    - NUNCA escreva frases como: "o juiz cometeu um erro", "o magistrado se equivocou", "a decisão está errada", "o juiz não analisou os documentos".
-   - A crítica deve ser IMPESSOAL, direcionada à DECISÃO/SENTENÇA[cite: 1, 2, 3]:
-     * Utilize fórmulas consagradas: "A r. sentença recorrida comporta reforma..."[cite: 1, 2, 3], "Com a devida vênia ao entendimento esposado pelo d. Juízo singular..."[cite: 1, 2, 3], "O decisum de piso merece reparo..."[cite: 1, 2, 3], "O Apelante/Município parte da premissa correta, mas extrai consequência jurídica incorreta ao sustentar que..."[cite: 1].
-2. TRATAMENTO FORENSE: Trate o órgão de origem como "d. Juízo a quo", "d. Juízo singular", "r. sentença combatida/recorrida", e a instância recursal como "Colenda Câmara Cível"[cite: 1, 2, 3], "E. Tribunal de Justiça"[cite: 1, 2, 3], "ínclito Relator".
+   - A crítica deve ser IMPESSOAL, direcionada à DECISÃO/SENTENÇA:
+     * Utilize fórmulas consagradas: "A r. sentença recorrida comporta reforma...", "Com a devida vênia ao entendimento esposado pelo d. Juízo singular...", "O decisum de piso merece reparo...", "O Apelante/Município parte da premissa correta, mas extrai consequência jurídica incorreta ao sustentar que...".
+2. TRATAMENTO FORENSE: Trate o órgão de origem como "d. Juízo a quo", "d. Juízo singular", "r. sentença combatida/recorrida", e a instância recursal como "Colenda Câmara Cível", "E. Tribunal de Justiça", "ínclito Relator".
 
 ### 🎯 REGRA DE OURO: SOBERANIA DAS DIRETRIZES DO ASSESSOR (OBEDIÊNCIA ESTRITA)
 1. DISTINÇÃO ENTRE 1º GRAU E 2º GRAU:
-   - **Decisão do Juiz (1º Grau):** É a decisão ou sentença originária recorrida (objeto do recurso)[cite: 1, 2, 3].
-   - **Decisão do Desembargador Relator (2º Grau):** É a decisão monocrática liminar, tutela antecipada recursal ou efeito suspensivo deferido/indeferido no Tribunal de Justiça[cite: 2].
+   - **Decisão do Juiz (1º Grau):** É a decisão ou sentença originária recorrida (objeto do recurso).
+   - **Decisão do Desembargador Relator (2º Grau):** É a decisão monocrática liminar, tutela antecipada recursal ou efeito suspensivo deferido/indeferido no Tribunal de Justiça.
    - **COMANDO DO USUÁRIO:** Se o usuário responder "pelo desprovimento", "pelo provimento", "acompanhe o relator", ADOTE IMEDIATAMENTE essa orientação de mérito e avance sem pedir novas confirmações.
 2. SOBERANIA TOTAL: A tese e orientação definidas pelo usuário no chat são ABSOLUTAS e VINCULANTES.
 
 ### 📜 ESTRUTURA VISUAL E FORMATAÇÃO HTML OBRIGATÓRIA (ESTILO WORD INSTITUCIONAL):
-Ao gerar a Etapa 2 e a Etapa 3, UTILIZE ESTRITAMENTE as seguintes classes HTML para formatar o texto[cite: 1, 2, 3]:
+Ao gerar a Etapa 2 e a Etapa 3, UTILIZE ESTRITAMENTE as seguintes classes HTML para formatar o texto:
 
-1. CABEÇALHO DO PROCESSO (Linhas isoladas e destacadas)[cite: 1, 2, 3]:
+1. CABEÇALHO DO PROCESSO (Linhas isoladas e destacadas):
 <div class="doc-header-block">
   <div class="doc-header-line"><strong>N.º MP:</strong> [Número do MP ou 'A ser preenchido']</div>
   <div class="doc-header-line"><strong>Autos n.º:</strong> [Número do Processo SAJ]</div>
@@ -582,17 +608,17 @@ Ao gerar a Etapa 2 e a Etapa 3, UTILIZE ESTRITAMENTE as seguintes classes HTML p
   <div class="doc-header-line"><strong>Apelado(s):</strong> [Nome da Parte Passiva]</div>
 </div>
 
-2. EMENTA TÉCNICA FORMAL (RECUADA À DIREITA, SEM TÍTULOS ARTIFICIAIS)[cite: 1, 2, 3]:
-NÃO escreva "EMENTA TÉCNICA FORMAL". Insira a ementa diretamente na div com classe doc-ementa[cite: 1, 2, 3]:
+2. EMENTA TÉCNICA FORMAL (RECUADA À DIREITA, SEM TÍTULOS ARTIFICIAIS):
+NÃO escreva "EMENTA TÉCNICA FORMAL". Insira a ementa diretamente na div com classe doc-ementa:
 <div class="doc-ementa">
 APELAÇÃO CÍVEL. AÇÃO DE OBRIGAÇÃO DE FAZER... [Palavras-chave em CAIXA ALTA separadas por pontos]. PRECEDENTES DO STF/STJ. <strong>PARECER PELO CONHECIMENTO E PROVIMENTO / DESPROVIMENTO / PARCIAL PROVIMENTO DO RECURSO.</strong>
 </div>
 
-3. VOCATIVO FORENSE[cite: 1, 2, 3]:
+3. VOCATIVO FORENSE:
 <div class="doc-vocativo">COLENDA CÂMARA CÍVEL,</div>
 
-4. RELATÓRIO DO RECURSO E CAPÍTULOS (SEM SUBTÍTULOS COMO 'RELATÓRIO DO RECURSO')[cite: 1, 2, 3]:
-Comece diretamente a narrativa do relatório em parágrafos justificados com recuo[cite: 1, 2, 3]:
+4. RELATÓRIO DO RECURSO E CAPÍTULOS (SEM SUBTÍTULOS COMO 'RELATÓRIO DO RECURSO'):
+Comece diretamente a narrativa do relatório em parágrafos justificados com recuo:
 <p class="doc-p">Trata-se de Apelação Cível interposta por... em face da r. sentença que...</p>
 <p class="doc-p">[Resumo encadeado das alegações recursais...]</p>
 <p class="doc-p">É o relatório.<br>O presente recurso é tempestivo e preenche os demais requisitos de admissibilidade, razão pela qual merece ser conhecido.</p>
@@ -617,7 +643,7 @@ Atue como o Assessor Jurídico Sênior Auditor e Mentor Especializado em Segundo
 
 ### 🏛️ PADRÃO VERNÁCULO FORENSE E DECORO PROCESSUAL
 - Aponte como vício grave de redação qualquer linguagem coloquial, agressiva ou personalista que ataque a figura do magistrado (ex: "o juiz errou", "o juiz cometeu um erro").
-- Recomende sempre construções jurídicas impessoais e eruditas (ex: "com a devida vênia ao entendimento firmado na origem, a r. decisão comporta reforma")[cite: 1, 2, 3].
+- Recomende sempre construções jurídicas impessoais e eruditas (ex: "com a devida vênia ao entendimento firmado na origem, a r. decisão comporta reforma").
 
 ### 🛡️ TRAVA DE HIGIENE DE CONTEXTO E PREVENÇÃO DE CONTAMINAÇÃO PROCESSUAL
 - Esta sessão destina-se EXCLUSIVAMENTE à análise, auditoria e redação do PROCESSO ATUAL.
@@ -640,12 +666,12 @@ def exibir_manual_ajuda():
     tab1, tab2, tab3 = st.tabs(["📄 Minuta de Parecer", "🛡️ Auditoria & Mentoria", "🔍 Pesquisa Jurisprudencial"])
     
     with tab1:
-        st.markdown("### 🏛️ Fluxo de Pareceres de 2º Grau[cite: 1]")
-        st.markdown("1. Anexe os PDFs na barra lateral e inicie a análise[cite: 1].\n2. Valide a tese jurídica respondendo na Fase 1[cite: 1].\n3. Receba a Ementa/Relatório e depois a Minuta Integral (6-10 páginas)[cite: 1].")
+        st.markdown("### 🏛️ Fluxo de Pareceres de 2º Grau")
+        st.markdown("1. Anexe os PDFs na barra lateral e inicie a análise.\n2. Valide a tese jurídica respondendo na Fase 1.\n3. Receba a Ementa/Relatório e depois a Minuta Integral (6-10 páginas).")
 
     with tab2:
-        st.markdown("### 🛡️ Auditoria Agêntica e Mentoria[cite: 1]")
-        st.markdown("Audita minutas de estagiários confrontando-as com as provas dos autos reais, gerando nota, tabela gramatical e peça reestruturada[cite: 1].")
+        st.markdown("### 🛡️ Auditoria Agêntica e Mentoria")
+        st.markdown("Audita minutas de estagiários confrontando-as com as provas dos autos reais, gerando nota, tabela gramatical e peça reestruturada.")
 
     with tab3:
         st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
@@ -760,7 +786,7 @@ with st.sidebar:
                             st.session_state.chats[st.session_state.current_chat_id] = {
                                 "title": "", "mode": chat_atual["mode"], "messages": [], "gemini_history": []
                             }
-                    st.rerun()
+                        st.rerun()
 
     st.markdown('<div class="help-section"></div>', unsafe_allow_html=True)
     if st.button("❓ Guia Operacional & Ajuda", use_container_width=True):

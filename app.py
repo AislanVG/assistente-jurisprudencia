@@ -4,6 +4,8 @@ import time
 import json
 import re
 import requests
+import tempfile
+import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from supabase import create_client, Client
@@ -43,7 +45,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico (Design Sóbrio & Status Agêntico)
+# 4. Injeção de CSS Dinâmico (Design Corporativo Sóbrio)
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -389,7 +391,8 @@ if "chats" not in st.session_state:
             "title": "",
             "mode": "📄 Minuta de Parecer Cível",
             "messages": [],
-            "gemini_history": []
+            "gemini_history": [],
+            "google_file_uris": []
         }
     }
     st.session_state.current_chat_id = primeiro_id
@@ -490,7 +493,7 @@ Atue como o Assessor Jurídico Sênior Auditor e Mentor Especializado em Segundo
 """
 
 # ----------------------------------------------------
-# 10. Modais de Ajuda
+# 9. Modais de Ajuda
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional", width="large")
 def exibir_manual_ajuda():
@@ -512,7 +515,7 @@ def exibir_manual_ajuda():
         st.markdown("Varredura em tempo real integrada ao Google Search.")
 
 # ----------------------------------------------------
-# 11. Barra Lateral (Layout Vertical Limpo)
+# 10. Barra Lateral (Layout Vertical Limpo)
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown(
@@ -545,7 +548,8 @@ with st.sidebar:
             "title": "",
             "mode": chat_atual["mode"],
             "messages": [],
-            "gemini_history": []
+            "gemini_history": [],
+            "google_file_uris": []
         }
         st.session_state.current_chat_id = novo_id
         st.rerun()
@@ -613,13 +617,6 @@ with st.sidebar:
             with c2:
                 if st.button("✕", key=f"del_{chat_id}", help="Excluir"):
                     del st.session_state.chats[chat_id]
-                    if st.session_state.current_chat_id == chat_id:
-                        restantes = list(st.session_state.chats.keys())
-                        st.session_state.current_chat_id = restantes[0] if restantes else str(uuid.uuid4())
-                        if not restantes:
-                            st.session_state.chats[st.session_state.current_chat_id] = {
-                                "title": "", "mode": chat_atual["mode"], "messages": [], "gemini_history": []
-                            }
                     st.rerun()
 
     st.markdown('<div class="help-section"></div>', unsafe_allow_html=True)
@@ -627,7 +624,7 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 12. Área Principal: Telas Iniciais vs. Chat
+# 11. Área Principal: Telas Iniciais vs. Chat
 # ----------------------------------------------------
 if chat_vazio:
     st.markdown("<div class='hero-title'>Qual é o caso de hoje?</div>", unsafe_allow_html=True)
@@ -660,7 +657,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 13. Processamento Agêntico Otimizado (Sem Travamentos)
+# 12. Processamento Seguro via Google Files API (Sem Travamento)
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua mensagem, orientação de ajuste ou comando..." if not chat_vazio else "Digite sua matéria jurídica ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -679,12 +676,29 @@ if prompt_final:
 
     with st.chat_message("assistant"):
         with st.status("🧠 Analisando autos e raciocinando...", expanded=True) as status_box:
-            st.write("📂 **Lendo acervo probatório dos autos...**")
-            st.write("🔍 **Consultando jurisprudência e teses vinculantes...**")
-            st.write("✍️ **Estruturando fundamentação jurídica de Segundo Grau...**")
-
             try:
                 client = genai.Client(api_key=GEMINI_API_KEY)
+
+                # 1. Upload Seguro para Google Files API (Apenas na 1ª Mensagem)
+                if not chat_atual.get("google_file_uris") and uploaded_files:
+                    st.write("📂 **Enviando documentos com segurança para a nuvem do Google...**")
+                    uploaded_uris = []
+                    for f in uploaded_files:
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                            tmp.write(f.getvalue())
+                            tmp_path = tmp.name
+                        
+                        uploaded_file_ref = client.files.upload(
+                            file=tmp_path,
+                            config=types.UploadFileConfig(display_name=f.name, mime_type="application/pdf")
+                        )
+                        uploaded_uris.append(uploaded_file_ref)
+                        os.unlink(tmp_path)
+                    
+                    chat_atual["google_file_uris"] = uploaded_uris
+
+                st.write("🔍 **Consultando precedentes vinculantes no STF e STJ...**")
+                st.write("✍️ **Estruturando fundamentação jurídica de Segundo Grau...**")
 
                 if chat_atual["mode"] == "🛡️ Auditoria & Mentoria":
                     instrucao = SUPERPROMPT_AUDITORIA
@@ -693,20 +707,12 @@ if prompt_final:
                 else:
                     instrucao = PROMPT_JURISPRUDENCIA
 
+                # Montagem das partes de entrada de forma leve (Passa as referências de arquivos)
                 user_parts = []
+                if len(chat_atual["gemini_history"]) == 0 and chat_atual.get("google_file_uris"):
+                    for file_ref in chat_atual["google_file_uris"]:
+                        user_parts.append(file_ref)
                 
-                # Ingestão binária dos arquivos PDF apenas na primeira interação
-                if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
-                    for f in uploaded_files:
-                        pdf_bytes = f.getvalue()
-                        user_parts.append(
-                            types.Part.from_bytes(
-                                data=pdf_bytes,
-                                mime_type="application/pdf"
-                            )
-                        )
-                        user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))
-
                 user_parts.append(types.Part.from_text(text=prompt_final))
 
                 chat_atual["gemini_history"].append(
@@ -715,8 +721,9 @@ if prompt_final:
 
                 config_params = {
                     "system_instruction": instrucao,
-                    "temperature": 0.0,
+                    "temperature": 0.1,
                     "max_output_tokens": 8192,
+                    "thinking_config": types.ThinkingConfig(thinking_budget=1024),
                     "tools": [types.Tool(google_search=types.GoogleSearch())]
                 }
 
@@ -744,5 +751,5 @@ if prompt_final:
                 chat_atual["messages"].append({"role": "assistant", "content": texto_acumulado})
 
             except Exception as e:
-                status_box.update(label="❌ Erro na comunicação", state="error", expanded=True)
+                status_box.update(label="❌ Erro no processamento", state="error", expanded=True)
                 st.error(f"Erro no processamento da análise: {str(e)}")

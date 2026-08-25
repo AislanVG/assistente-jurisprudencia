@@ -144,18 +144,6 @@ css_customizado = """
         color: #111827 !important;
     }
 
-    /* Bloco de Bastidores Expansível */
-    .reasoning-box {
-        background-color: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 10px 14px;
-        margin-bottom: 20px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        font-size: 13.5px;
-        color: #475569;
-    }
-
     /* Cabeçalho do Processo em Linhas Isoladas */
     .doc-header-block {
         margin-bottom: 24px;
@@ -531,7 +519,7 @@ def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjsp"):
     return None
 
 # ----------------------------------------------------
-# 9. Prompts Especializados com Diagramação Forense
+# 9. Prompts Especializados com Formatação Forense Rigorosa
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -801,7 +789,6 @@ else:
     st.markdown("<div class='main-chat-container'>", unsafe_allow_html=True)
     for i, msg in enumerate(chat_atual["messages"]):
         with st.chat_message(msg["role"]):
-            # Se for resposta do assistente e possuir registro de bastidores, exibe o expander persistente
             if msg["role"] == "assistant" and msg.get("reasoning_steps"):
                 with st.expander("🧠 Bastidores da Análise & Raciocínio Agêntico", expanded=False):
                     for step in msg["reasoning_steps"]:
@@ -825,7 +812,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 13. Processamento Seguro com Status Dinâmico e Persistente
+# 13. Processamento Seguro com Indicador Ativo de Produção
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua mensagem, orientação de ajuste ou comando..." if not chat_vazio else "Digite sua matéria jurídica ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -845,102 +832,109 @@ if prompt_final:
     with st.chat_message("assistant"):
         passos_executados = []
         
-        # 1. Box de Status com Raciocínio em Tempo Real
-        with st.status("🧠 Analisando autos e raciocinando nos bastidores...", expanded=True) as status_box:
-            p1 = "📂 **Leitura e extração do acervo probatório dos autos**"
+        # Identificação inteligente do que está sendo produzido
+        qtd_msg = len(chat_atual["messages"])
+        if qtd_msg <= 1:
+            etiqueta_status = "⏳ Produzindo Raio-X dos Autos e Pesquisa de Precedentes (Etapa 1)..."
+        elif qtd_msg <= 3:
+            etiqueta_status = "⏳ Produzindo Cabeçalho, Ementa Técnica e Relatório do Recurso (Etapa 2)..."
+        else:
+            etiqueta_status = "⏳ Redigindo Minuta Integral de Segundo Grau de Alta Densidade (Etapa 3)..."
+
+        with st.status(etiqueta_status, expanded=True) as status_box:
+            p1 = "📂 **Leitura e extração minuciosa do acervo probatório dos autos**"
             st.write(p1)
             passos_executados.append(p1)
-            time.sleep(0.3)
 
             p2 = "🔍 **Consulta ativa de jurisprudência e teses vinculantes no STF e STJ**"
             st.write(p2)
             passos_executados.append(p2)
-            time.sleep(0.3)
 
             p3 = "✍️ **Estruturação da fundamentação jurídica e diagramação forense**"
             st.write(p3)
             passos_executados.append(p3)
 
-            status_box.update(label="✅ Análise concluída com sucesso", state="complete", expanded=False)
+            try:
+                client = genai.Client(api_key=GEMINI_API_KEY)
 
-        # 2. Renderização da Resposta FORA do status
-        try:
-            client = genai.Client(api_key=GEMINI_API_KEY)
+                if chat_atual["mode"] == "🛡️ Auditoria & Mentoria":
+                    instrucao = SUPERPROMPT_AUDITORIA
+                elif chat_atual["mode"] == "📄 Minuta de Parecer Cível":
+                    instrucao = SUPERPROMPT_PARECER
+                else:
+                    instrucao = PROMPT_JURISPRUDENCIA
 
-            if chat_atual["mode"] == "🛡️ Auditoria & Mentoria":
-                instrucao = SUPERPROMPT_AUDITORIA
-            elif chat_atual["mode"] == "📄 Minuta de Parecer Cível":
-                instrucao = SUPERPROMPT_PARECER
-            else:
-                instrucao = PROMPT_JURISPRUDENCIA
+                user_parts = []
+                
+                if re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
+                    match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)
+                    dados_cnj = consultar_datajud_por_numero(match_cnj, tribunal="tjsp")
+                    if dados_cnj:
+                        user_parts.append(types.Part.from_text(text=f"[Consulta Oficial DataJud/CNJ]:\n{dados_cnj}"))
 
-            user_parts = []
-            
-            if re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
-                match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)
-                dados_cnj = consultar_datajud_por_numero(match_cnj, tribunal="tjsp")
-                if dados_cnj:
-                    user_parts.append(types.Part.from_text(text=f"[Consulta Oficial DataJud/CNJ]:\n{dados_cnj}"))
-
-            # Ingestão binária dos arquivos PDF apenas na 1ª mensagem da sessão
-            if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
-                for f in uploaded_files:
-                    pdf_bytes = f.getvalue()
-                    user_parts.append(
-                        types.Part.from_bytes(
-                            data=pdf_bytes,
-                            mime_type="application/pdf"
+                if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
+                    for f in uploaded_files:
+                        pdf_bytes = f.getvalue()
+                        user_parts.append(
+                            types.Part.from_bytes(
+                                data=pdf_bytes,
+                                mime_type="application/pdf"
+                            )
                         )
-                    )
-                    user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))
+                        user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))
 
-            user_parts.append(types.Part.from_text(text=prompt_final))
+                user_parts.append(types.Part.from_text(text=prompt_final))
 
-            chat_atual["gemini_history"].append(
-                types.Content(role="user", parts=user_parts)
-            )
+                chat_atual["gemini_history"].append(
+                    types.Content(role="user", parts=user_parts)
+                )
 
-            config_params = {
-                "system_instruction": instrucao,
-                "temperature": 0.0,
-                "max_output_tokens": 8192,
-                "tools": [types.Tool(google_search=types.GoogleSearch())]
-            }
+                config_params = {
+                    "system_instruction": instrucao,
+                    "temperature": 0.0,
+                    "max_output_tokens": 8192,
+                    "tools": [types.Tool(google_search=types.GoogleSearch())]
+                }
 
-            def stream_generator():
-                for tentativa in range(3):
-                    try:
-                        response_stream = client.models.generate_content_stream(
-                            model="gemini-2.5-flash",
-                            contents=chat_atual["gemini_history"],
-                            config=types.GenerateContentConfig(**config_params)
-                        )
-                        for chunk in response_stream:
-                            if chunk.text:
-                                yield chunk.text
-                        return
-                    except Exception as err:
-                        err_msg = str(err).lower()
-                        if "429" in err_msg or "resource_exhausted" in err_msg or "503" in err_msg:
-                            time.sleep(2 * (tentativa + 1))
-                            if tentativa == 2:
-                                raise Exception("Cota temporariamente excedida. Tente novamente em alguns segundos.")
-                            continue
-                        else:
-                            raise err
+                def stream_generator():
+                    primeiro_chunk = True
+                    for tentativa in range(3):
+                        try:
+                            response_stream = client.models.generate_content_stream(
+                                model="gemini-2.5-flash",
+                                contents=chat_atual["gemini_history"],
+                                config=types.GenerateContentConfig(**config_params)
+                            )
+                            for chunk in response_stream:
+                                if chunk.text:
+                                    # Fecha o status exatamente no instante em que o texto começa a fluir na tela
+                                    if primeiro_chunk:
+                                        status_box.update(label="✅ Análise concluída com sucesso", state="complete", expanded=False)
+                                        primeiro_chunk = False
+                                    yield chunk.text
+                            return
+                        except Exception as err:
+                            err_msg = str(err).lower()
+                            if "429" in err_msg or "resource_exhausted" in err_msg or "503" in err_msg:
+                                time.sleep(2 * (tentativa + 1))
+                                if tentativa == 2:
+                                    raise Exception("Cota temporariamente excedida. Tente novamente em alguns segundos.")
+                                continue
+                            else:
+                                raise err
 
-            texto_resposta = st.write_stream(stream_generator())
+                texto_resposta = st.write_stream(stream_generator())
 
-            chat_atual["gemini_history"].append(
-                types.Content(role="model", parts=[types.Part.from_text(text=texto_resposta)])
-            )
-            # Salva o texto e a lista de passos para manter o expander no histórico
-            chat_atual["messages"].append({
-                "role": "assistant",
-                "content": texto_resposta,
-                "reasoning_steps": passos_executados
-            })
-            st.rerun()
+                chat_atual["gemini_history"].append(
+                    types.Content(role="model", parts=[types.Part.from_text(text=texto_resposta)])
+                )
+                chat_atual["messages"].append({
+                    "role": "assistant",
+                    "content": texto_resposta,
+                    "reasoning_steps": passos_executados
+                })
+                st.rerun()
 
-        except Exception as e:
-            st.error(f"Erro no processamento da análise: {str(e)}")
+            except Exception as e:
+                status_box.update(label="❌ Erro no processamento", state="error", expanded=True)
+                st.error(f"Erro no processamento da análise: {str(e)}")

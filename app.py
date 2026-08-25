@@ -348,33 +348,46 @@ css_customizado = """
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 5. Fluxo de Autenticação Seguro (Atualizado com Captura OAuth)
+# 5. Fluxo de Autenticação Seguro (Atualizado com Captura Avançada)
 # ----------------------------------------------------
 import streamlit.components.v1 as components
 
 if "user_session" not in st.session_state:
     st.session_state.user_session = None
 
-# [NOVIDADE]: Intercepta o crachá de acesso (token) vindo do Google/Landing Page
 if not st.session_state.user_session:
-    # 1. O Streamlit não lê o "#" da URL. Este JS invisível joga o token para um lugar que o Python consegue ler ("?")
+    # 1. HACK AVANÇADO DE DOM: Fura o bloqueio do iframe do Streamlit para ler o "#" da URL
     components.html("""
         <script>
-        if (window.parent.location.hash.includes('access_token=')) {
-            var hash = window.parent.location.hash.substring(1);
-            window.parent.location.href = window.parent.location.pathname + '?' + hash;
+        try {
+            const parentDoc = window.parent.document;
+            const script = parentDoc.createElement('script');
+            script.innerHTML = `
+                if (window.location.hash.includes('access_token=')) {
+                    var hash = window.location.hash.substring(1);
+                    window.location.replace(window.location.pathname + '?' + hash);
+                }
+            `;
+            parentDoc.head.appendChild(script);
+        } catch (e) {
+            if (window.parent.location.hash.includes('access_token=')) {
+                var hash = window.parent.location.hash.substring(1);
+                window.parent.location.replace(window.parent.location.pathname + '?' + hash);
+            }
         }
         </script>
     """, height=0)
     
     # 2. O Python agora enxerga o crachá e loga o usuário no Supabase automaticamente
-    params = st.query_params
-    if "access_token" in params and "refresh_token" in params:
+    token = st.query_params.get("access_token")
+    refresh = st.query_params.get("refresh_token")
+    
+    if token and refresh:
         try:
-            res = supabase.auth.set_session(params["access_token"], params["refresh_token"])
+            res = supabase.auth.set_session(token, refresh)
             if res.user:
                 st.session_state.user_session = res.user
-                st.query_params.clear() # Limpa a URL para deixar o painel limpo
+                st.query_params.clear() # Limpa a URL para deixar o painel elegante
                 st.rerun()
         except Exception:
             pass
@@ -431,7 +444,6 @@ def exibir_tela_autenticacao():
 if not st.session_state.user_session:
     exibir_tela_autenticacao()
     st.stop()
-
 # ----------------------------------------------------
 # 6. Modal de Alteração de Senha
 # ----------------------------------------------------

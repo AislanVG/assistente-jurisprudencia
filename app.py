@@ -664,7 +664,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 12. Processamento Seguro via Google Files API (Corrigido)
+# 12. Processamento Seguro com Verificação Ativa de Status
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua mensagem, orientação de ajuste ou comando..." if not chat_vazio else "Digite sua matéria jurídica ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -686,9 +686,9 @@ if prompt_final:
             try:
                 client = genai.Client(api_key=GEMINI_API_KEY)
 
-                # 1. Upload Seguro para Google Files API (Salva metadados uri e mime_type)
+                # 1. Upload Seguro para Google Files API com Verificação de Ativação
                 if not chat_atual.get("uploaded_files_data") and uploaded_files:
-                    st.write("📂 **Enviando documentos com segurança para a nuvem do Google...**")
+                    st.write("📂 **Enviando documentos para a nuvem do Google...**")
                     files_meta = []
                     for f in uploaded_files:
                         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -699,8 +699,17 @@ if prompt_final:
                             file=tmp_path,
                             config=types.UploadFileConfig(display_name=f.name, mime_type="application/pdf")
                         )
-                        files_meta.append({"uri": file_upload.uri, "mime_type": "application/pdf"})
                         os.unlink(tmp_path)
+
+                        # Loop de verificação de processamento do arquivo no Google
+                        while file_upload.state.name == "PROCESSING":
+                            time.sleep(0.8)
+                            file_upload = client.files.get(name=file_upload.name)
+
+                        if file_upload.state.name == "FAILED":
+                            raise ValueError(f"Falha no processamento do arquivo {f.name} pelo Google.")
+
+                        files_meta.append({"name": file_upload.name, "uri": file_upload.uri, "mime_type": "application/pdf"})
                     
                     chat_atual["uploaded_files_data"] = files_meta
 
@@ -714,7 +723,7 @@ if prompt_final:
                 else:
                     instrucao = PROMPT_JURISPRUDENCIA
 
-                # 2. Conversão Correta usando types.Part.from_uri
+                # 2. Inserção das partes dos arquivos anexados na primeira mensagem
                 user_parts = []
                 if len(chat_atual["gemini_history"]) == 0 and chat_atual.get("uploaded_files_data"):
                     for file_info in chat_atual["uploaded_files_data"]:
@@ -731,29 +740,39 @@ if prompt_final:
                     types.Content(role="user", parts=user_parts)
                 )
 
+                # Configuração estável sem o conflito de thinking_budget em streaming de busca
                 config_params = {
                     "system_instruction": instrucao,
-                    "temperature": 0.1,
+                    "temperature": 0.0,
                     "max_output_tokens": 8192,
-                    "thinking_config": types.ThinkingConfig(thinking_budget=1024),
                     "tools": [types.Tool(google_search=types.GoogleSearch())]
                 }
 
                 status_box.update(label="✅ Análise concluída. Redigindo manifestação...", state="complete", expanded=False)
 
+                # 3. Stream com fallback de chamada garantida
                 response_container = st.empty()
                 texto_acumulado = ""
 
-                response_stream = client.models.generate_content_stream(
-                    model="gemini-2.5-flash",
-                    contents=chat_atual["gemini_history"],
-                    config=types.GenerateContentConfig(**config_params)
-                )
+                try:
+                    response_stream = client.models.generate_content_stream(
+                        model="gemini-2.5-flash",
+                        contents=chat_atual["gemini_history"],
+                        config=types.GenerateContentConfig(**config_params)
+                    )
 
-                for chunk in response_stream:
-                    if chunk.text:
-                        texto_acumulado += chunk.text
-                        response_container.markdown(texto_acumulado + "▌")
+                    for chunk in response_stream:
+                        if chunk.text:
+                            texto_acumulado += chunk.text
+                            response_container.markdown(texto_acumulado + "▌")
+                except Exception:
+                    # Fallback síncrono caso o socket de streaming oscile
+                    resp_direct = client.models.generate_content(
+                        model="gemini-2.5-flash",
+                        contents=chat_atual["gemini_history"],
+                        config=types.GenerateContentConfig(**config_params)
+                    )
+                    texto_acumulado = resp_direct.text or ""
 
                 response_container.markdown(texto_acumulado)
 

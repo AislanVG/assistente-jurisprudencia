@@ -43,7 +43,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Dinâmico (Design Forense Aprimorado)
+# 4. Injeção de CSS Forense Idêntico ao Word / TJ
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -128,30 +128,84 @@ css_customizado = """
         background-color: #f1f5f9 !important;
     }
 
-    .precedente-btn-container button {
-        width: 100% !important;
-        min-height: 85px !important;
-        height: auto !important;
-        white-space: normal !important;
-        text-align: left !important;
-        padding: 14px 16px !important;
-        border-radius: 12px !important;
-        border: 1px solid #cbd5e1 !important;
+    /* ESTILO VISUAL DE PEÇA FORENSE DO WORD / MINISTÉRIO PÚBLICO */
+    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) {
         background-color: #ffffff !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 12px !important;
+        padding: 32px 40px !important;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05) !important;
+    }
+
+    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) div[data-testid="stMarkdownContainer"] {
+        font-family: "Georgia", "Times New Roman", Times, serif !important;
+        font-size: 16px !important;
+        line-height: 1.7 !important;
+        color: #111827 !important;
+    }
+
+    /* Cabeçalho do Processo em Linhas Isoladas */
+    .doc-header-block {
+        margin-bottom: 24px;
+        line-height: 1.5;
+        font-size: 15.5px;
+    }
+    .doc-header-line {
+        margin-bottom: 4px;
+    }
+    .doc-header-line strong {
+        color: #0f172a;
+    }
+
+    /* Ementa Recuada à Direita (35% de margem esquerda) */
+    .doc-ementa {
+        margin-left: 35% !important;
+        margin-right: 0 !important;
+        margin-top: 20px !important;
+        margin-bottom: 28px !important;
+        font-size: 13.5px !important;
         line-height: 1.45 !important;
+        text-align: justify !important;
+        text-justify: inter-word !important;
+        color: #1e293b !important;
     }
-    .precedente-btn-container button:hover {
-        border-color: #2563eb !important;
-        background-color: #eff6ff !important;
+
+    /* Vocativo Forense Centralizado */
+    .doc-vocativo {
+        text-align: center !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        margin-top: 26px !important;
+        margin-bottom: 22px !important;
+        letter-spacing: 0.5px !important;
     }
-    .precedente-btn-container button p {
-        white-space: normal !important;
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
+
+    /* Parágrafos de Conteúdo com Recuo de Primeira Linha */
+    .doc-p {
+        text-indent: 2.2em;
+        text-align: justify !important;
+        text-justify: inter-word !important;
+        margin-bottom: 16px !important;
+    }
+
+    .doc-section-title {
+        font-size: 16px !important;
+        font-weight: bold !important;
+        margin-top: 24px !important;
+        margin-bottom: 14px !important;
+    }
+
+    /* Citações de Jurisprudência no Meio do Texto */
+    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) blockquote {
+        margin-left: 25% !important;
+        margin-right: 0 !important;
+        padding-left: 14px !important;
+        border-left: 2px solid #94a3b8 !important;
+        font-size: 13.5px !important;
+        line-height: 1.45 !important;
+        text-align: justify !important;
+        color: #334155 !important;
+        background: transparent !important;
     }
 
     .sidebar-label {
@@ -179,17 +233,6 @@ css_customizado = """
         margin-bottom: 18px;
     }
 
-    .feed-header {
-        font-size: 14.5px;
-        font-weight: 700;
-        color: #475569;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        margin-top: 18px;
-        margin-bottom: 16px;
-        text-align: center;
-    }
-
     .main-chat-container {
         padding-bottom: 100px;
     }
@@ -197,41 +240,6 @@ css_customizado = """
     .action-bar {
         margin-top: 8px;
         margin-bottom: 16px;
-    }
-
-    /* FORMATO FORENSE PARA AS MENSAGENS DO ASSISTENTE (ESTILO WORD / PEÇA INSTITUCIONAL) */
-    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) {
-        background-color: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 12px !important;
-        padding: 24px 28px !important;
-        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
-    }
-
-    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) div[data-testid="stMarkdownContainer"] {
-        font-family: "Georgia", "Times New Roman", Times, serif !important;
-        font-size: 15.5px !important;
-        line-height: 1.65 !important;
-        color: #0f172a !important;
-    }
-
-    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) p {
-        text-align: justify !important;
-        text-justify: inter-word !important;
-        margin-bottom: 14px !important;
-    }
-
-    /* Recuo de Bloco para Ementas e Citações de Jurisprudência */
-    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) blockquote {
-        margin-left: 25% !important;
-        margin-right: 0 !important;
-        padding-left: 14px !important;
-        border-left: 2px solid #94a3b8 !important;
-        font-size: 13.5px !important;
-        line-height: 1.45 !important;
-        text-align: justify !important;
-        color: #334155 !important;
-        background: transparent !important;
     }
 
     /* CARD DE LOGIN UNIFICADO */
@@ -524,7 +532,7 @@ def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjsp"):
     return None
 
 # ----------------------------------------------------
-# 9. Prompts Especializados com Diagramação Forense Estilo Word
+# 9. Prompts Especializados com Formatação Forense Rigorosa
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -562,116 +570,80 @@ Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdiç�
 ### 🏛️ PADRÃO VERNÁCULO FORENSE, URBANIDADE E DECORO PROCESSUAL:
 1. É TERMINANTEMENTE PROIBIDO O USO DE LINGUAGEM COLOQUIAL, RASTEIRA OU PERSONALISTA CONTRA O MAGISTRADO DE PRIMEIRO GRAU.
    - NUNCA escreva frases como: "o juiz cometeu um erro", "o magistrado se equivocou", "a decisão está errada", "o juiz não analisou os documentos".
-   - A crítica deve ser IMPESSOAL, direcionada à DECISÃO/SENTENÇA[cite: 2, 3]:
-     * Utilize fórmulas consagradas: "A r. sentença recorrida comporta reforma..."[cite: 2, 3], "Com a devida vênia ao entendimento esposado pelo d. Juízo singular..."[cite: 2, 3], "O decisum de piso merece reparo..."[cite: 2, 3], "O Apelante/Município parte da premissa correta, mas extrai consequência jurídica incorreta ao sustentar que..."[cite: 2].
-2. TRATAMENTO FORENSE: Trate o órgão de origem como "d. Juízo a quo", "d. Juízo singular", "r. sentença combatida/recorrida", e a instância recursal como "Colenda Câmara Cível"[cite: 2, 3], "E. Tribunal de Justiça"[cite: 2, 3], "ínclito Relator".
+   - A crítica deve ser IMPESSOAL, direcionada à DECISÃO/SENTENÇA[cite: 1, 2, 3]:
+     * Utilize fórmulas consagradas: "A r. sentença recorrida comporta reforma..."[cite: 1, 2, 3], "Com a devida vênia ao entendimento esposado pelo d. Juízo singular..."[cite: 1, 2, 3], "O decisum de piso merece reparo..."[cite: 1, 2, 3], "O Apelante/Município parte da premissa correta, mas extrai consequência jurídica incorreta ao sustentar que..."[cite: 1].
+2. TRATAMENTO FORENSE: Trate o órgão de origem como "d. Juízo a quo", "d. Juízo singular", "r. sentença combatida/recorrida", e a instância recursal como "Colenda Câmara Cível"[cite: 1, 2, 3], "E. Tribunal de Justiça"[cite: 1, 2, 3], "ínclito Relator".
 
 ### 🎯 REGRA DE OURO: SOBERANIA DAS DIRETRIZES DO ASSESSOR (OBEDIÊNCIA ESTRITA)
 1. DISTINÇÃO ENTRE 1º GRAU E 2º GRAU:
-   - **Decisão do Juiz (1º Grau):** É a decisão ou sentença originária recorrida (objeto do recurso)[cite: 2, 3].
-   - **Decisão do Desembargador Relator (2º Grau):** É a decisão monocrática liminar, tutela antecipada recursal ou efeito suspensivo deferido/indeferido no Tribunal de Justiça[cite: 3].
-   - **COMANDO DO USUÁRIO:** Se o usuário responder "pelo desprovimento", "pelo provimento", "acompanhe o relator", ADOTE IMEDIATAMENTE essa orientação de mérito e avance sem pedir novas confirmações da mesma pergunta[cite: 1].
+   - **Decisão do Juiz (1º Grau):** É a decisão ou sentença originária recorrida (objeto do recurso)[cite: 1, 2, 3].
+   - **Decisão do Desembargador Relator (2º Grau):** É a decisão monocrática liminar, tutela antecipada recursal ou efeito suspensivo deferido/indeferido no Tribunal de Justiça[cite: 2].
+   - **COMANDO DO USUÁRIO:** Se o usuário responder "pelo desprovimento", "pelo provimento", "acompanhe o relator", ADOTE IMEDIATAMENTE essa orientação de mérito e avance sem pedir novas confirmações.
 2. SOBERANIA TOTAL: A tese e orientação definidas pelo usuário no chat são ABSOLUTAS e VINCULANTES.
 
-### 📜 ESTRUTURAÇÃO VISUAL E DIAGRAMAÇÃO FORENSE (ESTILO WORD INSTITUCIONAL):
-1. CABEÇALHO DO PROCESSO (EM LINHAS SEPARADAS):
-   **N.º MP:** [Número MP ou A ser preenchido]  
-   **Autos n.º:** [Número do processo TJ]  
-   **Classe:** [Apelação Cível / Agravo de Instrumento]  
-   **Órgão Julgador:** [Câmara Cível competente]  
-   **Relator(a):** [Nome do Desembargador / Juiz Convocado]  
-   **Apelante(s):** [Nome do Recorrente]  
-   **Apelado(s):** [Nome do Recorrido]  
+### 📜 ESTRUTURA VISUAL E FORMATAÇÃO HTML OBRIGATÓRIA (ESTILO WORD INSTITUCIONAL):
+Ao gerar a Etapa 2 e a Etapa 3, UTILIZE ESTRITAMENTE as seguintes classes HTML para formatar o texto[cite: 1, 2, 3]:
 
-2. EMENTA TÉCNICA FORMAL (RECUADA À DIREITA / BLOCKQUOTE):
-   Formate a ementa inteira em bloco de citação (`>`), em caixa alta com separação por pontos:
-   > APELAÇÃO CÍVEL. AÇÃO DE OBRIGAÇÃO DE FAZER... [Palavras-chave]. TESE JURÍDICA E PRECEDENTES DO STJ/STF. **PARECER PELO CONHECIMENTO E PROVIMENTO / DESPROVIMENTO / PARCIAL PROVIMENTO DO RECURSO.**
+1. CABEÇALHO DO PROCESSO (Linhas isoladas e destacadas)[cite: 1, 2, 3]:
+<div class="doc-header-block">
+  <div class="doc-header-line"><strong>N.º MP:</strong> [Número do MP ou 'A ser preenchido']</div>
+  <div class="doc-header-line"><strong>Autos n.º:</strong> [Número do Processo SAJ]</div>
+  <div class="doc-header-line"><strong>Classe:</strong> [Apelação Cível / Agravo de Instrumento]</div>
+  <div class="doc-header-line"><strong>Órgão Julgador:</strong> [Câmara Cível competente]</div>
+  <div class="doc-header-line"><strong>Relator(a):</strong> [Nome do Relator]</div>
+  <div class="doc-header-line"><strong>Apelante(s):</strong> [Nome da Parte Ativa]</div>
+  <div class="doc-header-line"><strong>Apelado(s):</strong> [Nome da Parte Passiva]</div>
+</div>
 
-3. VOCATIVO:
-   No centro do documento, em linha destacada:
-   **COLENDA CÂMARA CÍVEL,**
+2. EMENTA TÉCNICA FORMAL (RECUADA À DIREITA, SEM TÍTULOS ARTIFICIAIS)[cite: 1, 2, 3]:
+NÃO escreva "EMENTA TÉCNICA FORMAL". Insira a ementa diretamente na div com classe doc-ementa[cite: 1, 2, 3]:
+<div class="doc-ementa">
+APELAÇÃO CÍVEL. AÇÃO DE OBRIGAÇÃO DE FAZER... [Palavras-chave em CAIXA ALTA separadas por pontos]. PRECEDENTES DO STF/STJ. <strong>PARECER PELO CONHECIMENTO E PROVIMENTO / DESPROVIMENTO / PARCIAL PROVIMENTO DO RECURSO.</strong>
+</div>
 
-4. RELATÓRIO DO RECURSO (TEXTO CORRIDO):
-   Inicie com parágrafo formal: "Trata-se de Apelação Cível interposta por... em face da r. sentença que..."[cite: 2, 3].
-   Resuma as razões recursais de forma encadeada[cite: 2, 3].
-   Fecho obrigatório do relatório:
-   "É o relatório.  
-   O presente recurso é tempestivo e preenche os demais requisitos de admissibilidade, razão pela qual merece ser conhecido."[cite: 2, 3]
+3. VOCATIVO FORENSE[cite: 1, 2, 3]:
+<div class="doc-vocativo">COLENDA CÂMARA CÍVEL,</div>
 
-5. CAPÍTULOS DO PARECER:
-   **I – Da controvérsia recursal** (1 a 2 parágrafos delimitando o litígio: "A controvérsia recursal cinge-se a verificar/definir se...")[cite: 2, 3].
-   **II – Da impugnação à justiça gratuita** (quando houver)[cite: 3].
-   **II/III – Do mérito** (Fundamentação jurídica densa, exaustiva e contínua de 2.500 a 4.000 palavras, articulando fatos, laudos e precedentes vinculantes)[cite: 1, 2, 3].
-   **III/IV – Conclusão**: "Ante o exposto, esta Procuradoria de Justiça manifesta-se pelo conhecimento e provimento / desprovimento / parcial provimento do recurso."[cite: 2, 3]
+4. RELATÓRIO DO RECURSO E CAPÍTULOS (SEM SUBTÍTULOS COMO 'RELATÓRIO DO RECURSO')[cite: 1, 2, 3]:
+Comece diretamente a narrativa do relatório em parágrafos justificados com recuo[cite: 1, 2, 3]:
+<p class="doc-p">Trata-se de Apelação Cível interposta por... em face da r. sentença que...</p>
+<p class="doc-p">[Resumo encadeado das alegações recursais...]</p>
+<p class="doc-p">É o relatório.<br>O presente recurso é tempestivo e preenche os demais requisitos de admissibilidade, razão pela qual merece ser conhecido.</p>
+
+<div class="doc-section-title">I – Da controvérsia recursal</div>
+<p class="doc-p">A controvérsia recursal cinge-se a verificar/definir se...</p>
+
+<div class="doc-section-title">II – Do mérito</div>
+<p class="doc-p">[Desenvolvimento denso, contínuo e fundamentado (2.500 a 4.000 palavras)...]</p>
+
+<div class="doc-section-title">III – Conclusão</div>
+<p class="doc-p">Ante o exposto, esta Procuradoria de Justiça manifesta-se pelo conhecimento e provimento / desprovimento / parcial provimento do recurso.</p>
 
 ### 🔄 FLUXO PROGRESSIVO EM 3 ETAPAS:
 - **ETAPA 1:** Apresente o Raio-X dos autos e a Pergunta de Validação da tese. PARE e aguarde a resposta do assessor.
-- **ETAPA 2:** Quando o usuário responder com o sentido do parecer (ex: "pelo desprovimento", "sim", "confirmado", "prosseguir"), GERE IMEDIATAMENTE a Ementa Técnica Formal e o Relatório do Recurso completo[cite: 1]. PARE e aguarde o comando para gerar a Minuta Integral (Etapa 3)[cite: 1].
-- **ETAPA 3:** Quando o usuário autorizar ("prosseguir", "validado", "minuta final"), GERE A PEÇA COMPLETA DE SEGUNDO GRAU integralmente (2.500 a 4.000 palavras) sem qualquer placeholder[cite: 1].
+- **ETAPA 2:** Quando o usuário responder com o sentido do parecer (ex: "pelo desprovimento", "sim", "confirmado", "prosseguir"), GERE IMEDIATAMENTE o Cabeçalho, a Ementa Recuada e o Relatório do Recurso no padrão HTML forense acima. PARE e aguarde o comando para gerar a Minuta Integral (Etapa 3).
+- **ETAPA 3:** Quando o usuário autorizar ("prosseguir", "validado", "minuta final"), GERE A PEÇA COMPLETA DE SEGUNDO GRAU integralmente (2.500 a 4.000 palavras) sem qualquer placeholder.
 """
 
 SUPERPROMPT_AUDITORIA = """
-Atue como o Assessor Jurídico Sênior Auditor e Mentor Especializado em Segundo Grau de Jurisdição Cível[cite: 1]. Seu objetivo é AUDITAR, AVALIAR e REVISAR exaustivamente as minutas de pareceres elaboradas por estagiários e assessores em formação, fornecendo um parecer técnico de revisão pedagógico, rigoroso, construtivo e totalmente livre de alucinações[cite: 1].
+Atue como o Assessor Jurídico Sênior Auditor e Mentor Especializado em Segundo Grau de Jurisdição Cível. Seu objetivo é AUDITAR, AVALIAR e REVISAR exaustivamente as minutas de pareceres elaboradas por estagiários e assessores em formação, fornecendo um parecer técnico de revisão pedagógico, rigoroso, construtivo e totalmente livre de alucinações.
 
 ### 🏛️ PADRÃO VERNÁCULO FORENSE E DECORO PROCESSUAL
 - Aponte como vício grave de redação qualquer linguagem coloquial, agressiva ou personalista que ataque a figura do magistrado (ex: "o juiz errou", "o juiz cometeu um erro").
-- Recomende sempre construções jurídicas impessoais e eruditas (ex: "com a devida vênia ao entendimento firmado na origem, a r. decisão comporta reforma")[cite: 2, 3].
+- Recomende sempre construções jurídicas impessoais e eruditas (ex: "com a devida vênia ao entendimento firmado na origem, a r. decisão comporta reforma")[cite: 1, 2, 3].
 
 ### 🛡️ TRAVA DE HIGIENE DE CONTEXTO E PREVENÇÃO DE CONTAMINAÇÃO PROCESSUAL
-- Esta sessão destina-se EXCLUSIVAMENTE à análise, auditoria e redação do PROCESSO ATUAL[cite: 1].
-- Se em qualquer momento o usuário tentar iniciar a análise de um NOVO PROCESSO dentro desta mesma conversa, PARE IMEDIATAMENTE e emita o aviso de abertura de Novo Atendimento[cite: 1].
+- Esta sessão destina-se EXCLUSIVAMENTE à análise, auditoria e redação do PROCESSO ATUAL.
+- Se em qualquer momento o usuário tentar iniciar a análise de um NOVO PROCESSO dentro desta mesma conversa, PARE IMEDIATAMENTE e emita o aviso de abertura de Novo Atendimento.
 
 ### 🔄 FLUXO DE TRABALHO AGÊNTICO EM 3 FASES:
-#### FASE 1: Identificação dos Autos e da Minuta Anexada nos arquivos[cite: 1].
-#### FASE 2: Relatório de Auditoria, Nota (0 a 10), Tabela Gramatical de Português e Detecção de Alucinações de IA[cite: 1].
-#### FASE 3: Minuta Integral Reestruturada (6 a 10 páginas / 2.500 a 4.000 palavras)[cite: 1].
+#### FASE 1: Identificação dos Autos e da Minuta Anexada nos arquivos.
+#### FASE 2: Relatório de Auditoria, Nota (0 a 10), Tabela Gramatical de Português e Detecção de Alucinações de IA.
+#### FASE 3: Minuta Integral Reestruturada (6 a 10 páginas / 2.500 a 4.000 palavras).
 """
 
 # ----------------------------------------------------
-# 10. Feed Dinâmico de Precedentes (Cache 12h)
-# ----------------------------------------------------
-@st.cache_data(ttl=43200)
-def carregar_feed_precedentes_dinamico():
-    prompt_busca = """
-    Pesquise no Google Search os 6 julgados, temas repetitivos ou teses vinculantes mais relevantes e recentes do STF e STJ em Direito Privado, Cível, Consumidor ou Saúde Pública publicados nas últimas semanas/meses.
-    Retorne ESTRITAMENTE um array JSON contendo 6 objetos com os campos exatos:
-    [
-      {
-        "tribunal": "STJ ou STF",
-        "tema": "Identificação exata do Tema, Súmula ou REsp",
-        "desc": "Resumo objetivo da tese jurídica em até 120 caracteres"
-      }
-    ]
-    Responda apenas com o JSON puro, sem crases de markdown ou texto adicional.
-    """
-    try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
-        resp = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt_busca,
-            config=types.GenerateContentConfig(
-                tools=[types.Tool(google_search=types.GoogleSearch())],
-                temperature=0.0
-            )
-        )
-        texto_limpo = re.sub(r"```json|```", "", resp.text).strip()
-        dados = json.loads(texto_limpo)
-        if isinstance(dados, list) and len(dados) >= 4:
-            return dados[:6]
-    except Exception:
-        pass
-
-    return [
-        {"tribunal": "STJ", "tema": "Tema 1.082/STJ (Saúde)", "desc": "Cobertura obrigatória de terapias multidisciplinares (ABA) para autismo."},
-        {"tribunal": "STJ", "tema": "REsp 2.221.399/SP (3ª Turma)", "desc": "Dever de fornecimento de procedimentos especiais prescritos por médico assistente."},
-        {"tribunal": "STJ", "tema": "Tema 290/STJ (Execução)", "desc": "Marco temporal e requisitos da LC 118/2005 para fraude à execução fiscal."},
-        {"tribunal": "STF", "tema": "Tema 793/STF (SUS)", "desc": "Responsabilidade solidária dos entes públicos no fornecimento de tratamentos médicos."},
-        {"tribunal": "STF", "tema": "Tema 1.234/STF (Fármacos)", "desc": "Critérios vinculantes de competência para fornecimento judicial de medicamentos."},
-        {"tribunal": "STF", "tema": "Súmula Vinculante 510", "desc": "Mandado de Segurança contra atos praticados por serviços notariais e de registro."}
-    ]
-
-# ----------------------------------------------------
-# 11. Modais de Ajuda & Feedback
+# 10. Modais de Ajuda
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional", width="large")
 def exibir_manual_ajuda():
@@ -681,19 +653,19 @@ def exibir_manual_ajuda():
     tab1, tab2, tab3 = st.tabs(["📄 Minuta de Parecer", "🛡️ Auditoria & Mentoria", "🔍 Pesquisa Jurisprudencial"])
     
     with tab1:
-        st.markdown("### 🏛️ Fluxo de Pareceres de 2º Grau[cite: 1]")
-        st.markdown("1. Anexe os PDFs na barra lateral e inicie a análise[cite: 1].\n2. Valide a tese jurídica respondendo na Fase 1[cite: 1].\n3. Receba a Ementa/Relatório e depois a Minuta Integral (6-10 páginas)[cite: 1].")
+        st.markdown("### 🏛️ Fluxo de Pareceres de 2º Grau")
+        st.markdown("1. Anexe os PDFs na barra lateral e inicie a análise.\n2. Valide a tese jurídica respondendo na Fase 1.\n3. Receba a Ementa/Relatório e depois a Minuta Integral (6-10 páginas).")
 
     with tab2:
-        st.markdown("### 🛡️ Auditoria Agêntica e Mentoria[cite: 1]")
-        st.markdown("Audita minutas de estagiários confrontando-as com as provas dos autos reais, gerando nota, tabela gramatical e peça reestruturada[cite: 1].")
+        st.markdown("### 🛡️ Auditoria Agêntica e Mentoria")
+        st.markdown("Audita minutas de estagiários confrontando-as com as provas dos autos reais, gerando nota, tabela gramatical e peça reestruturada.")
 
     with tab3:
         st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
         st.markdown("Varredura em tempo real integrada ao Google Search e à API do DataJud (CNJ).")
 
 # ----------------------------------------------------
-# 12. Barra Lateral (Menu Vertical Limpo e Otimizado)
+# 11. Barra Lateral (Menu Vertical Limpo e Otimizado)
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown(
@@ -808,58 +780,19 @@ with st.sidebar:
         exibir_manual_ajuda()
 
 # ----------------------------------------------------
-# 13. Horário Local
-# ----------------------------------------------------
-try:
-    fuso_padrao = ZoneInfo("America/Sao_Paulo")
-    hora_local = datetime.now(fuso_padrao).hour
-except Exception:
-    hora_local = (datetime.utcnow().hour - 3) % 24
-
-if hora_local < 12:
-    saudacao = "Qual é o caso da manhã?"
-elif hora_local < 18:
-    saudacao = "Qual é o caso da tarde?"
-else:
-    saudacao = "Qual é o caso da noite?"
-
-# ----------------------------------------------------
-# 14. Área Principal: Telas Iniciais vs. Chat
+# 12. Área Principal: Telas Iniciais vs. Chat
 # ----------------------------------------------------
 if chat_vazio:
-    st.markdown(f"<div class='hero-title'>{saudacao}</div>", unsafe_allow_html=True)
+    st.markdown("<div class='hero-title'>Qual é o caso de hoje?</div>", unsafe_allow_html=True)
     
     col_c1, col_c2, col_c3 = st.columns([0.5, 3.5, 0.5])
     with col_c2:
-        if chat_atual["mode"] == "📄 Minuta de Parecer Cível":
-            if uploaded_files:
-                if st.button("⚡ Analisar autos e gerar parecer completo", key="sug_parecer", use_container_width=True, type="primary"):
-                    st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes verificados."
-                    st.rerun()
-            else:
-                st.info("📂 Anexe os arquivos PDF na barra lateral para iniciar a análise dos autos.")
-
-        elif chat_atual["mode"] == "🛡️ Auditoria & Mentoria":
-            if uploaded_files:
-                if st.button("🛡️ Executar Auditoria Completa e Mentoria (Fase 2)", key="sug_audit", use_container_width=True, type="primary"):
-                    st.session_state["trigger_prompt"] = "Execute a FASE 2 da Auditoria Agêntica: realize o cruzamento minucioso das peças processuais com a minuta do estagiário/assessor anexadas nos arquivos."
-                    st.rerun()
-            else:
-                st.info("📂 Anexe os **PDFs dos Autos e da Minuta** na barra lateral para iniciar a auditoria.")
-        
+        if uploaded_files:
+            if st.button("⚡ Analisar autos e gerar parecer completo", use_container_width=True, type="primary"):
+                st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes verificados."
+                st.rerun()
         else:
-            st.markdown("<div class='feed-header'>🏛️ Precedentes Recentes dos Tribunais Superiores (STJ / STF)</div>", unsafe_allow_html=True)
-            feed_precedentes = carregar_feed_precedentes_dinamico()
-            col_f1, col_f2 = st.columns(2)
-            for idx, prec in enumerate(feed_precedentes):
-                col_alvo = col_f1 if idx % 2 == 0 else col_f2
-                with col_alvo:
-                    st.markdown("<div class='precedente-btn-container'>", unsafe_allow_html=True)
-                    rotulo_btn = f"📌 **[{prec.get('tribunal', 'STJ')}]** {prec.get('tema', '')}\n\n_{prec.get('desc', '')}_"
-                    if st.button(rotulo_btn, key=f"prec_din_{idx}", use_container_width=True):
-                        st.session_state["trigger_prompt"] = f"Apresente uma análise jurisprudencial analítica e verificada sobre o seguinte precedente do {prec.get('tribunal')}: {prec.get('tema')}. Foco na tese jurídica real, critérios práticos e ementa oficial."
-                        st.rerun()
-                    st.markdown("</div>", unsafe_allow_html=True)
+            st.info("📂 Anexe os arquivos PDF na barra lateral para iniciar a análise dos autos.")
 
 else:
     st.subheader(chat_atual["mode"])
@@ -869,7 +802,7 @@ else:
     st.markdown("<div class='main-chat-container'>", unsafe_allow_html=True)
     for i, msg in enumerate(chat_atual["messages"]):
         with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+            st.markdown(msg["content"], unsafe_allow_html=True)
             
             if msg["role"] == "assistant":
                 st.markdown("<div class='action-bar'>", unsafe_allow_html=True)
@@ -887,7 +820,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 15. Processamento Seguro e Confiável
+# 13. Processamento Seguro e Confiável
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua mensagem, orientação de ajuste ou comando..." if not chat_vazio else "Digite sua matéria jurídica ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)

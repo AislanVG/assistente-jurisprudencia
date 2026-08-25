@@ -43,7 +43,7 @@ def get_supabase_client() -> Client:
 supabase = get_supabase_client()
 
 # ----------------------------------------------------
-# 4. Injeção de CSS Forense Idêntico ao Word / TJ
+# 4. Injeção de CSS Forense e Bloco de Bastidores
 # ----------------------------------------------------
 css_customizado = """
 <style>
@@ -133,7 +133,7 @@ css_customizado = """
         background-color: #ffffff !important;
         border: 1px solid #cbd5e1 !important;
         border-radius: 12px !important;
-        padding: 32px 40px !important;
+        padding: 28px 36px !important;
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05) !important;
     }
 
@@ -144,10 +144,22 @@ css_customizado = """
         color: #111827 !important;
     }
 
+    /* Bloco de Bastidores Expansível */
+    .reasoning-box {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        font-size: 13.5px;
+        color: #475569;
+    }
+
     /* Cabeçalho do Processo em Linhas Isoladas */
     .doc-header-block {
         margin-bottom: 24px;
-        line-height: 1.5;
+        line-height: 1.55;
         font-size: 15.5px;
     }
     .doc-header-line {
@@ -157,7 +169,7 @@ css_customizado = """
         color: #0f172a;
     }
 
-    /* Ementa Recuada à Direita (35% de margem esquerda) */
+    /* Ementa Recuada à Direita */
     .doc-ementa {
         margin-left: 35% !important;
         margin-right: 0 !important;
@@ -193,19 +205,6 @@ css_customizado = """
         font-weight: bold !important;
         margin-top: 24px !important;
         margin-bottom: 14px !important;
-    }
-
-    /* Citações de Jurisprudência no Meio do Texto */
-    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) blockquote {
-        margin-left: 25% !important;
-        margin-right: 0 !important;
-        padding-left: 14px !important;
-        border-left: 2px solid #94a3b8 !important;
-        font-size: 13.5px !important;
-        line-height: 1.45 !important;
-        text-align: justify !important;
-        color: #334155 !important;
-        background: transparent !important;
     }
 
     .sidebar-label {
@@ -532,7 +531,7 @@ def consultar_datajud_por_numero(numero_processo: str, tribunal: str = "tjsp"):
     return None
 
 # ----------------------------------------------------
-# 9. Prompts Especializados com Formatação Forense Rigorosa
+# 9. Prompts Especializados com Diagramação Forense
 # ----------------------------------------------------
 PROMPT_JURISPRUDENCIA = """
 Você é um consultor jurídico sênior especializado em pesquisa jurisprudencial analítica brasileira.
@@ -653,12 +652,12 @@ def exibir_manual_ajuda():
     tab1, tab2, tab3 = st.tabs(["📄 Minuta de Parecer", "🛡️ Auditoria & Mentoria", "🔍 Pesquisa Jurisprudencial"])
     
     with tab1:
-        st.markdown("### 🏛️ Fluxo de Pareceres de 2º Grau")
-        st.markdown("1. Anexe os PDFs na barra lateral e inicie a análise.\n2. Valide a tese jurídica respondendo na Fase 1.\n3. Receba a Ementa/Relatório e depois a Minuta Integral (6-10 páginas).")
+        st.markdown("### 🏛️ Fluxo de Pareceres de 2º Grau[cite: 1]")
+        st.markdown("1. Anexe os PDFs na barra lateral e inicie a análise[cite: 1].\n2. Valide a tese jurídica respondendo na Fase 1[cite: 1].\n3. Receba a Ementa/Relatório e depois a Minuta Integral (6-10 páginas)[cite: 1].")
 
     with tab2:
-        st.markdown("### 🛡️ Auditoria Agêntica e Mentoria")
-        st.markdown("Audita minutas de estagiários confrontando-as com as provas dos autos reais, gerando nota, tabela gramatical e peça reestruturada.")
+        st.markdown("### 🛡️ Auditoria Agêntica e Mentoria[cite: 1]")
+        st.markdown("Audita minutas de estagiários confrontando-as com as provas dos autos reais, gerando nota, tabela gramatical e peça reestruturada[cite: 1].")
 
     with tab3:
         st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
@@ -802,6 +801,12 @@ else:
     st.markdown("<div class='main-chat-container'>", unsafe_allow_html=True)
     for i, msg in enumerate(chat_atual["messages"]):
         with st.chat_message(msg["role"]):
+            # Se for resposta do assistente e possuir registro de bastidores, exibe o expander persistente
+            if msg["role"] == "assistant" and msg.get("reasoning_steps"):
+                with st.expander("🧠 Bastidores da Análise & Raciocínio Agêntico", expanded=False):
+                    for step in msg["reasoning_steps"]:
+                        st.markdown(step)
+            
             st.markdown(msg["content"], unsafe_allow_html=True)
             
             if msg["role"] == "assistant":
@@ -820,7 +825,7 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 13. Processamento Seguro e Confiável
+# 13. Processamento Seguro com Status Dinâmico e Persistente
 # ----------------------------------------------------
 prompt_placeholder = "Digite sua mensagem, orientação de ajuste ou comando..." if not chat_vazio else "Digite sua matéria jurídica ou orientação..."
 prompt_digitado = st.chat_input(prompt_placeholder)
@@ -838,6 +843,27 @@ if prompt_final:
         st.markdown(prompt_final)
 
     with st.chat_message("assistant"):
+        passos_executados = []
+        
+        # 1. Box de Status com Raciocínio em Tempo Real
+        with st.status("🧠 Analisando autos e raciocinando nos bastidores...", expanded=True) as status_box:
+            p1 = "📂 **Leitura e extração do acervo probatório dos autos**"
+            st.write(p1)
+            passos_executados.append(p1)
+            time.sleep(0.3)
+
+            p2 = "🔍 **Consulta ativa de jurisprudência e teses vinculantes no STF e STJ**"
+            st.write(p2)
+            passos_executados.append(p2)
+            time.sleep(0.3)
+
+            p3 = "✍️ **Estruturação da fundamentação jurídica e diagramação forense**"
+            st.write(p3)
+            passos_executados.append(p3)
+
+            status_box.update(label="✅ Análise concluída com sucesso", state="complete", expanded=False)
+
+        # 2. Renderização da Resposta FORA do status
         try:
             client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -850,7 +876,6 @@ if prompt_final:
 
             user_parts = []
             
-            # Consulta DataJud por número de processo
             if re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
                 match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)
                 dados_cnj = consultar_datajud_por_numero(match_cnj, tribunal="tjsp")
@@ -909,7 +934,12 @@ if prompt_final:
             chat_atual["gemini_history"].append(
                 types.Content(role="model", parts=[types.Part.from_text(text=texto_resposta)])
             )
-            chat_atual["messages"].append({"role": "assistant", "content": texto_resposta})
+            # Salva o texto e a lista de passos para manter o expander no histórico
+            chat_atual["messages"].append({
+                "role": "assistant",
+                "content": texto_resposta,
+                "reasoning_steps": passos_executados
+            })
             st.rerun()
 
         except Exception as e:

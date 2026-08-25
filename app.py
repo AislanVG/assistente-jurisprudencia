@@ -272,8 +272,7 @@ css_customizado = """
     }
     
     /* Caixas de Texto */
-    div[data-testid="stTextInput"] input,
-    div[data-testid="stTextArea"] textarea {
+    div[data-testid="stTextInput"] input {
         font-size: 15px !important;
         padding: 10px 14px !important;
         border-radius: 8px !important;
@@ -380,7 +379,6 @@ def exibir_tela_autenticacao():
             unsafe_allow_html=True
         )
 
-# Bloqueia a renderização caso o usuário não esteja logado
 if not st.session_state.user_session:
     exibir_tela_autenticacao()
     st.stop()
@@ -585,11 +583,11 @@ Atue como o Assessor Jurídico Sênior Auditor e Mentor Especializado em Segundo
 
 ### 🔄 FLUXO DE TRABALHO AGÊNTICO EM 3 FASES:
 
-#### FASE 1: Coleta do Insumo Duplo (Processo + Minuta a Auditar)
-Solicite o envio da Minuta do Estagiário/Assessor e das Peças Processuais de Origem (Petição Inicial, Sentença, Apelação, Contrarrazões, Laudos)[cite: 1].
+#### FASE 1: Coleta das Peças e Minuta nos Autos Anexados
+Identifique e processe os documentos anexados pelo usuário (tanto as peças de origem do processo quanto a minuta do estagiário/assessor)[cite: 1].
 
 #### FASE 2: Relatório de Auditoria, Mentoria e Avaliação de IA
-Com base no cruzamento minucioso dos autos reais com a minuta, emita[cite: 1]:
+Com base no cruzamento minucioso dos autos reais com a minuta identificada nos anexos, emita[cite: 1]:
 1. **DIAGNÓSTICO E NOTA GERAL:**[cite: 1]
    - **Nota Global da Minuta:** [De 0,0 a 10,0][cite: 1]
    - **Status:** [APROVADA SEM RESSALVAS | APROVADA COM AJUSTES | REPROVADA / NECESSITA REESCRITA][cite: 1]
@@ -688,7 +686,7 @@ def exibir_manual_ajuda():
         st.markdown("Audita minutas de estagiários confrontando-as com as provas dos autos reais[cite: 1].")
         st.markdown(
             """
-1. Cole o texto da **Minuta a Auditar** e anexe os **Autos do Processo (PDFs)**[cite: 1].
+1. Anexe os **PDFs dos Autos e a Minuta do Estagiário** no campo de upload da barra lateral[cite: 1].
 2. A IA gera a **Nota (0 a 10)**, Tabela de Correção Gramatical, Auditoria de Uso Indevido de IA e Prevalência de Precedentes (Fase 2)[cite: 1].
 3. Após sua validação, a IA reescreve a **Minuta Integral Reestruturada** no padrão de 6 a 10 páginas (Fase 3)[cite: 1].
             """
@@ -751,7 +749,7 @@ def modal_feedback_negativo(msg_index, msg_content):
             st.rerun()
 
 # ----------------------------------------------------
-# 12. Barra Lateral (Layout Vertical Unificado dos Modos)
+# 12. Barra Lateral (Menu Vertical Limpo e Otimizado)
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown(
@@ -790,7 +788,6 @@ with st.sidebar:
             st.session_state.current_chat_id = novo_id
             st.rerun()
 
-    # BARRAS EMPILHADAS VERTICALMENTE (LARGURA TOTAL E ZERO QUEBRA DE TEXTO)
     st.markdown('<div class="sidebar-label">Modo de Operação</div>', unsafe_allow_html=True)
     
     is_parecer = chat_atual["mode"] == "📄 Minuta de Parecer Cível"
@@ -809,36 +806,29 @@ with st.sidebar:
         st.rerun()
 
     uploaded_files = []
-    minuta_audit_texto = ""
     
     if chat_atual["mode"] in ["📄 Minuta de Parecer Cível", "🛡️ Auditoria & Mentoria"]:
-        st.markdown('<div class="sidebar-label">Autos do Processo (PDFs)</div>', unsafe_allow_html=True)
+        rotulo_upload = "Documentos dos Autos e Minuta (PDFs)" if chat_atual["mode"] == "🛡️ Auditoria & Mentoria" else "Autos do Processo (PDFs)"
+        help_upload = "Selecione a Minuta do Estagiário e as Peças dos Autos (Inicial, Sentença, Laudos)" if chat_atual["mode"] == "🛡️ Auditoria & Mentoria" else "Selecione Petição Inicial, Sentença, Apelação, Laudos e Provas"
+        
+        st.markdown(f'<div class="sidebar-label">{rotulo_upload}</div>', unsafe_allow_html=True)
         uploaded_files = st.file_uploader(
             "Upload dos Processos",
             type=["pdf"],
             accept_multiple_files=True,
-            help="Selecione Petição Inicial, Sentença, Apelação, Laudos e Provas",
+            help=help_upload,
             label_visibility="collapsed",
             key=f"uploader_{st.session_state.current_chat_id}"
         )
 
-        if chat_atual["mode"] == "🛡️ Auditoria & Mentoria":
-            st.markdown('<div class="sidebar-label">Minuta a ser Auditada</div>', unsafe_allow_html=True)
-            minuta_audit_texto = st.text_area(
-                "Texto da Minuta do Estagiário/Assessor",
-                placeholder="Cole aqui o texto da minuta que será auditada...",
-                height=140,
-                key=f"minuta_text_{st.session_state.current_chat_id}"
-            )
-
-        if len(chat_atual["messages"]) == 0:
-            if chat_atual["mode"] == "📄 Minuta de Parecer Cível" and uploaded_files:
+        if len(chat_atual["messages"]) == 0 and uploaded_files:
+            if chat_atual["mode"] == "📄 Minuta de Parecer Cível":
                 if st.button("⚡ Iniciar Análise do Processo", use_container_width=True, type="primary"):
                     st.session_state["trigger_prompt"] = "Analise integralmente o conjunto das peças processuais anexadas e elabore o diagnóstico da Etapa 1 com a pesquisa de precedentes verificados."
                     st.rerun()
-            elif chat_atual["mode"] == "🛡️ Auditoria & Mentoria" and (uploaded_files or minuta_audit_texto):
-                if st.button("🛡️ Iniciar Auditoria da Minuta", use_container_width=True, type="primary"):
-                    st.session_state["trigger_prompt"] = f"Execute a FASE 2 da Auditoria Agêntica: realize o cruzamento das peças processuais anexadas com a minuta apresentada a seguir.\n\n[MINUTA SUBMETIDA À AUDITORIA]:\n{minuta_audit_texto}"
+            elif chat_atual["mode"] == "🛡️ Auditoria & Mentoria":
+                if st.button("🛡️ Iniciar Auditoria dos Autos e Minuta", use_container_width=True, type="primary"):
+                    st.session_state["trigger_prompt"] = "Execute a FASE 2 da Auditoria Agêntica: realize o cruzamento minucioso das peças processuais com a minuta do estagiário/assessor anexadas nos arquivos."
                     st.rerun()
 
     conversas_com_historico = {
@@ -913,12 +903,12 @@ if chat_vazio:
                 st.info("📂 Anexe os arquivos PDF na barra lateral para iniciar a análise dos autos.")
 
         elif chat_atual["mode"] == "🛡️ Auditoria & Mentoria":
-            if uploaded_files and minuta_audit_texto:
+            if uploaded_files:
                 if st.button("🛡️ Executar Auditoria Completa e Mentoria (Fase 2)", key="sug_audit", use_container_width=True, type="primary"):
-                    st.session_state["trigger_prompt"] = f"Execute a FASE 2 da Auditoria Agêntica: realize o cruzamento das peças processuais anexadas com a minuta apresentada a seguir.\n\n[MINUTA SUBMETIDA À AUDITORIA]:\n{minuta_audit_texto}"
+                    st.session_state["trigger_prompt"] = "Execute a FASE 2 da Auditoria Agêntica: realize o cruzamento minucioso das peças processuais com a minuta do estagiário/assessor anexadas nos arquivos."
                     st.rerun()
             else:
-                st.info("📂 Anexe os **PDFs dos Autos** e cole o texto da **Minuta a Auditar** na barra lateral para iniciar a auditoria[cite: 1].")
+                st.info("📂 Anexe os **PDFs dos Autos e da Minuta** na barra lateral para iniciar a auditoria[cite: 1].")
         
         else:
             st.markdown("<div class='feed-header'>🏛️ Precedentes Recentes dos Tribunais Superiores (STJ / STF)</div>", unsafe_allow_html=True)
@@ -982,8 +972,6 @@ if prompt_final:
     if not chat_atual["title"]:
         if uploaded_files:
             chat_atual["title"] = f"Autos ({len(uploaded_files)} docs)"
-        elif minuta_audit_texto:
-            chat_atual["title"] = "Auditoria de Minuta"
         else:
             chat_atual["title"] = prompt_final[:30] + ("..." if len(prompt_final) > 30 else "")
 
@@ -995,7 +983,6 @@ if prompt_final:
         try:
             client = genai.Client(api_key=GEMINI_API_KEY)
 
-            # Roteamento de Instrução do Sistema
             if chat_atual["mode"] == "🛡️ Auditoria & Mentoria":
                 instrucao = SUPERPROMPT_AUDITORIA
             elif chat_atual["mode"] == "📄 Minuta de Parecer Cível":
@@ -1005,14 +992,12 @@ if prompt_final:
 
             user_parts = []
             
-            # Consulta DataJud por número de processo
             if re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final):
                 match_cnj = re.search(r"\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}", prompt_final).group(0)
                 dados_cnj = consultar_datajud_por_numero(match_cnj, tribunal="tjsp")
                 if dados_cnj:
                     user_parts.append(types.Part.from_text(text=f"[Consulta Oficial DataJud/CNJ]:\n{dados_cnj}"))
 
-            # Ingestão binária de múltiplos PDFs na 1ª mensagem da sessão
             if len(chat_atual["gemini_history"]) == 0 and uploaded_files:
                 for f in uploaded_files:
                     pdf_bytes = f.getvalue()
@@ -1022,7 +1007,7 @@ if prompt_final:
                             mime_type="application/pdf"
                         )
                     )
-                    user_parts.append(types.Part.from_text(text=f"[Documento dos Autos: {f.name}]"))
+                    user_parts.append(types.Part.from_text(text=f"[Documento Anexado: {f.name}]"))
 
             user_parts.append(types.Part.from_text(text=prompt_final))
 
@@ -1030,7 +1015,6 @@ if prompt_final:
                 types.Content(role="user", parts=user_parts)
             )
 
-            # Configuração com Google Search ativo para tolerância zero à alucinação
             config_params = {
                 "system_instruction": instrucao,
                 "temperature": 0.0,

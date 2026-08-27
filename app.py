@@ -348,7 +348,7 @@ css_customizado = """
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 5. Fluxo de Autenticação Seguro (Design Compacto Sem Rolagem)
+# 5. Fluxo de Autenticação Seguro (AvJuris IA)
 # ----------------------------------------------------
 import streamlit.components.v1 as components
 
@@ -448,12 +448,12 @@ div[data-testid="stTextInput"] { margin-bottom: -10px !important; }
             '<div class="auth-right-panel">'
             '<div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 30px; position: relative; z-index: 10;">'
             '<svg style="width: 28px; height: 28px; color: #38BDF8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>'
-            '<span style="font-size: 24px; font-weight: 800; color: white; letter-spacing: -0.5px;">AMENO<span style="color: #38BDF8;">.IA</span></span>'
+            '<span style="font-size: 24px; font-weight: 800; color: white; letter-spacing: -0.5px;">AVJURIS<span style="color: #38BDF8;">.AI</span></span>'
             '</div>'
             '<h2 style="text-align: center; font-size: 32px; font-weight: 800; line-height: 1.2; margin-bottom: 25px; position: relative; z-index: 10;">A infraestrutura<br>definitiva para<br><span style="color: #38BDF8;">advogados de elite</span></h2>'
             '<div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 24px; position: relative; z-index: 10; backdrop-filter: blur(10px);">'
             '<div style="color: #38BDF8; font-size: 32px; font-family: Georgia, serif; line-height: 0; margin-bottom: 10px; opacity: 0.8;">"</div>'
-            '<p style="font-size: 13.5px; line-height: 1.55; color: #cbd5e1; margin-bottom: 18px; text-align: justify;">A Ameno IA revolucionou a forma como conduzimos nosso trabalho no escritório. Com a capacidade de extrair fatos de reuniões com o AtaPrime e emitir pareceres detalhados no JusPrime, conseguimos otimizar nosso tempo e blindar nosso faturamento.</p>'
+            '<p style="font-size: 13.5px; line-height: 1.55; color: #cbd5e1; margin-bottom: 18px; text-align: justify;">A AvJuris IA revolucionou a forma como conduzimos nosso trabalho no escritório. Com a capacidade de pesquisar jurisprudência real e emitir pareceres detalhados, conseguimos otimizar nosso tempo e blindar nosso faturamento.</p>'
             '<div style="display: flex; align-items: center; gap: 12px;">'
             '<div style="width: 38px; height: 38px; border-radius: 50%; background: #38BDF8; color: #0B132B; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px;">MC</div>'
             '<div><div style="font-weight: 700; font-size: 13px; color: white;">Mariana Costa</div><div style="font-size: 11px; color: #94a3b8;">Advogada Sênior</div></div>'

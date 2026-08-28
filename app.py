@@ -348,7 +348,7 @@ css_customizado = """
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 5. Fluxo de Autenticação Seguro (AvJuris IA - Redirecionamento Definitivo)
+# 5. Fluxo de Autenticação Seguro (AvJuris IA - OAuth Nova Aba)
 # ----------------------------------------------------
 import streamlit.components.v1 as components
 
@@ -356,7 +356,7 @@ if "user_session" not in st.session_state:
     st.session_state.user_session = None
 
 if not st.session_state.user_session:
-    # 1. Captura o token vindo do retorno do Google
+    # Captura o token de autenticação após o redirecionamento
     components.html("""
         <script>
         try {
@@ -392,16 +392,7 @@ if not st.session_state.user_session:
             pass
 
 def exibir_tela_autenticacao():
-    try:
-        oauth_res = supabase.auth.sign_in_with_oauth({
-            "provider": "google",
-            "options": {
-                "redirect_to": "https://jurisprimeai.streamlit.app/"
-            }
-        })
-        oauth_url = oauth_res.url
-    except Exception:
-        oauth_url = f"{SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=https://jurisprimeai.streamlit.app/"
+    oauth_url = f"{SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=https://jurisprimeai.streamlit.app/"
 
     st.markdown("""<style>
 .block-container { max-width: 1350px !important; padding-top: 0.5rem !important; padding-bottom: 0 !important; }
@@ -409,7 +400,7 @@ def exibir_tela_autenticacao():
 .auth-right-panel { background: linear-gradient(135deg, #0B132B 0%, #0F172A 100%); border-radius: 20px; padding: 40px 32px; color: white; height: 82vh; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25); position: relative; overflow: hidden; margin-top: 10px; }
 .auth-right-panel::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 60%); pointer-events: none; }
 
-.google-btn-custom {
+.google-btn-link {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -420,14 +411,15 @@ def exibir_tela_autenticacao():
     padding: 10px;
     font-size: 14px;
     font-weight: 600;
-    color: #1e293b;
+    color: #1e293b !important;
     background: #ffffff;
     cursor: pointer;
-    text-decoration: none;
+    text-decoration: none !important;
     transition: all 0.2s;
+    margin-bottom: 12px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
-.google-btn-custom:hover { background: #f8fafc; border-color: #cbd5e1; }
+.google-btn-link:hover { background: #f8fafc; border-color: #cbd5e1; }
 
 .auth-divider { display: flex; align-items: center; text-align: center; color: #94a3b8; font-size: 11px; margin: 12px 0; text-transform: lowercase; }
 .auth-divider::before, .auth-divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
@@ -445,36 +437,15 @@ div[data-testid="stTextInput"] { margin-bottom: -10px !important; }
     
     with col1:
         st.markdown("<h1 style='text-align: center; color: #0f172a; font-weight: 800; font-size: 30px; line-height: 1.15; margin-top: 10px; margin-bottom: 8px;'>Sua rotina jurídica<br>mais eficiente</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #475569; font-size: 13.5px; margin-bottom: 14px;'>Faça login ou experimente grátis agora mesmo!</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: #475569; font-size: 13.5px; margin-bottom: 16px;'>Faça login ou experimente grátis agora mesmo!</p>", unsafe_allow_html=True)
         
-        # Injeção direta via components.html com window.top.location para destravar o clique
-        components.html(f"""
-            <button onclick="window.top.location.href='{oauth_url}';" class="google-btn-custom" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        # Botão com abertura explícita em nova aba para ignorar o bloqueio de sandbox do iframe
+        st.markdown(f'''
+            <a href="{oauth_url}" target="_blank" rel="noopener noreferrer" class="google-btn-link">
                 <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                 Acessar com o Google
-            </button>
-            <style>
-                body {{ margin: 0; padding: 0; overflow: hidden; }}
-                .google-btn-custom {{
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    width: 100%;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 8px;
-                    padding: 10px;
-                    font-size: 14px;
-                    font-weight: 600;
-                    color: #1e293b;
-                    background: #ffffff;
-                    cursor: pointer;
-                    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-                    transition: all 0.2s;
-                }}
-                .google-btn-custom:hover {{ background: #f8fafc; border-color: #cbd5e1; }}
-            </style>
-        """, height=46)
+            </a>
+        ''', unsafe_allow_html=True)
         
         st.markdown('<div class="auth-divider">ou</div>', unsafe_allow_html=True)
         

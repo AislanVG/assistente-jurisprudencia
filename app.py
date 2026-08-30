@@ -360,7 +360,6 @@ div[data-testid="stTextInput"] { margin-bottom: -10px !important; }
             '<span style="font-size: 26px;">⚖️</span>'
             '<span style="font-size: 24px; font-weight: 800; color: white; letter-spacing: -0.5px;">JurisPrime <span style="color: #38BDF8;">AI</span></span>'
             '</div>'
-            '<div style="text-align: center; font-size: 12px; font-weight: 700; color: #38BDF8; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;">Bem-vindo à Procuradoria de Justiça Cível • MPMS</div>'
             '<h2 style="text-align: center; font-size: 24px; font-weight: 800; line-height: 1.25; margin-bottom: 20px; position: relative; z-index: 10;">Inteligência Jurídica Especializada em <span style="color: #38BDF8;">Segundo Grau</span></h2>'
             '<div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; padding: 18px 20px; position: relative; z-index: 10; backdrop-filter: blur(10px); display: flex; flex-direction: column; gap: 12px;">'
             '<div style="display: flex; align-items: flex-start; gap: 10px;">'

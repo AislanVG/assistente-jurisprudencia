@@ -281,7 +281,7 @@ def exibir_tela_autenticacao():
     st.markdown("""<style>
 .block-container { max-width: 1350px !important; padding-top: 0.5rem !important; padding-bottom: 0 !important; }
 .stApp { background-color: #ffffff !important; overflow: hidden !important; }
-.auth-right-panel { background: linear-gradient(135deg, #0B132B 0%, #0F172A 100%); border-radius: 20px; padding: 36px 30px; color: white; height: 84vh; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25); position: relative; overflow: hidden; margin-top: 8px; }
+.auth-right-panel { background: linear-gradient(135deg, #0B132B 0%, #0F172A 100%); border-radius: 20px; padding: 32px 28px; color: white; height: 84vh; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25); position: relative; overflow: hidden; margin-top: 8px; }
 .auth-right-panel::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 60%); pointer-events: none; }
 
 .google-btn-link {
@@ -356,30 +356,30 @@ div[data-testid="stTextInput"] { margin-bottom: -10px !important; }
     with col2:
         right_panel_html = (
             '<div class="auth-right-panel">'
-            '<div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; position: relative; z-index: 10;">'
+            '<div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; position: relative; z-index: 10;">'
             '<span style="font-size: 26px;">⚖️</span>'
             '<span style="font-size: 24px; font-weight: 800; color: white; letter-spacing: -0.5px;">JurisPrime <span style="color: #38BDF8;">AI</span></span>'
             '</div>'
-            '<h2 style="text-align: center; font-size: 24px; font-weight: 800; line-height: 1.25; margin-bottom: 20px; position: relative; z-index: 10;">Inteligência Jurídica Especializada em <span style="color: #38BDF8;">Segundo Grau</span></h2>'
-            '<div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; padding: 18px 20px; position: relative; z-index: 10; backdrop-filter: blur(10px); display: flex; flex-direction: column; gap: 12px;">'
+            '<h2 style="text-align: center; font-size: 21px; font-weight: 800; line-height: 1.3; margin-bottom: 18px; position: relative; z-index: 10;">Inteligência Jurídica Especializada<br>em <span style="color: #38BDF8;">Segundo&nbsp;Grau</span></h2>'
+            '<div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; padding: 16px 18px; position: relative; z-index: 10; backdrop-filter: blur(10px); display: flex; flex-direction: column; gap: 11px;">'
             '<div style="display: flex; align-items: flex-start; gap: 10px;">'
-            '<span style="font-size: 18px;">📄</span>'
-            '<div style="font-size: 12.5px; line-height: 1.45; color: #cbd5e1;"><strong style="color: white;">Pareceres Cíveis Densos (6 a 10 págs):</strong> Elaboração estruturada com cabeçalho oficial, ementa técnica e fundamentação exaustiva no padrão do TJMS e MPMS.</div>'
-            '</div>'
-            '<div style="display: flex; align-items: flex-start; gap: 10px;">'
-            '<span style="font-size: 18px;">🔍</span>'
-            '<div style="font-size: 12.5px; line-height: 1.45; color: #cbd5e1;"><strong style="color: white;">Jurisprudência Sem Alucinação:</strong> Varredura em tempo real no STF, STJ e TJMS com conferência exata de números de REsp, temas repetitivos e súmulas vinculantes.</div>'
+            '<span style="font-size: 17px;">📄</span>'
+            '<div style="font-size: 12px; line-height: 1.4; color: #cbd5e1;"><strong style="color: white;">Pareceres Cíveis Densos (6 a 10 págs):</strong> Elaboração estruturada com cabeçalho oficial, ementa técnica e fundamentação exaustiva no padrão do TJMS e MPMS.</div>'
             '</div>'
             '<div style="display: flex; align-items: flex-start; gap: 10px;">'
-            '<span style="font-size: 18px;">🛡️</span>'
-            '<div style="font-size: 12.5px; line-height: 1.45; color: #cbd5e1;"><strong style="color: white;">Auditoria Agêntica & Mentoria:</strong> Confronto probatório das minutas de assessores e estagiários com os autos, nota técnica e reestruturação integral.</div>'
+            '<span style="font-size: 17px;">🔍</span>'
+            '<div style="font-size: 12px; line-height: 1.4; color: #cbd5e1;"><strong style="color: white;">Jurisprudência Sem Alucinação:</strong> Varredura em tempo real no STF, STJ e TJMS com conferência exata de números de REsp, temas repetitivos e súmulas vinculantes.</div>'
             '</div>'
             '<div style="display: flex; align-items: flex-start; gap: 10px;">'
-            '<span style="font-size: 18px;">🏛️</span>'
-            '<div style="font-size: 12.5px; line-height: 1.45; color: #cbd5e1;"><strong style="color: white;">Conexão Direta DataJud (CNJ):</strong> Leitura automática de classes, órgãos julgadores e histórico de andamentos processuais.</div>'
+            '<span style="font-size: 17px;">🛡️</span>'
+            '<div style="font-size: 12px; line-height: 1.4; color: #cbd5e1;"><strong style="color: white;">Auditoria Agêntica & Mentoria:</strong> Confronto probatório das minutas de assessores e estagiários com os autos, nota técnica e reestruturação integral.</div>'
+            '</div>'
+            '<div style="display: flex; align-items: flex-start; gap: 10px;">'
+            '<span style="font-size: 17px;">🏛️</span>'
+            '<div style="font-size: 12px; line-height: 1.4; color: #cbd5e1;"><strong style="color: white;">Conexão Direta DataJud (CNJ):</strong> Leitura automática de classes, órgãos julgadores e histórico de andamentos processuais.</div>'
             '</div>'
             '</div>'
-            '<div style="text-align: center; margin-top: 16px; font-size: 11.5px; color: #94a3b8;">🔒 Infraestrutura Segura • Decoro Forense & Urbanidade Processual</div>'
+            '<div style="text-align: center; margin-top: 14px; font-size: 11px; color: #94a3b8;">🔒 Infraestrutura Segura • Decoro Forense & Urbanidade Processual</div>'
             '</div>'
         )
         st.markdown(right_panel_html, unsafe_allow_html=True)

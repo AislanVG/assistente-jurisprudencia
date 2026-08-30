@@ -233,7 +233,7 @@ css_customizado = """
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 5. Fluxo de Autenticação Seguro
+# 5. Fluxo de Autenticação Seguro (JurisPrime AI - MPMS)
 # ----------------------------------------------------
 import streamlit.components.v1 as components
 
@@ -281,7 +281,7 @@ def exibir_tela_autenticacao():
     st.markdown("""<style>
 .block-container { max-width: 1350px !important; padding-top: 0.5rem !important; padding-bottom: 0 !important; }
 .stApp { background-color: #ffffff !important; overflow: hidden !important; }
-.auth-right-panel { background: linear-gradient(135deg, #0B132B 0%, #0F172A 100%); border-radius: 20px; padding: 40px 32px; color: white; height: 82vh; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25); position: relative; overflow: hidden; margin-top: 10px; }
+.auth-right-panel { background: linear-gradient(135deg, #0B132B 0%, #0F172A 100%); border-radius: 20px; padding: 36px 30px; color: white; height: 84vh; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25); position: relative; overflow: hidden; margin-top: 8px; }
 .auth-right-panel::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 60%); pointer-events: none; }
 
 .google-btn-link {
@@ -321,7 +321,7 @@ div[data-testid="stTextInput"] { margin-bottom: -10px !important; }
     
     with col1:
         st.markdown("<h1 style='text-align: center; color: #0f172a; font-weight: 800; font-size: 30px; line-height: 1.15; margin-top: 10px; margin-bottom: 8px;'>Sua rotina jurídica<br>mais eficiente</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #475569; font-size: 13.5px; margin-bottom: 16px;'>Faça login ou experimente grátis agora mesmo!</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: #475569; font-size: 13.5px; margin-bottom: 16px;'>Faça login ou acesse com sua conta institucional</p>", unsafe_allow_html=True)
         
         st.markdown(f'''
             <a href="{oauth_url}" target="_blank" rel="noopener noreferrer" class="google-btn-link">
@@ -351,24 +351,36 @@ div[data-testid="stTextInput"] { margin-bottom: -10px !important; }
                     except Exception:
                         st.error("E-mail ou senha incorretos.")
 
-        st.markdown("<p style='text-align: center; font-size: 11px; color: #64748b; margin-top: 14px; margin-bottom: 0px;'>Ao fazer login você concorda com os<br><strong>Termos de Uso</strong> e a <strong>Política de Privacidade</strong>.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; font-size: 11px; color: #64748b; margin-top: 14px; margin-bottom: 0px;'>Ambiente Seguro • Acesso Restrito aos Membros e Assessores</p>", unsafe_allow_html=True)
 
     with col2:
         right_panel_html = (
             '<div class="auth-right-panel">'
-            '<div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 30px; position: relative; z-index: 10;">'
-            '<svg style="width: 28px; height: 28px; color: #38BDF8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>'
-            '<span style="font-size: 24px; font-weight: 800; color: white; letter-spacing: -0.5px;">AVJURIS<span style="color: #38BDF8;">.AI</span></span>'
+            '<div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; position: relative; z-index: 10;">'
+            '<span style="font-size: 26px;">⚖️</span>'
+            '<span style="font-size: 24px; font-weight: 800; color: white; letter-spacing: -0.5px;">JurisPrime <span style="color: #38BDF8;">AI</span></span>'
             '</div>'
-            '<h2 style="text-align: center; font-size: 32px; font-weight: 800; line-height: 1.2; margin-bottom: 25px; position: relative; z-index: 10;">A infraestrutura<br>definitiva para<br><span style="color: #38BDF8;">advogados de elite</span></h2>'
-            '<div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 24px; position: relative; z-index: 10; backdrop-filter: blur(10px);">'
-            '<div style="color: #38BDF8; font-size: 32px; font-family: Georgia, serif; line-height: 0; margin-bottom: 10px; opacity: 0.8;">"</div>'
-            '<p style="font-size: 13.5px; line-height: 1.55; color: #cbd5e1; margin-bottom: 18px; text-align: justify;">A AvJuris IA revolucionou a forma como conduzimos nosso trabalho no escritório. Com a capacidade de pesquisar jurisprudência real e emitir pareceres detalhados, conseguimos otimizar nosso tempo e blindar nosso faturamento.</p>'
-            '<div style="display: flex; align-items: center; gap: 12px;">'
-            '<div style="width: 38px; height: 38px; border-radius: 50%; background: #38BDF8; color: #0B132B; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px;">MC</div>'
-            '<div><div style="font-weight: 700; font-size: 13px; color: white;">Mariana Costa</div><div style="font-size: 11px; color: #94a3b8;">Advogada Sênior</div></div>'
+            '<div style="text-align: center; font-size: 12px; font-weight: 700; color: #38BDF8; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;">Bem-vindo à Procuradoria de Justiça Cível • MPMS</div>'
+            '<h2 style="text-align: center; font-size: 24px; font-weight: 800; line-height: 1.25; margin-bottom: 20px; position: relative; z-index: 10;">Inteligência Jurídica Especializada em <span style="color: #38BDF8;">Segundo Grau</span></h2>'
+            '<div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; padding: 18px 20px; position: relative; z-index: 10; backdrop-filter: blur(10px); display: flex; flex-direction: column; gap: 12px;">'
+            '<div style="display: flex; align-items: flex-start; gap: 10px;">'
+            '<span style="font-size: 18px;">📄</span>'
+            '<div style="font-size: 12.5px; line-height: 1.45; color: #cbd5e1;"><strong style="color: white;">Pareceres Cíveis Densos (6 a 10 págs):</strong> Elaboração estruturada com cabeçalho oficial, ementa técnica e fundamentação exaustiva no padrão do TJMS e MPMS.</div>'
+            '</div>'
+            '<div style="display: flex; align-items: flex-start; gap: 10px;">'
+            '<span style="font-size: 18px;">🔍</span>'
+            '<div style="font-size: 12.5px; line-height: 1.45; color: #cbd5e1;"><strong style="color: white;">Jurisprudência Sem Alucinação:</strong> Varredura em tempo real no STF, STJ e TJMS com conferência exata de números de REsp, temas repetitivos e súmulas vinculantes.</div>'
+            '</div>'
+            '<div style="display: flex; align-items: flex-start; gap: 10px;">'
+            '<span style="font-size: 18px;">🛡️</span>'
+            '<div style="font-size: 12.5px; line-height: 1.45; color: #cbd5e1;"><strong style="color: white;">Auditoria Agêntica & Mentoria:</strong> Confronto probatório das minutas de assessores e estagiários com os autos, nota técnica e reestruturação integral.</div>'
+            '</div>'
+            '<div style="display: flex; align-items: flex-start; gap: 10px;">'
+            '<span style="font-size: 18px;">🏛️</span>'
+            '<div style="font-size: 12.5px; line-height: 1.45; color: #cbd5e1;"><strong style="color: white;">Conexão Direta DataJud (CNJ):</strong> Leitura automática de classes, órgãos julgadores e histórico de andamentos processuais.</div>'
             '</div>'
             '</div>'
+            '<div style="text-align: center; margin-top: 16px; font-size: 11.5px; color: #94a3b8;">🔒 Infraestrutura Segura • Decoro Forense & Urbanidade Processual</div>'
             '</div>'
         )
         st.markdown(right_panel_html, unsafe_allow_html=True)

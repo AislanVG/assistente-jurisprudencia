@@ -228,127 +228,12 @@ css_customizado = """
         margin-top: 8px;
         margin-bottom: 16px;
     }
-
-    /* CARD DE LOGIN UNIFICADO */
-    .auth-unified-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 20px;
-        padding: 32px 36px 24px 36px;
-        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
-        text-align: center;
-        max-width: 530px;
-        margin: 2vh auto 0 auto;
-    }
-    
-    .auth-badge {
-        display: inline-block;
-        background: #eff6ff;
-        color: #1e3a8a;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.6px;
-        text-transform: uppercase;
-        padding: 5px 14px;
-        border-radius: 20px;
-        margin-bottom: 12px;
-        border: 1px solid #dbeafe;
-    }
-    
-    .auth-title {
-        font-size: 29px;
-        font-weight: 800;
-        color: #0f172a;
-        margin-bottom: 6px;
-        letter-spacing: -0.5px;
-    }
-    
-    .auth-subtitle {
-        font-size: 15px;
-        color: #475569;
-        margin-bottom: 16px;
-        line-height: 1.45;
-    }
-    
-    .feature-pills {
-        display: flex;
-        justify-content: center;
-        flex-wrap: nowrap;
-        gap: 10px;
-        margin-bottom: 22px;
-    }
-    
-    .pill {
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        color: #334155;
-        font-size: 13px;
-        font-weight: 600;
-        padding: 6px 12px;
-        border-radius: 6px;
-        white-space: nowrap !important;
-    }
-    
-    div[data-testid="stWidgetLabel"] label p {
-        font-size: 15.5px !important;
-        font-weight: 600 !important;
-        color: #1e293b !important;
-        margin-bottom: 4px !important;
-        text-align: left !important;
-    }
-    
-    div[data-testid="stTextInput"] input {
-        font-size: 15px !important;
-        padding: 10px 14px !important;
-        border-radius: 8px !important;
-        border: 1px solid #cbd5e1 !important;
-        background-color: #ffffff !important;
-    }
-    
-    div[data-testid="stForm"] {
-        border: none !important;
-        padding: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    div[data-testid="stForm"] button[kind="primary"],
-    div[data-testid="stForm"] button {
-        background-color: #1e3a8a !important;
-        border-color: #1e3a8a !important;
-        color: #ffffff !important;
-        font-size: 17px !important;
-        font-weight: 700 !important;
-        height: 48px !important;
-        border-radius: 8px !important;
-        margin-top: 14px !important;
-        transition: all 0.2s ease !important;
-    }
-    div[data-testid="stForm"] button:hover {
-        background-color: #2563eb !important;
-        border-color: #2563eb !important;
-    }
-    
-    .auth-security-footer {
-        text-align: center !important;
-        font-size: 12.5px !important;
-        font-weight: 500 !important;
-        color: #64748b !important;
-        margin-top: 20px !important;
-        margin-bottom: 0px !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 6px !important;
-        border-top: 1px solid #f1f5f9;
-        padding-top: 14px;
-    }
 </style>
 """
 st.markdown(css_customizado, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 5. Fluxo de Autenticação Seguro (AvJuris IA - OAuth Estável)
+# 5. Fluxo de Autenticação Seguro
 # ----------------------------------------------------
 import streamlit.components.v1 as components
 
@@ -356,7 +241,6 @@ if "user_session" not in st.session_state:
     st.session_state.user_session = None
 
 if not st.session_state.user_session:
-    # Captura o token de autenticação após o redirecionamento
     components.html("""
         <script>
         try {
@@ -439,7 +323,6 @@ div[data-testid="stTextInput"] { margin-bottom: -10px !important; }
         st.markdown("<h1 style='text-align: center; color: #0f172a; font-weight: 800; font-size: 30px; line-height: 1.15; margin-top: 10px; margin-bottom: 8px;'>Sua rotina jurídica<br>mais eficiente</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; color: #475569; font-size: 13.5px; margin-bottom: 16px;'>Faça login ou experimente grátis agora mesmo!</p>", unsafe_allow_html=True)
         
-        # Botão com abertura explícita em nova aba para ignorar o bloqueio de sandbox do iframe
         st.markdown(f'''
             <a href="{oauth_url}" target="_blank" rel="noopener noreferrer" class="google-btn-link">
                 <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
@@ -493,6 +376,7 @@ div[data-testid="stTextInput"] { margin-bottom: -10px !important; }
 if not st.session_state.user_session:
     exibir_tela_autenticacao()
     st.stop()
+
 # ----------------------------------------------------
 # 6. Modal de Alteração de Senha
 # ----------------------------------------------------
@@ -639,26 +523,26 @@ Disponibilize o trecho oficial de um acórdão representativo em bloco formatado
 """
 
 SUPERPROMPT_PARECER = """
-Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdição (Cível). Seu objetivo é elaborar minutas de PARECER CÍVEL EM SEGUNDO GRAU completas, densas, fluidas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral, seguindo o padrão vernáculo e estilístico das manifestações de segundo grau[cite: 1, 2, 3].
+Atue como Assessor Jurídico Sênior com atuação em Segundo Grau de Jurisdição (Cível). Seu objetivo é elaborar minutas de PARECER CÍVEL EM SEGUNDO GRAU completas, densas, fluidas e exaustivamente fundamentadas (meta real de 6 a 10 páginas / 2.500 a 4.000 palavras), com tom formal, erudito, sóbrio e cerebral, seguindo o padrão vernáculo e estilístico das manifestações de segundo grau.
 
 ### 🏛️ PADRÃO VERNÁCULO FORENSE, URBANIDADE E DECORO PROCESSUAL:
 1. É TERMINANTEMENTE PROIBIDO O USO DE LINGUAGEM COLOQUIAL, RASTEIRA OU PERSONALISTA CONTRA O MAGISTRADO DE PRIMEIRO GRAU.
    - NUNCA escreva frases como: "o juiz cometeu um erro", "o magistrado se equivocou", "a decisão está errada", "o juiz não analisou os documentos".
-   - A crítica deve ser IMPESSOAL, direcionada à DECISÃO/SENTENÇA[cite: 1, 2, 3]:
-     * Utilize fórmulas consagradas: "A r. sentença recorrida comporta reforma..."[cite: 1, 2, 3], "Com a devida vênia ao entendimento esposado pelo d. Juízo singular..."[cite: 1, 2, 3], "O decisum de piso merece reparo..."[cite: 1, 2, 3], "O Apelante/Município parte da premissa correta, mas extrai consequência jurídica incorreta ao sustentar que..."[cite: 1].
-2. TRATAMENTO FORENSE: Trate o órgão de origem como "d. Juízo a quo", "d. Juízo singular", "r. sentença combatida/recorrida", e a instância recursal como "Colenda Câmara Cível"[cite: 1, 2, 3], "E. Tribunal de Justiça"[cite: 1, 2, 3], "ínclito Relator".
+   - A crítica deve ser IMPESSOAL, direcionada à DECISÃO/SENTENÇA:
+     * Utilize fórmulas consagradas: "A r. sentença recorrida comporta reforma...", "Com a devida vênia ao entendimento esposado pelo d. Juízo singular...", "O decisum de piso merece reparo...", "O Apelante/Município parte da premissa correta, mas extrai consequência jurídica incorreta ao sustentar que...".
+2. TRATAMENTO FORENSE: Trate o órgão de origem como "d. Juízo a quo", "d. Juízo singular", "r. sentença combatida/recorrida", e a instância recursal como "Colenda Câmara Cível", "E. Tribunal de Justiça", "ínclito Relator".
 
 ### 🎯 REGRA DE OURO: SOBERANIA DAS DIRETRIZES DO ASSESSOR (OBEDIÊNCIA ESTRITA)
 1. DISTINÇÃO ENTRE 1º GRAU E 2º GRAU:
-   - **Decisão do Juiz (1º Grau):** É a decisão ou sentença originária recorrida (objeto do recurso)[cite: 1, 2, 3].
-   - **Decisão do Desembargador Relator (2º Grau):** É a decisão monocrática liminar, tutela antecipada recursal ou efeito suspensivo deferido/indeferido no Tribunal de Justiça[cite: 2].
+   - **Decisão do Juiz (1º Grau):** É a decisão ou sentença originária recorrida (objeto do recurso).
+   - **Decisão do Desembargador Relator (2º Grau):** É a decisão monocrática liminar, tutela antecipada recursal ou efeito suspensivo deferido/indeferido no Tribunal de Justiça.
    - **COMANDO DO USUÁRIO:** Se o usuário responder "pelo desprovimento", "pelo provimento", "acompanhe o relator", ADOTE IMEDIATAMENTE essa orientação de mérito e avance sem pedir novas confirmações.
 2. SOBERANIA TOTAL: A tese e orientação definidas pelo usuário no chat são ABSOLUTAS e VINCULANTES.
 
 ### 📜 ESTRUTURA VISUAL E FORMATAÇÃO HTML OBRIGATÓRIA (ESTILO WORD INSTITUCIONAL):
-Ao gerar a Etapa 2 e a Etapa 3, UTILIZE ESTRITAMENTE as seguintes classes HTML para formatar o texto[cite: 1, 2, 3]:
+Ao gerar a Etapa 2 e a Etapa 3, UTILIZE ESTRITAMENTE as seguintes classes HTML para formatar o texto:
 
-1. CABEÇALHO DO PROCESSO (Linhas isoladas e destacadas)[cite: 1, 2, 3]:
+1. CABEÇALHO DO PROCESSO (Linhas isoladas e destacadas):
 <div class="doc-header-block">
   <div class="doc-header-line"><strong>N.º MP:</strong> [Número do MP ou 'A ser preenchido']</div>
   <div class="doc-header-line"><strong>Autos n.º:</strong> [Número do Processo SAJ]</div>
@@ -669,17 +553,17 @@ Ao gerar a Etapa 2 e a Etapa 3, UTILIZE ESTRITAMENTE as seguintes classes HTML p
   <div class="doc-header-line"><strong>Apelado(s):</strong> [Nome da Parte Passiva]</div>
 </div>
 
-2. EMENTA TÉCNICA FORMAL (RECUADA À DIREITA, SEM TÍTULOS ARTIFICIAIS)[cite: 1, 2, 3]:
-NÃO escreva "EMENTA TÉCNICA FORMAL". Insira a ementa diretamente na div com classe doc-ementa[cite: 1, 2, 3]:
+2. EMENTA TÉCNICA FORMAL (RECUADA À DIREITA, SEM TÍTULOS ARTIFICIAIS):
+NÃO escreva "EMENTA TÉCNICA FORMAL". Insira a ementa diretamente na div com classe doc-ementa:
 <div class="doc-ementa">
 APELAÇÃO CÍVEL. AÇÃO DE OBRIGAÇÃO DE FAZER... [Palavras-chave em CAIXA ALTA separadas por pontos]. PRECEDENTES DO STF/STJ. <strong>PARECER PELO CONHECIMENTO E PROVIMENTO / DESPROVIMENTO / PARCIAL PROVIMENTO DO RECURSO.</strong>
 </div>
 
-3. VOCATIVO FORENSE[cite: 1, 2, 3]:
+3. VOCATIVO FORENSE:
 <div class="doc-vocativo">COLENDA CÂMARA CÍVEL,</div>
 
-4. RELATÓRIO DO RECURSO E CAPÍTULOS (SEM SUBTÍTULOS COMO 'RELATÓRIO DO RECURSO')[cite: 1, 2, 3]:
-Comece diretamente a narrativa do relatório em parágrafos justificados com recuo[cite: 1, 2, 3]:
+4. RELATÓRIO DO RECURSO E CAPÍTULOS (SEM SUBTÍTULOS COMO 'RELATÓRIO DO RECURSO'):
+Comece diretamente a narrativa do relatório em parágrafos justificados com recuo:
 <p class="doc-p">Trata-se de Apelação Cível interposta por... em face da r. sentença que...</p>
 <p class="doc-p">[Resumo encadeado das alegações recursais...]</p>
 <p class="doc-p">É o relatório.<br>O presente recurso é tempestivo e preenche os demais requisitos de admissibilidade, razão pela qual merece ser conhecido.</p>
@@ -704,7 +588,7 @@ Atue como o Assessor Jurídico Sênior Auditor e Mentor Especializado em Segundo
 
 ### 🏛️ PADRÃO VERNÁCULO FORENSE E DECORO PROCESSUAL
 - Aponte como vício grave de redação qualquer linguagem coloquial, agressiva ou personalista que ataque a figura do magistrado (ex: "o juiz errou", "o juiz cometeu um erro").
-- Recomende sempre construções jurídicas impessoais e eruditas (ex: "com a devida vênia ao entendimento firmado na origem, a r. decisão comporta reforma")[cite: 1, 2, 3].
+- Recomende sempre construções jurídicas impessoais e eruditas (ex: "com a devida vênia ao entendimento firmado na origem, a r. decisão comporta reforma").
 
 ### 🛡️ TRAVA DE HIGIENE DE CONTEXTO E PREVENÇÃO DE CONTAMINAÇÃO PROCESSUAL
 - Esta sessão destina-se EXCLUSIVAMENTE à análise, auditoria e redação do PROCESSO ATUAL.
@@ -717,26 +601,63 @@ Atue como o Assessor Jurídico Sênior Auditor e Mentor Especializado em Segundo
 """
 
 # ----------------------------------------------------
-# 10. Modais de Ajuda
+# 10. Modais de Ajuda & Manual Operacional Completo
 # ----------------------------------------------------
 @st.dialog("📖 Central de Ajuda & Manual Operacional", width="large")
 def exibir_manual_ajuda():
     st.markdown("## ⚖️ Manual Operacional: JurisPrime AI")
-    st.caption("Guia Oficial para Pesquisa Jurisprudencial, Elaboração e Auditoria de Peças de 2º Grau")
+    st.caption("Guia Oficial para Pesquisa Jurisprudencial, Elaboração de Pareceres e Auditoria de Peças de 2º Grau")
     
     tab1, tab2, tab3 = st.tabs(["📄 Minuta de Parecer", "🛡️ Auditoria & Mentoria", "🔍 Pesquisa Jurisprudencial"])
     
     with tab1:
-        st.markdown("### 🏛️ Fluxo de Pareceres de 2º Grau[cite: 1]")
-        st.markdown("1. Anexe os PDFs na barra lateral e inicie a análise[cite: 1].\n2. Valide a tese jurídica respondendo na Fase 1[cite: 1].\n3. Receba a Ementa/Relatório e depois a Minuta Integral (6-10 páginas)[cite: 1].")
+        st.markdown("### 🏛️ Elaboração de Pareceres de 2º Grau")
+        st.markdown("""
+        O módulo de **Pareceres Cíveis** opera com inteligência jurídica progressiva em 3 etapas para garantir controle total sobre a tese ministerial:
+
+        * **Etapa 1 – Raio-X Probatório & Validação:**
+          * Faça o upload dos PDFs dos autos (Petição Inicial, Sentença, Apelação, Contrarrazões, Laudos).
+          * A IA realiza a leitura do acervo fático, mapeia os pedidos, sintetiza a controvérsia e faz uma pergunta objetiva de validação de tese.
+        * **Etapa 2 – Ementa Técnica & Relatório do Recurso:**
+          * Responda com a orientação de mérito desejada (*ex: 'pelo desprovimento', 'acompanhar o relator', 'pelo provimento parcial'*).
+          * A IA gera o cabeçalho oficial do processo, a ementa técnica com recuo padrão e o relatório estruturado do recurso.
+        * **Etapa 3 – Minuta Integral de Segundo Grau:**
+          * Ao confirmar com *'prosseguir'* ou *'minuta final'*, a IA redige a peça completa e exaustiva (meta de 6 a 10 páginas / 2.500 a 4.000 palavras), com rigor vernáculo e precedentes vinculantes.
+        
+        **Regras de Redação:** Decoro forense absoluto, tratamento impessoal ao juízo de origem (*d. Juízo a quo, r. sentença recorrida*) e soberania estrita das instruções do usuário.
+        """)
 
     with tab2:
-        st.markdown("### 🛡️ Auditoria Agêntica e Mentoria[cite: 1]")
-        st.markdown("Audita minutas de estagiários confrontando-as com as provas dos autos reais, gerando nota, tabela gramatical e peça reestruturada[cite: 1].")
+        st.markdown("### 🛡️ Auditoria Agêntica & Mentoria Pedagógica")
+        st.markdown("""
+        Módulo desenvolvido para revisar e qualificar minutas elaboradas por estagiários, residentes e assessores em formação:
+
+        * **Como Utilizar:**
+          * Anexe na barra lateral os **PDFs dos Autos** conjuntamente com o **PDF da Minuta elaborada pelo assessor/estagiário**.
+          * Clique em *'Iniciar Auditoria dos Autos e Minuta'*.
+        * **Entregáveis da Auditoria (Fase 2):**
+          * **Confronto Probatório:** Verificação se os fatos e valores citados na minuta realmente existem nos autos.
+          * **Detecção de Alucinações:** Identificação de leis revogadas ou números de processos inexistentes.
+          * **Tabela Gramatical e Vernáculo:** Correção de erros ortográficos, concordância e linguagem inadequada/coloquial.
+          * **Nota Técnica (0 a 10):** Avaliação de maturidade jurídica da peça.
+        * **Reestruturação Integral (Fase 3):**
+          * A IA entrega a versão reescrita e aprimorada da peça (6 a 10 páginas), pronta para assinatura.
+        """)
 
     with tab3:
         st.markdown("### 🔍 Pesquisa Jurisprudencial Analítica")
-        st.markdown("Varredura em tempo real integrada ao Google Search e à API do DataJud (CNJ).")
+        st.markdown("""
+        Módulo especializado em pesquisa em tempo real com **tolerância zero a precedentes fictícios**:
+
+        * **Varredura Integrada:** Realiza buscas ao vivo no STF, STJ e Tribunais Estaduais/Regionais via Google Search.
+        * **Integração com DataJud (CNJ):** Se você digitar o número de um processo no padrão CNJ (`0000000-00.0000.0.00.0000`), o sistema consulta a API oficial do DataJud e extrai automaticamente classe, vara e últimas movimentações.
+        * **Estrutura do Relatório Jurisprudencial:**
+          * Tese jurídica central e distribuição do ônus probatório.
+          * Precedentes favoráveis e desfavoráveis (*distinguishing*).
+          * Critérios objetivos exigidos pelos tribunais.
+          * Súmulas e Temas Repetitivos vinculantes.
+          * Sugestão de ementa oficial pronta para citação.
+        """)
 
 # ----------------------------------------------------
 # 11. Barra Lateral (Menu Vertical Limpo e Otimizado)
@@ -919,7 +840,6 @@ if prompt_final:
     with st.chat_message("assistant"):
         passos_executados = []
         
-        # Identificação inteligente do que está sendo produzido
         qtd_msg = len(chat_atual["messages"])
         if qtd_msg <= 1:
             etiqueta_status = "⏳ Produzindo Raio-X dos Autos e Pesquisa de Precedentes (Etapa 1)..."
@@ -994,7 +914,6 @@ if prompt_final:
                             )
                             for chunk in response_stream:
                                 if chunk.text:
-                                    # Fecha o status exatamente no instante em que o texto começa a fluir na tela
                                     if primeiro_chunk:
                                         status_box.update(label="✅ Análise concluída com sucesso", state="complete", expanded=False)
                                         primeiro_chunk = False

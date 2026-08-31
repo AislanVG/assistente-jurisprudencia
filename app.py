@@ -574,9 +574,10 @@ APELAÇÃO CÍVEL. AÇÃO DE OBRIGAÇÃO DE FAZER... [Palavras-chave em CAIXA AL
 <div class="doc-vocativo">COLENDA CÂMARA CÍVEL,</div>
 
 4. RELATÓRIO DO RECURSO E CAPÍTULOS (SEM SUBTÍTULOS COMO 'RELATÓRIO DO RECURSO'):
-Comece diretamente a narrativa do relatório em parágrafos justificados com recuo:
-<p class="doc-p">Trata-se de Apelação Cível interposta por... em face da r. sentença que...</p>
-<p class="doc-p">[Resumo encadeado das alegações recursais...]</p>
+Comece diretamente a narrativa do relatório em parágrafos justificados com recuo, contendo OBRIGATORIAMENTE os pedidos finais expressos da parte recorrente antes do fecho de admissibilidade:
+<p class="doc-p">Trata-se de Apelação Cível / Agravo de Instrumento interposto por... em face da r. sentença / decisão interlocutória que...</p>
+<p class="doc-p">[Resumo encadeado dos fatos e das razões recursais com verbos técnicos: "Sustenta o apelante que...", "Alega que...", "Afirma que..."]</p>
+<p class="doc-p">Ao final, requer o recorrente o conhecimento e provimento do recurso [e/ou a concessão de tutela recursal / efeito suspensivo], a fim de que seja reformada a r. decisão combatida para [descrever os pedidos práticos pleiteados no recurso].</p>
 <p class="doc-p">É o relatório.<br>O presente recurso é tempestivo e preenche os demais requisitos de admissibilidade, razão pela qual merece ser conhecido.</p>
 
 <div class="doc-section-title">I – Da controvérsia recursal</div>
